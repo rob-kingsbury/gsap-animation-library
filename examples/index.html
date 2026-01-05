@@ -919,42 +919,709 @@
     }
 
     function generateFullHTML() {
+      const css = generateExportCSS();
+      const html = generateExportHTML();
+      const js = generateExportJS();
+
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animated Page - Animations ${selectedAnimations.join(', ')}</title>
+  <title>Animated Page - ${selectedAnimations.map(id => animationInfo[id].name).join(', ')}</title>
+
+  <!-- GSAP & Plugins from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"><\/script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"><\/script>
+
+  <!-- Lenis Smooth Scroll -->
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"><\/script>
+
   <style>
-    /* Base styles - customize as needed */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0a0f1a; color: #fff; font-family: system-ui, sans-serif; }
-    section { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+${css}
   </style>
 </head>
 <body>
-  <!-- Selected Animations: ${selectedAnimations.map(id => animationInfo[id].name).join(', ')} -->
+${html}
 
-${selectedAnimations.map(id => `  <!-- Animation ${id}: ${animationInfo[id].name} -->
-  <section data-anim="${id}">
-    <!-- Add your ${animationInfo[id].name} content here -->
-    <!-- See documentation for required HTML structure -->
-    <div style="text-align: center; padding: 40px;">
-      <h2>${animationInfo[id].name}</h2>
-      <p style="opacity: 0.7; margin-top: 1rem;">${animationInfo[id].desc}</p>
-    </div>
-  </section>
-`).join('\n')}
-  <script type="module">
-    // Option 1: Auto-init (copy gsap-animation-library folder to your project)
-    import { init } from './gsap-animation-library/src/index.js';
-    init();
-
-    // Option 2: Use CDN versions of GSAP and manually init
-    // See README for manual initialization
+  <script>
+${js}
   <\/script>
 </body>
 </html>`;
+    }
+
+    function generateExportCSS() {
+      let css = `/* ============================================================
+   BASE STYLES
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0f1a;
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+h1, h2, h3 { font-weight: 700; }
+p { line-height: 1.6; }
+`;
+
+      // Add CSS for each selected animation
+      if (selectedAnimations.includes(1)) {
+        css += `
+/* ============================================================
+   STACKING CARDS - Animation 1
+   ============================================================ */
+.stack-container {
+  position: relative;
+  padding-bottom: 50vh;
+  width: 100%;
+}
+.stack-card {
+  position: sticky;
+  width: calc(100% - 8rem);
+  margin: 0 auto;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 5rem;
+  will-change: transform;
+  transform-origin: center top;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+}
+.stack-card-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  width: 100%;
+  max-width: 1400px;
+  align-items: center;
+}
+.stack-card-content { color: #fff; }
+.stack-card[data-index="0"] { background: #1a2744; }
+.stack-card[data-index="1"] { background: #2d1f3d; }
+.stack-card[data-index="2"] { background: #1f3d2d; }
+.stack-card[data-index="3"] { background: #3d2d1f; }
+@media (max-width: 1024px) {
+  .stack-card { width: calc(100% - 4rem); padding: 3rem; }
+  .stack-card-inner { grid-template-columns: 1fr; gap: 2rem; }
+}
+`;
+      }
+
+      if (selectedAnimations.includes(2)) {
+        css += `
+/* ============================================================
+   VIDEO SCALE ON SCROLL - Animation 2
+   ============================================================ */
+.hero-section { position: relative; overflow: hidden; }
+.hero-video-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  transform-origin: center center;
+}
+.hero-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+`;
+      }
+
+      if (selectedAnimations.includes(3)) {
+        css += `
+/* ============================================================
+   IMAGE REVEAL - Animation 3
+   ============================================================ */
+.image-reveal-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.image-revealer {
+  position: absolute;
+  inset: 0;
+  background: var(--reveal-color, #0a0f1a);
+  z-index: 2;
+  will-change: transform;
+}
+.reveal-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  will-change: transform;
+  transform-origin: center center;
+}
+.image-reveal-container.is-revealed .reveal-image { opacity: 1; }
+`;
+      }
+
+      if (selectedAnimations.includes(4)) {
+        css += `
+/* ============================================================
+   TEXT EXPLOSION - Animation 4
+   ============================================================ */
+.explosion-section {
+  min-height: 200vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.explosion-content {
+  text-align: center;
+  max-width: 900px;
+  padding: 2rem;
+  transition: opacity 0.3s ease;
+}
+.explosion-content.is-exploding { opacity: 0; }
+.explosion-line {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.explosion-line:nth-child(even) { transform: translateX(100px); }
+.explosion-line.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.explosion-attribution {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+}
+.explosion-attribution.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.explosion-word {
+  position: fixed;
+  font-size: clamp(1rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #fff;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+  white-space: nowrap;
+}
+.explosion-word.is-exploding { opacity: 1; }
+`;
+      }
+
+      if (selectedAnimations.includes(5)) {
+        css += `
+/* ============================================================
+   PARALLAX REVEAL - Animation 5
+   ============================================================ */
+.parallax-section {
+  position: relative;
+  z-index: 2;
+  background: var(--section-bg, #0a0f1a);
+  clip-path: inset(0 0 0 0);
+  will-change: clip-path;
+}
+.parallax-reveal-target {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.parallax-reveal-target.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.parallax-block {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.parallax-block.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+`;
+      }
+
+      if (selectedAnimations.includes(6)) {
+        css += `
+/* ============================================================
+   PROGRESS NAV BLOB - Animation 6
+   ============================================================ */
+.progress-nav {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.progress-nav.is-visible { opacity: 1; }
+.progress-blob {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), border-radius 0.3s ease;
+  z-index: 0;
+}
+.progress-blob.is-moving { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+.progress-dot {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  z-index: 1;
+  margin-bottom: 12px;
+  transition: border-color 0.3s ease;
+}
+.progress-dot:last-child { margin-bottom: 0; }
+.progress-dot:hover { border-color: rgba(255, 255, 255, 0.6); }
+.progress-dot.is-active { border-color: transparent; }
+.progress-dot::before {
+  content: attr(data-label);
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 16px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.progress-dot:hover::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-5px);
+}
+@media (max-width: 768px) {
+  .progress-nav { right: 1rem; padding: 12px; }
+  .progress-dot::before { display: none; }
+}
+`;
+      }
+
+      return css;
+    }
+
+    function generateExportHTML() {
+      let html = '  <!-- Selected Animations: ' + selectedAnimations.map(id => animationInfo[id].name).join(', ') + ' -->\n\n';
+
+      selectedAnimations.forEach((id, idx) => {
+        switch (id) {
+          case 1:
+            html += `  <!-- Animation 1: Stacking Cards -->
+  <section id="section-${idx + 1}" data-section="section${idx + 1}">
+    <div class="stack-container" data-anim="1">
+      <article class="stack-card" data-index="0">
+        <div class="stack-card-inner">
+          <div class="stack-card-content">
+            <h2>Card One</h2>
+            <p>Your content for the first card goes here. Cards will stack as you scroll.</p>
+          </div>
+        </div>
+      </article>
+      <article class="stack-card" data-index="1">
+        <div class="stack-card-inner">
+          <div class="stack-card-content">
+            <h2>Card Two</h2>
+            <p>Second card content. Previous cards scale down as this one scrolls over.</p>
+          </div>
+        </div>
+      </article>
+      <article class="stack-card" data-index="2">
+        <div class="stack-card-inner">
+          <div class="stack-card-content">
+            <h2>Card Three</h2>
+            <p>Third and final card in the stack.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>\n\n`;
+            break;
+
+          case 2:
+            html += `  <!-- Animation 2: Video Scale on Scroll -->
+  <section id="section-${idx + 1}" data-section="section${idx + 1}" class="hero-section" style="height: 150vh;">
+    <div class="hero-video-container">
+      <!-- Replace with your video or use a background image -->
+      <div class="hero-video" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></div>
+      <div class="hero-video-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <h1 style="font-size: 3rem; margin-bottom: 1rem;">Hero Section</h1>
+      <p style="font-size: 1.25rem; opacity: 0.8;">Scroll to see the video zoom effect</p>
+    </div>
+  </section>\n\n`;
+            break;
+
+          case 3:
+            html += `  <!-- Animation 3: Image Reveal -->
+  <section id="section-${idx + 1}" data-section="section${idx + 1}" style="padding: 4rem;">
+    <div class="image-reveal-container" data-anim="3" style="width: 80%; max-width: 600px; aspect-ratio: 16/9;">
+      <div class="image-revealer"></div>
+      <!-- Replace src with your image -->
+      <img class="reveal-image" src="https://picsum.photos/800/450" alt="Reveal image">
+    </div>
+  </section>\n\n`;
+            break;
+
+          case 4:
+            html += `  <!-- Animation 4: Text Explosion -->
+  <section id="section-${idx + 1}" data-section="section${idx + 1}" class="explosion-section" data-anim="4">
+    <div class="explosion-content">
+      <p class="explosion-line">"Design is not just</p>
+      <p class="explosion-line">what it looks like.</p>
+      <p class="explosion-line">Design is how</p>
+      <p class="explosion-line">it works."</p>
+      <p class="explosion-attribution">— Steve Jobs</p>
+    </div>
+  </section>\n\n`;
+            break;
+
+          case 5:
+            html += `  <!-- Animation 5: Parallax Reveal -->
+  <section id="section-${idx + 1}" data-section="section${idx + 1}" class="parallax-section" data-anim="5" style="min-height: 150vh; padding: 4rem;">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div class="parallax-block" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 0.5rem;">Content Block 1</h3>
+        <p style="opacity: 0.7;">This section will slide up to reveal a fixed footer behind it.</p>
+      </div>
+      <div class="parallax-block" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 0.5rem;">Content Block 2</h3>
+        <p style="opacity: 0.7;">Keep scrolling to see the parallax effect.</p>
+      </div>
+      <div class="parallax-block" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px;">
+        <h3 style="margin-bottom: 0.5rem;">Content Block 3</h3>
+        <p style="opacity: 0.7;">The footer will be revealed below.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parallax Footer (fixed behind content) -->
+  <footer class="parallax-reveal-target" style="height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+    <div style="text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Footer Revealed!</h2>
+      <p style="opacity: 0.8;">This footer was hidden behind the content</p>
+    </div>
+  </footer>\n\n`;
+            break;
+
+          case 6:
+            html += `  <!-- Animation 6: Progress Nav -->
+  <nav class="progress-nav" data-anim="6">
+    <div class="progress-blob"></div>
+    ${selectedAnimations.map((_, i) => `<button class="progress-dot" data-section="section${i + 1}" data-label="Section ${i + 1}"></button>`).join('\n    ')}
+  </nav>\n\n`;
+            break;
+        }
+      });
+
+      return html;
+    }
+
+    function generateExportJS() {
+      return `    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Initialize Lenis smooth scroll
+    const lenis = new Lenis({
+      duration: 1.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 0.8,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    // Initialize animations on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+${selectedAnimations.includes(1) ? `
+      // Animation 1: Stacking Cards
+      const stackCards = document.querySelectorAll('.stack-card');
+      const baseTop = 32;
+      const staggerOffset = 30;
+
+      stackCards.forEach((card, index) => {
+        card.style.top = \`\${baseTop + index * staggerOffset}px\`;
+        card.style.zIndex = index + 1;
+
+        if (index === stackCards.length - 1) return;
+
+        ScrollTrigger.create({
+          trigger: card,
+          start: 'top top',
+          end: '+=200%',
+          scrub: true,
+          onUpdate: (self) => {
+            const scale = 1 - self.progress * 0.1;
+            card.style.transform = \`scale(\${scale})\`;
+          },
+        });
+      });
+` : ''}${selectedAnimations.includes(2) ? `
+      // Animation 2: Video Scale on Scroll
+      const heroVideo = document.querySelector('.hero-video');
+      const heroSection = document.querySelector('.hero-section');
+      if (heroVideo && heroSection) {
+        gsap.to(heroVideo, {
+          scale: 1.3,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+      }
+` : ''}${selectedAnimations.includes(3) ? `
+      // Animation 3: Image Reveal
+      const revealContainer = document.querySelector('.image-reveal-container');
+      if (revealContainer) {
+        const revealer = revealContainer.querySelector('.image-revealer');
+        const image = revealContainer.querySelector('.reveal-image');
+
+        gsap.set(image, { scale: 1.2 });
+
+        ScrollTrigger.create({
+          trigger: revealContainer,
+          start: 'top 60%',
+          onEnter: () => {
+            gsap.to(revealer, { xPercent: -100, duration: 1.2, ease: 'power3.out' });
+            gsap.to(image, { scale: 1, duration: 1.4, ease: 'power3.out' });
+            revealContainer.classList.add('is-revealed');
+          },
+        });
+      }
+` : ''}${selectedAnimations.includes(4) ? `
+      // Animation 4: Text Explosion
+      const explosionSection = document.querySelector('.explosion-section');
+      if (explosionSection) {
+        const lines = explosionSection.querySelectorAll('.explosion-line');
+        const content = explosionSection.querySelector('.explosion-content');
+        const attribution = explosionSection.querySelector('.explosion-attribution');
+        let explosionWords = [];
+        let hasExploded = false;
+
+        lines.forEach((line, index) => {
+          ScrollTrigger.create({
+            trigger: explosionSection,
+            start: \`\${10 + index * 10}% center\`,
+            onEnter: () => line.classList.add('is-visible'),
+            onLeaveBack: () => {
+              line.classList.remove('is-visible');
+              resetExplosion();
+            },
+          });
+        });
+
+        if (attribution) {
+          ScrollTrigger.create({
+            trigger: explosionSection,
+            start: '55% center',
+            onEnter: () => attribution.classList.add('is-visible'),
+            onLeaveBack: () => attribution.classList.remove('is-visible'),
+          });
+        }
+
+        ScrollTrigger.create({
+          trigger: explosionSection,
+          start: '75% center',
+          onEnter: () => { if (!hasExploded) triggerExplosion(); },
+          onLeaveBack: () => resetExplosion(),
+        });
+
+        function triggerExplosion() {
+          if (!content || hasExploded) return;
+          hasExploded = true;
+
+          const words = [];
+          lines.forEach((line) => {
+            line.textContent.split(/\\s+/).forEach((word) => {
+              const cleanWord = word.replace(/["""\-—]/g, '').trim();
+              if (cleanWord) words.push(cleanWord);
+            });
+          });
+
+          content.classList.add('is-exploding');
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+
+          words.forEach((word, i) => {
+            const el = document.createElement('span');
+            el.className = 'explosion-word';
+            el.textContent = word;
+            el.style.left = \`\${centerX}px\`;
+            el.style.top = \`\${centerY}px\`;
+            el.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(el);
+            explosionWords.push(el);
+
+            requestAnimationFrame(() => {
+              setTimeout(() => {
+                const angle = (i / words.length) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+                const distance = 400 + Math.random() * 600;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                const rotation = (Math.random() - 0.5) * 120;
+                el.style.transform = \`translate(calc(-50% + \${x}px), calc(-50% + \${y}px)) rotate(\${rotation}deg)\`;
+                el.classList.add('is-exploding');
+              }, 50 + i * 40);
+            });
+          });
+        }
+
+        function resetExplosion() {
+          hasExploded = false;
+          if (content) content.classList.remove('is-exploding');
+          explosionWords.forEach((el) => el.remove());
+          explosionWords = [];
+        }
+      }
+` : ''}${selectedAnimations.includes(5) ? `
+      // Animation 5: Parallax Reveal
+      const parallaxSection = document.querySelector('.parallax-section');
+      if (parallaxSection) {
+        const blocks = parallaxSection.querySelectorAll('.parallax-block');
+        const revealTarget = document.querySelector('.parallax-reveal-target');
+
+        ScrollTrigger.create({
+          trigger: parallaxSection,
+          start: 'top 60%',
+          onEnter: () => {
+            blocks.forEach((block, i) => {
+              setTimeout(() => block.classList.add('is-visible'), i * 100);
+            });
+            if (revealTarget) {
+              setTimeout(() => revealTarget.classList.add('is-visible'), blocks.length * 100 + 300);
+            }
+          },
+        });
+
+        gsap.to(parallaxSection, {
+          clipPath: 'inset(0 0 100% 0)',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: parallaxSection,
+            start: 'bottom bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+
+        gsap.to(parallaxSection, {
+          y: -100,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: parallaxSection,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+      }
+` : ''}${selectedAnimations.includes(6) ? `
+      // Animation 6: Progress Nav Blob
+      const progressNav = document.querySelector('.progress-nav');
+      if (progressNav) {
+        const blob = progressNav.querySelector('.progress-blob');
+        const dots = progressNav.querySelectorAll('.progress-dot');
+        const sections = document.querySelectorAll('[data-section]');
+
+        setTimeout(() => progressNav.classList.add('is-visible'), 1500);
+
+        sections.forEach((section) => {
+          ScrollTrigger.create({
+            trigger: section,
+            start: 'top center',
+            end: 'bottom center',
+            onEnter: () => setActive(section.dataset.section),
+            onEnterBack: () => setActive(section.dataset.section),
+          });
+        });
+
+        function setActive(sectionId) {
+          dots.forEach((dot, index) => {
+            const isActive = dot.dataset.section === sectionId;
+            dot.classList.toggle('is-active', isActive);
+            if (isActive && blob) {
+              blob.classList.add('is-moving');
+              blob.style.top = \`\${16 + index * 44}px\`;
+              setTimeout(() => blob.classList.remove('is-moving'), 500);
+            }
+          });
+        }
+
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            const target = document.getElementById(dot.dataset.section.replace('section', 'section-'));
+            if (target) lenis.scrollTo(target, { duration: 1.5 });
+          });
+        });
+      }
+` : ''}
+      console.log('Animations initialized!');
+    });`;
     }
 
     function removeAnimation(id) {
