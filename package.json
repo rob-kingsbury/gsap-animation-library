@@ -1,0 +1,28 @@
+{
+  "name": "gsap-animation-library",
+  "version": "1.0.0",
+  "description": "A modular, component-based library of reusable GSAP/ScrollTrigger animations",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  },
+  "keywords": [
+    "gsap",
+    "scrolltrigger",
+    "animation",
+    "scroll-animation",
+    "lenis"
+  ],
+  "author": "",
+  "license": "MIT"
+}

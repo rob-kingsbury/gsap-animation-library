@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSAP Animation Library - Page Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0f1a;
+      --surface: #141b2d;
+      --border: #2a3547;
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.6);
+      --accent: #667eea;
+      --success: #10b981;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Builder Layout */
+    .builder {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .sidebar h1 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .sidebar p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin: 24px 0 12px;
+    }
+
+    /* Animation Cards */
+    .anim-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .anim-card:hover {
+      border-color: var(--accent);
+    }
+
+    .anim-card.selected {
+      border-color: var(--accent);
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .anim-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .anim-number {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .anim-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .anim-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Selected animations */
+    .selected-list {
+      min-height: 80px;
+      background: var(--bg);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .selected-list:empty::before {
+      content: 'Click animations to add them';
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .selected-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+      cursor: grab;
+      transition: all 0.2s ease;
+    }
+
+    .selected-item:active {
+      cursor: grabbing;
+    }
+
+    .selected-item.dragging {
+      opacity: 0.5;
+      background: var(--accent);
+    }
+
+    .selected-item.drag-over {
+      border: 2px dashed var(--accent);
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .selected-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .selected-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drag-handle {
+      color: var(--text-muted);
+      cursor: grab;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .remove-btn:hover {
+      color: #ef4444;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd6;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+    }
+
+    /* Preview Area */
+    .preview {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .preview-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .code-output {
+      margin-bottom: 24px;
+    }
+
+    .code-output h3 {
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+    }
+
+    .code-block {
+      background: #1a1f2e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .code-block code {
+      color: #e2e8f0;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+
+    .tab:hover {
+      border-color: var(--text-muted);
+    }
+
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Live Preview - Scrollable iframe-like container */
+    .live-preview-container {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .live-preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .live-preview-toolbar span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .live-preview-scroll {
+      height: calc(100% - 45px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    .live-preview-content {
+      min-height: 300vh;
+      position: relative;
+    }
+
+    /* Preview Section Styles */
+    .preview-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 60px 40px;
+    }
+
+    .preview-section-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: var(--accent);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 10;
+    }
+
+    /* Animation 1: Stacking Cards Preview */
+    .preview-stack-container {
+      width: 100%;
+      padding-bottom: 50vh;
+    }
+
+    .preview-stack-card {
+      position: sticky;
+      width: calc(100% - 60px);
+      margin: 0 auto;
+      min-height: 70vh;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+      transform-origin: center top;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.3);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .preview-stack-card[data-index="0"] { background: #1a2744; z-index: 1; top: 20px; }
+    .preview-stack-card[data-index="1"] { background: #2d1f3d; z-index: 2; top: 50px; }
+    .preview-stack-card[data-index="2"] { background: #1f3d2d; z-index: 3; top: 80px; }
+
+    /* Animation 2: Video Scale Preview */
+    .preview-video-section {
+      height: 150vh;
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+
+    .preview-video-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      will-change: transform;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-video-bg::after {
+      content: 'VIDEO / IMAGE';
+      font-size: 2rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.2em;
+    }
+
+    .preview-video-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+    }
+
+    /* Animation 3: Image Reveal Preview */
+    .preview-reveal-container {
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      aspect-ratio: 4/3;
+    }
+
+    .preview-reveal-mask {
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      z-index: 2;
+      will-change: transform;
+    }
+
+    .preview-reveal-image {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #ff6b6b, #feca57);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      font-size: 1.25rem;
+      will-change: transform;
+    }
+
+    /* Animation 4: Text Explosion Preview */
+    .preview-explosion-section {
+      min-height: 200vh;
+    }
+
+    .preview-quote-content {
+      text-align: center;
+      max-width: 600px;
+      transition: opacity 0.3s ease;
+    }
+
+    .preview-quote-content.is-exploding {
+      opacity: 0;
+    }
+
+    .preview-quote-line {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.6s ease;
+      margin-bottom: 8px;
+    }
+
+    .preview-quote-line:nth-child(even) {
+      transform: translateX(50px);
+    }
+
+    .preview-quote-line.is-visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .explosion-word {
+      position: fixed;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+    }
+
+    .explosion-word.is-exploding {
+      opacity: 1;
+    }
+
+    /* Animation 5: Parallax Reveal Preview */
+    .preview-parallax-section {
+      min-height: 100vh;
+      background: #1a1a2e;
+      position: relative;
+      z-index: 2;
+    }
+
+    .preview-parallax-content {
+      padding: 60px 40px;
+    }
+
+    .preview-parallax-block {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    .preview-parallax-block.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .preview-footer {
+      position: fixed;
+      bottom: 0;
+      left: 300px;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    .preview-footer.is-visible {
+      opacity: 1;
+    }
+
+    /* Animation 6: Progress Nav Preview */
+    .preview-progress-nav {
+      position: fixed;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      padding: 12px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .preview-progress-nav.is-visible {
+      opacity: 1;
+    }
+
+    .preview-progress-blob {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .preview-progress-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-progress-dot:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      color: var(--text-muted);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Section backgrounds */
+    .bg-1 { background: linear-gradient(180deg, #0a0f1a 0%, #1a1a2e 100%); }
+    .bg-2 { background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); }
+    .bg-3 { background: linear-gradient(180deg, #16213e 0%, #0f3460 100%); }
+    .bg-4 { background: linear-gradient(180deg, #0f3460 0%, #1a1a2e 100%); }
+    .bg-5 { background: linear-gradient(180deg, #1a1a2e 0%, #0a0f1a 100%); }
+    .bg-6 { background: linear-gradient(180deg, #0a0f1a 0%, #141b2d 100%); }
+  </style>
+</head>
+<body>
+  <div class="builder">
+    <aside class="sidebar">
+      <h1>Animation Library</h1>
+      <p>Select animations to build your page</p>
+
+      <div class="section-title">Selected Animations</div>
+      <div id="selectedList" class="selected-list"></div>
+
+      <button class="btn btn-primary" onclick="generateCode()">Generate Code</button>
+      <button class="btn btn-primary" style="margin-top: 8px; background: #10b981;" onclick="exportHTML()">Export HTML File</button>
+      <button class="btn btn-secondary" onclick="copyShareURL()">Copy Share URL</button>
+      <button class="btn btn-secondary" onclick="clearSelection()">Clear All</button>
+
+      <div class="section-title">Available Animations</div>
+
+      <div class="anim-card" data-anim="1" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">1</span>
+          <span class="anim-name">Stacking Cards</span>
+        </div>
+        <p class="anim-desc">Cards stack on top of each other with scale-down effect (concom.tv style)</p>
+      </div>
+
+      <div class="anim-card" data-anim="2" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">2</span>
+          <span class="anim-name">Video Scale</span>
+        </div>
+        <p class="anim-desc">Video/image grows as you scroll, perfect for hero sections</p>
+      </div>
+
+      <div class="anim-card" data-anim="3" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">3</span>
+          <span class="anim-name">Image Reveal</span>
+        </div>
+        <p class="anim-desc">Dramatic mask reveal with simultaneous scale animation</p>
+      </div>
+
+      <div class="anim-card" data-anim="4" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">4</span>
+          <span class="anim-name">Text Explosion</span>
+        </div>
+        <p class="anim-desc">Words fly in then explode outward in all directions</p>
+      </div>
+
+      <div class="anim-card" data-anim="5" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">5</span>
+          <span class="anim-name">Parallax Reveal</span>
+        </div>
+        <p class="anim-desc">Content slides to reveal fixed element behind (footer effect)</p>
+      </div>
+
+      <div class="anim-card" data-anim="6" onclick="toggleAnimation(this)">
+        <div class="anim-card-header">
+          <span class="anim-number">6</span>
+          <span class="anim-name">Progress Nav</span>
+        </div>
+        <p class="anim-desc">Blob navigation that follows scroll position with tooltips</p>
+      </div>
+    </aside>
+
+    <main class="preview">
+      <div class="preview-header">
+        <h2>Page Preview & Code</h2>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('live')">Live Preview</button>
+          <button class="tab" onclick="switchTab('html')">HTML</button>
+          <button class="tab" onclick="switchTab('js')">JavaScript</button>
+          <button class="tab" onclick="switchTab('css')">CSS</button>
+        </div>
+      </div>
+
+      <div id="live" class="tab-content active">
+        <div class="live-preview-container">
+          <div class="live-preview-toolbar">
+            <span>Live Preview</span>
+            <div class="scroll-hint" id="scrollHint" style="display: none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+              </svg>
+              Scroll to see animations
+            </div>
+          </div>
+          <div class="live-preview-scroll" id="previewScroll">
+            <div class="live-preview-content" id="previewContent">
+              <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+                <p>Select animations from the sidebar to preview your page layout</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="html" class="tab-content">
+        <div class="code-output" style="overflow-y: auto; flex: 1;">
+          <h3>HTML Structure</h3>
+          <div class="code-block"><code id="htmlCode"><!-- Select animations to generate HTML --></code></div>
+        </div>
+      </div>
+
+      <div id="js" class="tab-content">
+        <div class="code-output" style="overflow-y: auto; flex: 1;">
+          <h3>JavaScript</h3>
+          <div class="code-block"><code id="jsCode">// Select animations to generate JavaScript</code></div>
+        </div>
+      </div>
+
+      <div id="css" class="tab-content">
+        <div class="code-output" style="overflow-y: auto; flex: 1;">
+          <h3>CSS Styles</h3>
+          <div class="code-block"><code id="cssCode">/* Select animations to generate CSS */</code></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Progress nav outside preview for fixed positioning demo -->
+  <nav class="preview-progress-nav" id="progressNav">
+    <div class="preview-progress-blob" id="progressBlob"></div>
+    <div class="preview-progress-dot"></div>
+    <div class="preview-progress-dot"></div>
+    <div class="preview-progress-dot"></div>
+  </nav>
+
+  <!-- Footer for parallax demo -->
+  <footer class="preview-footer" id="previewFooter">
+    <span style="color: white; font-size: 1.25rem; font-weight: 600;">Fixed Footer Revealed</span>
+  </footer>
+
+  <script>
+    let selectedAnimations = [];
+    let explosionWords = [];
+    let draggedItem = null;
+
+    const animationInfo = {
+      1: { name: 'Stacking Cards', slug: 'stacking-cards', desc: 'Cards that stack as you scroll' },
+      2: { name: 'Video Scale', slug: 'video-scale', desc: 'Hero video that grows on scroll' },
+      3: { name: 'Image Reveal', slug: 'image-reveal', desc: 'Image with mask reveal effect' },
+      4: { name: 'Text Explosion', slug: 'text-explosion', desc: 'Quote that explodes on scroll' },
+      5: { name: 'Parallax Reveal', slug: 'parallax-reveal', desc: 'Content reveals fixed footer' },
+      6: { name: 'Progress Nav', slug: 'progress-nav', desc: 'Blob navigation indicator' },
+    };
+
+    // Load from URL params on init
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const anims = params.get('anims');
+      if (anims) {
+        selectedAnimations = anims.split(',').map(n => parseInt(n)).filter(n => n >= 1 && n <= 6);
+        selectedAnimations.forEach(id => {
+          const card = document.querySelector(`.anim-card[data-anim="${id}"]`);
+          if (card) card.classList.add('selected');
+        });
+        updateSelectedList();
+        updateLivePreview();
+      }
+    }
+
+    // Update URL without reload
+    function updateURL() {
+      const url = new URL(window.location);
+      if (selectedAnimations.length > 0) {
+        url.searchParams.set('anims', selectedAnimations.join(','));
+      } else {
+        url.searchParams.delete('anims');
+      }
+      window.history.replaceState({}, '', url);
+    }
+
+    function toggleAnimation(card) {
+      const animId = parseInt(card.dataset.anim);
+
+      if (selectedAnimations.includes(animId)) {
+        selectedAnimations = selectedAnimations.filter(id => id !== animId);
+        card.classList.remove('selected');
+      } else {
+        selectedAnimations.push(animId);
+        card.classList.add('selected');
+      }
+
+      updateSelectedList();
+      updateLivePreview();
+      updateURL();
+    }
+
+    function updateSelectedList() {
+      const list = document.getElementById('selectedList');
+      list.innerHTML = selectedAnimations.map((id, index) => `
+        <div class="selected-item" draggable="true" data-index="${index}" data-id="${id}">
+          <div class="selected-item-left">
+            <span class="drag-handle">&#x2630;</span>
+            <span>${id}. ${animationInfo[id].name}</span>
+          </div>
+          <button class="remove-btn" onclick="event.stopPropagation(); removeAnimation(${id})">×</button>
+        </div>
+      `).join('');
+
+      // Add drag event listeners
+      setupDragAndDrop();
+    }
+
+    function setupDragAndDrop() {
+      const items = document.querySelectorAll('.selected-item');
+
+      items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          draggedItem = item;
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+          draggedItem = null;
+          document.querySelectorAll('.selected-item').forEach(i => i.classList.remove('drag-over'));
+        });
+
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (draggedItem && draggedItem !== item) {
+            item.classList.add('drag-over');
+          }
+        });
+
+        item.addEventListener('dragleave', () => {
+          item.classList.remove('drag-over');
+        });
+
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          item.classList.remove('drag-over');
+
+          if (draggedItem && draggedItem !== item) {
+            const fromIndex = parseInt(draggedItem.dataset.index);
+            const toIndex = parseInt(item.dataset.index);
+
+            // Reorder array
+            const [moved] = selectedAnimations.splice(fromIndex, 1);
+            selectedAnimations.splice(toIndex, 0, moved);
+
+            updateSelectedList();
+            updateLivePreview();
+            updateURL();
+          }
+        });
+      });
+    }
+
+    function copyShareURL() {
+      if (selectedAnimations.length === 0) {
+        alert('Please select at least one animation');
+        return;
+      }
+      const url = new URL(window.location);
+      url.searchParams.set('anims', selectedAnimations.join(','));
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        alert('Share URL copied to clipboard!');
+      });
+    }
+
+    function exportHTML() {
+      if (selectedAnimations.length === 0) {
+        alert('Please select at least one animation');
+        return;
+      }
+
+      const html = generateFullHTML();
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `animated-page-${selectedAnimations.join('-')}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function generateFullHTML() {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Page - Animations ${selectedAnimations.join(', ')}</title>
+  <style>
+    /* Base styles - customize as needed */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0f1a; color: #fff; font-family: system-ui, sans-serif; }
+    section { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <!-- Selected Animations: ${selectedAnimations.map(id => animationInfo[id].name).join(', ')} -->
+
+${selectedAnimations.map(id => `  <!-- Animation ${id}: ${animationInfo[id].name} -->
+  <section data-anim="${id}">
+    <!-- Add your ${animationInfo[id].name} content here -->
+    <!-- See documentation for required HTML structure -->
+    <div style="text-align: center; padding: 40px;">
+      <h2>${animationInfo[id].name}</h2>
+      <p style="opacity: 0.7; margin-top: 1rem;">${animationInfo[id].desc}</p>
+    </div>
+  </section>
+`).join('\n')}
+  <script type="module">
+    // Option 1: Auto-init (copy gsap-animation-library folder to your project)
+    import { init } from './gsap-animation-library/src/index.js';
+    init();
+
+    // Option 2: Use CDN versions of GSAP and manually init
+    // See README for manual initialization
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function removeAnimation(id) {
+      selectedAnimations = selectedAnimations.filter(a => a !== id);
+      document.querySelector(`.anim-card[data-anim="${id}"]`).classList.remove('selected');
+      updateSelectedList();
+      updateLivePreview();
+    }
+
+    function clearSelection() {
+      selectedAnimations = [];
+      document.querySelectorAll('.anim-card').forEach(card => card.classList.remove('selected'));
+      updateSelectedList();
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const content = document.getElementById('previewContent');
+      const scrollHint = document.getElementById('scrollHint');
+      const progressNav = document.getElementById('progressNav');
+      const previewFooter = document.getElementById('previewFooter');
+
+      // Reset explosion words
+      explosionWords.forEach(w => w.remove());
+      explosionWords = [];
+
+      // Hide fixed elements
+      progressNav.classList.remove('is-visible');
+      previewFooter.classList.remove('is-visible');
+
+      if (selectedAnimations.length === 0) {
+        scrollHint.style.display = 'none';
+        content.innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+            </svg>
+            <p>Select animations from the sidebar to preview your page layout</p>
+          </div>
+        `;
+        content.style.minHeight = 'auto';
+        return;
+      }
+
+      scrollHint.style.display = 'flex';
+
+      // Calculate total height needed
+      const sectionHeight = 150; // vh per section
+      content.style.minHeight = `${selectedAnimations.length * sectionHeight}vh`;
+
+      // Generate preview sections
+      content.innerHTML = selectedAnimations.map((id, idx) => generatePreviewSection(id, idx)).join('');
+
+      // Show progress nav if selected
+      if (selectedAnimations.includes(6)) {
+        setTimeout(() => progressNav.classList.add('is-visible'), 500);
+      }
+
+      // Setup scroll-based animations
+      setupScrollAnimations();
+    }
+
+    function generatePreviewSection(animId, index) {
+      const bgClass = `bg-${(index % 6) + 1}`;
+
+      switch (animId) {
+        case 1: // Stacking Cards
+          return `
+            <section class="preview-section ${bgClass}" data-anim-section="1" style="min-height: 250vh; padding: 0;">
+              <span class="preview-section-label">1. Stacking Cards</span>
+              <div class="preview-stack-container">
+                <div class="preview-stack-card" data-index="0">Card 1</div>
+                <div class="preview-stack-card" data-index="1">Card 2</div>
+                <div class="preview-stack-card" data-index="2">Card 3</div>
+              </div>
+            </section>
+          `;
+
+        case 2: // Video Scale
+          return `
+            <section class="preview-video-section" data-anim-section="2">
+              <span class="preview-section-label">2. Video Scale</span>
+              <div class="preview-video-bg" id="videoBg"></div>
+              <div class="preview-video-content">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Hero Section</h2>
+                <p style="opacity: 0.7;">Scroll to see video zoom effect</p>
+              </div>
+            </section>
+          `;
+
+        case 3: // Image Reveal
+          return `
+            <section class="preview-section ${bgClass}" data-anim-section="3">
+              <span class="preview-section-label">3. Image Reveal</span>
+              <div class="preview-reveal-container" id="revealContainer">
+                <div class="preview-reveal-mask" id="revealMask"></div>
+                <div class="preview-reveal-image" id="revealImage">IMAGE</div>
+              </div>
+            </section>
+          `;
+
+        case 4: // Text Explosion
+          return `
+            <section class="preview-section preview-explosion-section ${bgClass}" data-anim-section="4">
+              <span class="preview-section-label">4. Text Explosion</span>
+              <div class="preview-quote-content" id="quoteContent">
+                <p class="preview-quote-line">"Design is not just</p>
+                <p class="preview-quote-line">what it looks like.</p>
+                <p class="preview-quote-line">Design is how</p>
+                <p class="preview-quote-line">it works."</p>
+              </div>
+            </section>
+          `;
+
+        case 5: // Parallax Reveal
+          return `
+            <section class="preview-section preview-parallax-section" data-anim-section="5" style="min-height: 150vh;">
+              <span class="preview-section-label">5. Parallax Reveal</span>
+              <div class="preview-parallax-content">
+                <div class="preview-parallax-block" data-block="0">
+                  <h3 style="margin-bottom: 8px;">Block 1</h3>
+                  <p style="opacity: 0.7;">Content slides up to reveal footer</p>
+                </div>
+                <div class="preview-parallax-block" data-block="1">
+                  <h3 style="margin-bottom: 8px;">Block 2</h3>
+                  <p style="opacity: 0.7;">Keep scrolling...</p>
+                </div>
+                <div class="preview-parallax-block" data-block="2">
+                  <h3 style="margin-bottom: 8px;">Block 3</h3>
+                  <p style="opacity: 0.7;">Almost there!</p>
+                </div>
+              </div>
+            </section>
+          `;
+
+        case 6: // Progress Nav
+          return `
+            <section class="preview-section ${bgClass}" data-anim-section="6">
+              <span class="preview-section-label">6. Progress Nav</span>
+              <div style="text-align: center;">
+                <h3 style="margin-bottom: 1rem;">Progress Navigation</h3>
+                <p style="opacity: 0.7;">See the blob indicator on the right</p>
+              </div>
+            </section>
+          `;
+
+        default:
+          return '';
+      }
+    }
+
+    function setupScrollAnimations() {
+      const scrollContainer = document.getElementById('previewScroll');
+      let hasExploded = false;
+
+      scrollContainer.addEventListener('scroll', () => {
+        const scrollTop = scrollContainer.scrollTop;
+        const containerHeight = scrollContainer.clientHeight;
+
+        // Animation 1: Stacking Cards
+        const stackCards = document.querySelectorAll('.preview-stack-card');
+        stackCards.forEach((card, index) => {
+          if (index === stackCards.length - 1) return;
+          const cardTop = card.offsetTop - scrollTop;
+          const progress = Math.max(0, Math.min(1, (containerHeight - cardTop) / containerHeight));
+          const scale = 1 - progress * 0.1;
+          card.style.transform = `scale(${Math.max(0.85, scale)})`;
+        });
+
+        // Animation 2: Video Scale
+        const videoBg = document.getElementById('videoBg');
+        if (videoBg) {
+          const section = videoBg.closest('section');
+          const sectionTop = section.offsetTop - scrollTop;
+          const progress = Math.max(0, Math.min(1, -sectionTop / containerHeight));
+          const scale = 1 + progress * 0.3;
+          videoBg.style.transform = `scale(${scale})`;
+        }
+
+        // Animation 3: Image Reveal
+        const revealContainer = document.getElementById('revealContainer');
+        if (revealContainer) {
+          const section = revealContainer.closest('section');
+          const sectionTop = section.offsetTop - scrollTop;
+          if (sectionTop < containerHeight * 0.6) {
+            const mask = document.getElementById('revealMask');
+            const image = document.getElementById('revealImage');
+            mask.style.transform = 'translateX(-100%)';
+            image.style.transform = 'scale(1)';
+          }
+        }
+
+        // Animation 4: Text Explosion
+        const quoteSection = document.querySelector('[data-anim-section="4"]');
+        if (quoteSection) {
+          const sectionTop = quoteSection.offsetTop - scrollTop;
+          const sectionProgress = -sectionTop / quoteSection.offsetHeight;
+
+          // Reveal lines
+          const lines = document.querySelectorAll('.preview-quote-line');
+          lines.forEach((line, i) => {
+            if (sectionProgress > 0.1 + i * 0.1) {
+              line.classList.add('is-visible');
+            }
+          });
+
+          // Explosion
+          if (sectionProgress > 0.5 && !hasExploded) {
+            hasExploded = true;
+            triggerExplosion();
+          }
+
+          if (sectionProgress < 0.3) {
+            hasExploded = false;
+            resetExplosion();
+          }
+        }
+
+        // Animation 5: Parallax Reveal
+        const parallaxSection = document.querySelector('[data-anim-section="5"]');
+        if (parallaxSection) {
+          const sectionTop = parallaxSection.offsetTop - scrollTop;
+          if (sectionTop < containerHeight * 0.6) {
+            const blocks = document.querySelectorAll('.preview-parallax-block');
+            blocks.forEach((block, i) => {
+              setTimeout(() => block.classList.add('is-visible'), i * 150);
+            });
+            document.getElementById('previewFooter').classList.add('is-visible');
+          }
+        }
+
+        // Animation 6: Progress Nav blob position
+        if (selectedAnimations.includes(6)) {
+          const sections = document.querySelectorAll('[data-anim-section]');
+          let activeIndex = 0;
+          sections.forEach((section, i) => {
+            const sectionTop = section.offsetTop - scrollTop;
+            if (sectionTop < containerHeight / 2) {
+              activeIndex = i;
+            }
+          });
+          const blob = document.getElementById('progressBlob');
+          blob.style.top = `${12 + activeIndex * 32}px`;
+        }
+      });
+    }
+
+    function triggerExplosion() {
+      const quoteContent = document.getElementById('quoteContent');
+      if (!quoteContent) return;
+
+      quoteContent.classList.add('is-exploding');
+
+      const words = ['Design', 'is', 'not', 'just', 'what', 'it', 'looks', 'like', 'Design', 'is', 'how', 'it', 'works'];
+      const previewContainer = document.querySelector('.live-preview-container');
+      const rect = previewContainer.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      words.forEach((word, i) => {
+        const el = document.createElement('span');
+        el.className = 'explosion-word';
+        el.textContent = word;
+        el.style.left = `${centerX}px`;
+        el.style.top = `${centerY}px`;
+        el.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(el);
+        explosionWords.push(el);
+
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const angle = (i / words.length) * Math.PI * 2 + (Math.random() - 0.5);
+            const distance = 150 + Math.random() * 200;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+            const rotation = (Math.random() - 0.5) * 90;
+
+            el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotation}deg)`;
+            el.classList.add('is-exploding');
+          }, 30 + i * 30);
+        });
+      });
+    }
+
+    function resetExplosion() {
+      const quoteContent = document.getElementById('quoteContent');
+      if (quoteContent) {
+        quoteContent.classList.remove('is-exploding');
+      }
+
+      const lines = document.querySelectorAll('.preview-quote-line');
+      lines.forEach(line => line.classList.remove('is-visible'));
+
+      explosionWords.forEach(el => el.remove());
+      explosionWords = [];
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.tab-content#${tabId}`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function generateCode() {
+      if (selectedAnimations.length === 0) {
+        alert('Please select at least one animation');
+        return;
+      }
+
+      document.getElementById('htmlCode').textContent = generateHTML();
+      document.getElementById('jsCode').textContent = generateJS();
+      document.getElementById('cssCode').textContent = generateCSSInfo();
+
+      switchTab('html');
+    }
+
+    function generateHTML() {
+      const sections = selectedAnimations.map(id => {
+        const info = animationInfo[id];
+        return `
+<!-- ${info.name} Section -->
+<section data-anim="${id}">
+  <!-- Add your content here -->
+  <!-- See component documentation for structure -->
+</section>`;
+      }).join('\n');
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Animated Page</title>
+</head>
+<body>
+${sections}
+
+  <script type="module">
+    import { init } from './gsap-animation-library/src/index.js';
+    init();
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function generateJS() {
+      const imports = selectedAnimations.map(id => animationInfo[id].name.replace(/\s/g, '')).join(', ');
+
+      return `// Option 1: Auto-init (recommended for quick setup)
+import { init } from './gsap-animation-library/src/index.js';
+init();
+
+// Option 2: Manual initialization (more control)
+import { ${imports} } from './gsap-animation-library/src/index.js';
+
+// Initialize each animation with custom options
+${selectedAnimations.map(id => {
+  const name = animationInfo[id].name.replace(/\s/g, '');
+  return `new ${name}('[data-anim="${id}"]', { /* options */ });`;
+}).join('\n')}`;
+    }
+
+    function generateCSSInfo() {
+      return `/* CSS is auto-injected when using init() */
+/* To manually get CSS for specific animations: */
+
+import { getAnimationCSS } from './gsap-animation-library/src/index.js';
+
+const css = getAnimationCSS([${selectedAnimations.join(', ')}]);
+console.log(css);
+
+/* Or inject directly: */
+import { injectCSS } from './gsap-animation-library/src/index.js';
+injectCSS([${selectedAnimations.join(', ')}]);`;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', loadFromURL);
+  </script>
+</body>
+</html>
