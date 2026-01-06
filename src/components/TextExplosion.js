@@ -1,15 +1,16 @@
 /**
  * COMPONENT 4: Text/Quote Explosion
  *
- * Words animate in from alternating sides, then explode outward
- * in all directions when triggered. Creates a dramatic dispersal effect.
+ * Text is split into individual characters that explode outward from center
+ * toward the viewer (scaling up) as user scrolls. The section pins during
+ * the explosion for dramatic effect.
  *
  * Usage:
  *   import { TextExplosion } from 'gsap-animation-library';
  *
  *   new TextExplosion('.quote-section', {
- *     textSelector: '.quote-line',
- *     explodeAt: '75%',
+ *     textSelector: '.explosion-line',
+ *     holdDuration: 0.35,  // How long quote stays visible before exploding
  *   });
  */
 
@@ -28,142 +29,167 @@ export class TextExplosion {
 
     this.options = {
       textSelector: '.explosion-line',
+      pinWrapperSelector: '.explosion-pin-wrapper',
       contentSelector: '.explosion-content',
       attributionSelector: '.explosion-attribution',
-      lineStaggerPercent: 10,    // Percent of scroll between each line reveal
-      explodeAt: '75%',          // Scroll position to trigger explosion
-      explosionDistance: 400,    // Min distance words travel
+      holdDuration: 0.35,        // Portion of scroll where text is static (0-1)
+      explosionEnd: 0.85,        // When explosion completes (0-1)
+      scrollDistance: '200%',    // Total scroll distance for pin
+      explosionDistance: 400,    // Min distance chars travel
       explosionDistanceMax: 600, // Max additional random distance
-      explosionDuration: 40,     // Ms between each word animation
-      rotationRange: 120,        // Max rotation in degrees
-      scaleRange: [0.5, 1.5],    // Scale range for exploded words
+      rotationRange: 90,         // Max rotation in degrees
+      scaleRange: [2, 5],        // Scale range (toward viewer effect)
       ...options,
     };
 
-    this.lines = this.section.querySelectorAll(this.options.textSelector);
+    this.pinWrapper = this.section.querySelector(this.options.pinWrapperSelector);
     this.content = this.section.querySelector(this.options.contentSelector);
+    this.lines = this.section.querySelectorAll(this.options.textSelector);
     this.attribution = this.section.querySelector(this.options.attributionSelector);
-    this.explosionWords = [];
-    this.hasExploded = false;
-    this.triggers = [];
+
+    this.allChars = [];
+    this.charData = [];
+    this.trigger = null;
 
     this.init();
   }
 
   init() {
-    if (this.lines.length === 0) return;
-
-    // Animate lines in from alternating sides
-    this.lines.forEach((line, index) => {
-      const trigger = ScrollTrigger.create({
-        trigger: this.section,
-        start: () => `${10 + index * this.options.lineStaggerPercent}% center`,
-        onEnter: () => line.classList.add('is-visible'),
-        onLeaveBack: () => {
-          line.classList.remove('is-visible');
-          this.reset();
-        },
-      });
-      this.triggers.push(trigger);
-    });
-
-    // Attribution animation
-    if (this.attribution) {
-      const attrTrigger = ScrollTrigger.create({
-        trigger: this.section,
-        start: '55% center',
-        onEnter: () => this.attribution.classList.add('is-visible'),
-        onLeaveBack: () => this.attribution.classList.remove('is-visible'),
-      });
-      this.triggers.push(attrTrigger);
+    if (this.lines.length === 0 || !this.pinWrapper) {
+      console.warn('TextExplosion: Required elements not found');
+      return;
     }
 
-    // Explosion trigger
-    const explosionTrigger = ScrollTrigger.create({
-      trigger: this.section,
-      start: `${this.options.explodeAt} center`,
-      onEnter: () => {
-        if (!this.hasExploded) {
-          this.explode();
-        }
-      },
-      onLeaveBack: () => this.reset(),
+    // 1. Split all text into individual character spans
+    this.splitTextIntoChars();
+
+    // 2. Calculate explosion vectors after DOM update
+    requestAnimationFrame(() => {
+      this.calculateExplosionVectors();
     });
-    this.triggers.push(explosionTrigger);
+
+    // 3. Create pinned scroll animation
+    this.trigger = ScrollTrigger.create({
+      trigger: this.section,
+      start: 'top top',
+      end: `+=${this.options.scrollDistance}`,
+      pin: this.pinWrapper,
+      scrub: 0.5,
+      onRefresh: () => this.calculateExplosionVectors(),
+      onUpdate: (self) => this.onScroll(self.progress),
+    });
   }
 
-  explode() {
-    if (!this.content || this.hasExploded) return;
-    this.hasExploded = true;
+  splitTextIntoChars() {
+    this.allChars = [];
 
-    // Collect all words
-    const words = [];
+    // Process each line
     this.lines.forEach((line) => {
       const text = line.textContent;
-      text.split(/\s+/).forEach((word) => {
-        const cleanWord = word.replace(/["""\-—]/g, '').trim();
-        if (cleanWord) words.push(cleanWord);
+      line.textContent = '';
+
+      [...text].forEach((char) => {
+        const span = document.createElement('span');
+        span.className = 'explosion-char';
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        line.appendChild(span);
+        this.allChars.push(span);
       });
     });
 
+    // Process attribution if present
     if (this.attribution) {
-      this.attribution.textContent.split(/\s+/).forEach((word) => {
-        const cleanWord = word.replace(/[—]/g, '').trim();
-        if (cleanWord) words.push(cleanWord);
+      const text = this.attribution.textContent;
+      this.attribution.textContent = '';
+
+      [...text].forEach((char) => {
+        const span = document.createElement('span');
+        span.className = 'explosion-char';
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        this.attribution.appendChild(span);
+        this.allChars.push(span);
       });
     }
+  }
 
-    // Hide original content
-    this.content.classList.add('is-exploding');
+  calculateExplosionVectors() {
+    if (!this.content) return;
 
-    // Get center position
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    const rect = this.content.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
-    // Create and animate explosion words
-    words.forEach((word, i) => {
-      const el = document.createElement('span');
-      el.className = 'explosion-word';
-      el.textContent = word;
-      el.style.left = `${centerX}px`;
-      el.style.top = `${centerY}px`;
-      el.style.transform = 'translate(-50%, -50%)';
+    this.charData = this.allChars.map((span) => {
+      const r = span.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
 
-      document.body.appendChild(el);
-      this.explosionWords.push(el);
+      // Vector pointing outward from center
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-      // Animate to random positions
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          const angle = (i / words.length) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-          const distance = this.options.explosionDistance + Math.random() * this.options.explosionDistanceMax;
-          const x = Math.cos(angle) * distance;
-          const y = Math.sin(angle) * distance;
-          const rotation = (Math.random() - 0.5) * this.options.rotationRange;
-          const scale = this.options.scaleRange[0] + Math.random() * (this.options.scaleRange[1] - this.options.scaleRange[0]);
+      // Calculate explosion trajectory
+      const baseDist = this.options.explosionDistance + Math.random() * this.options.explosionDistanceMax;
 
-          el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotation}deg) scale(${scale})`;
-          el.classList.add('is-exploding');
-        }, 50 + i * this.options.explosionDuration);
-      });
+      return {
+        el: span,
+        tx: (dx / dist) * baseDist + (Math.random() - 0.5) * 150,
+        ty: (dy / dist) * baseDist + (Math.random() - 0.5) * 150,
+        tr: (Math.random() - 0.5) * this.options.rotationRange,
+        ts: this.options.scaleRange[0] + Math.random() * (this.options.scaleRange[1] - this.options.scaleRange[0]),
+      };
     });
   }
 
-  reset() {
-    this.hasExploded = false;
+  onScroll(progress) {
+    // Timeline:
+    // 0 to holdDuration: Text visible, no animation
+    // holdDuration to explosionEnd: Explosion animates
+    // explosionEnd to 1: Fully exploded
 
-    if (this.content) {
-      this.content.classList.remove('is-exploding');
+    let explosionProgress = 0;
+
+    if (progress <= this.options.holdDuration) {
+      explosionProgress = 0;
+    } else if (progress <= this.options.explosionEnd) {
+      const range = this.options.explosionEnd - this.options.holdDuration;
+      explosionProgress = (progress - this.options.holdDuration) / range;
+    } else {
+      explosionProgress = 1;
     }
 
-    this.explosionWords.forEach((el) => el.remove());
-    this.explosionWords = [];
+    this.applyExplosion(explosionProgress);
+  }
+
+  applyExplosion(progress) {
+    // Ease function for natural deceleration
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    this.charData.forEach((c, i) => {
+      // Slight stagger based on character index
+      const stagger = (i % 20) * 0.01;
+      const t = Math.max(0, Math.min(1, (progress - stagger) / (1 - stagger)));
+      const e = ease(t);
+
+      const x = c.tx * e;
+      const y = c.ty * e;
+      const r = c.tr * e;
+      const s = 1 + (c.ts - 1) * e;
+      const o = 1 - e;
+
+      c.el.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg) scale(${s})`;
+      c.el.style.opacity = o;
+    });
   }
 
   destroy() {
-    this.reset();
-    this.triggers.forEach((trigger) => trigger.kill());
-    this.triggers = [];
+    if (this.trigger) {
+      this.trigger.kill();
+      this.trigger = null;
+    }
+    this.allChars = [];
+    this.charData = [];
   }
 
   static getCSS() {
@@ -173,74 +199,43 @@ export class TextExplosion {
    ============================================================ */
 
 .explosion-section {
-  min-height: 200vh;
+  position: relative;
+  overflow: visible;
+}
+
+.explosion-pin-wrapper {
+  height: 100vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .explosion-content {
   text-align: center;
   max-width: 900px;
   padding: 2rem;
-  transition: opacity 0.3s ease;
-}
-
-.explosion-content.is-exploding {
-  opacity: 0;
 }
 
 .explosion-line {
+  display: block;
   font-size: clamp(1.5rem, 4vw, 3rem);
   font-weight: 700;
   line-height: 1.3;
   color: #fff;
-  opacity: 0;
-  transform: translateX(-100px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.explosion-line:nth-child(even) {
-  transform: translateX(100px);
-}
-
-.explosion-line.is-visible {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .explosion-attribution {
+  display: block;
   margin-top: 2rem;
   font-size: 1.25rem;
   color: rgba(255, 255, 255, 0.7);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
 }
 
-.explosion-attribution.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Explosion words that fly out */
-.explosion-word {
-  position: fixed;
-  font-size: clamp(1rem, 3vw, 2rem);
-  font-weight: 700;
-  color: #fff;
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0;
-  transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              opacity 0.5s ease;
-  white-space: nowrap;
-}
-
-.explosion-word.is-exploding {
-  opacity: 1;
+/* Individual character spans */
+.explosion-char {
+  display: inline-block;
 }
 `;
   }
@@ -257,9 +252,11 @@ export class TextExplosion {
 
     return `
 <section class="explosion-section">
-  <div class="explosion-content">
-    ${opts.lines.map((line) => `<p class="explosion-line">${line}</p>`).join('\n    ')}
-    <p class="explosion-attribution">${opts.attribution}</p>
+  <div class="explosion-pin-wrapper">
+    <div class="explosion-content">
+      ${opts.lines.map((line) => `<p class="explosion-line">${line}</p>`).join('\n      ')}
+      <p class="explosion-attribution">${opts.attribution}</p>
+    </div>
   </div>
 </section>
 `;

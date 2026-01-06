@@ -43,7 +43,7 @@ That's it! The library automatically:
 | 1 | Stacking Cards | `data-anim="1"` or `data-anim="stacking-cards"` | Cards stack on scroll with scale-down effect |
 | 2 | Video Scale | `data-anim="2"` or `data-anim="video-scale"` | Video/image grows as you scroll |
 | 3 | Image Reveal | `data-anim="3"` or `data-anim="image-reveal"` | Dramatic mask reveal with scale |
-| 4 | Text Explosion | `data-anim="4"` or `data-anim="text-explosion"` | Words fly in, then explode outward |
+| 4 | Text Explosion | `data-anim="4"` or `data-anim="text-explosion"` | Characters explode outward toward viewer on scroll |
 | 5 | Parallax Reveal | `data-anim="5"` or `data-anim="parallax-reveal"` | Content reveals fixed element behind |
 | 6 | Progress Nav | `data-anim="6"` or `data-anim="progress-nav"` | Blob navigation following scroll |
 
@@ -132,16 +132,42 @@ new VideoScaleOnScroll('.hero-video', {
 
 ### 4. Text Explosion
 
+Text is split into individual characters that explode outward from center toward the viewer (scaling up) as user scrolls. The section pins during the explosion for a dramatic effect.
+
+**Required HTML structure:**
+```html
+<section class="explosion-section">
+  <div class="explosion-pin-wrapper">
+    <div class="explosion-content">
+      <p class="explosion-line">"Your quote here</p>
+      <p class="explosion-line">across multiple lines."</p>
+      <p class="explosion-attribution">— Author Name</p>
+    </div>
+  </div>
+</section>
+```
+
+**Options:**
 ```javascript
 {
   textSelector: '.explosion-line',
-  lineStaggerPercent: 10,      // Scroll % between each line
-  explodeAt: '75%',            // When to trigger explosion
-  explosionDistance: 400,      // Min distance words travel
+  pinWrapperSelector: '.explosion-pin-wrapper',
+  contentSelector: '.explosion-content',
+  attributionSelector: '.explosion-attribution',
+  holdDuration: 0.35,          // Portion of scroll where text is static (0-1)
+  explosionEnd: 0.85,          // When explosion completes (0-1)
+  scrollDistance: '200%',      // Total scroll distance for pin
+  explosionDistance: 400,      // Min distance chars travel
   explosionDistanceMax: 600,   // Max additional distance
-  rotationRange: 120,          // Max rotation in degrees
+  rotationRange: 90,           // Max rotation in degrees
+  scaleRange: [2, 5],          // Scale range (toward viewer effect)
 }
 ```
+
+**Timeline:**
+- **0% - 35%**: Quote visible, no movement (reading time)
+- **35% - 85%**: Characters explode outward, scaling up and fading
+- **85% - 100%**: Fully exploded, section unpins
 
 ### 5. Parallax Reveal
 
