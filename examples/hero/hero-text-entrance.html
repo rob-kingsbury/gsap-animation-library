@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Text Entrance | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           HERO TEXT ENTRANCE
+           Dramatic text entrance sequences for
+           landing page hero sections
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background gradient */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.1) 0%, transparent 70%);
+            opacity: 0;
+        }
+
+        /* Hero content */
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+        }
+
+        /* Eyebrow/Label */
+        .hero-eyebrow {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #c9a227;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+        }
+
+        /* Main headline */
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 7rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-title .line-inner {
+            display: block;
+            transform: translateY(100%);
+        }
+
+        .hero-title .highlight {
+            color: #c9a227;
+        }
+
+        /* Subtitle */
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            opacity: 0;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            color: rgba(245, 245, 240, 0.7);
+        }
+
+        /* CTA Buttons */
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-btn--primary {
+            background: #c9a227;
+            color: #0a0a0a;
+            border: none;
+        }
+
+        .hero-btn--secondary {
+            background: transparent;
+            color: #f5f5f0;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.5;
+        }
+
+        .scroll-indicator .arrow {
+            width: 20px;
+            height: 30px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .scroll-indicator .arrow::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: #c9a227;
+            border-radius: 2px;
+            animation: scrollBounce 2s infinite;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            50% { transform: translateX(-50%) translateY(8px); opacity: 0.5; }
+        }
+
+        /* Variant sections */
+        .section {
+            min-height: 100vh;
+            padding: 100px 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Replay button */
+        .replay-btn {
+            display: block;
+            margin: 2rem auto 0;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Variant: Split reveal */
+        .hero-split {
+            text-align: left;
+            align-items: flex-start;
+            padding-left: 10%;
+        }
+
+        .hero-split .hero-title {
+            font-size: clamp(2rem, 6vw, 5rem);
+        }
+
+        /* Variant: Masked reveal */
+        .hero-masked .hero-title {
+            position: relative;
+        }
+
+        .title-mask {
+            position: absolute;
+            inset: 0;
+            background: #c9a227;
+            transform-origin: left;
+        }
+
+        /* Variant: Staggered chars */
+        .hero-chars .hero-title .char {
+            display: inline-block;
+            opacity: 0;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Main Hero -->
+    <section class="hero" id="heroMain">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <p class="hero-eyebrow">Welcome to our platform</p>
+            <h1 class="hero-title">
+                <span class="line"><span class="line-inner">We build</span></span>
+                <span class="line"><span class="line-inner"><span class="highlight">exceptional</span></span></span>
+                <span class="line"><span class="line-inner">digital experiences</span></span>
+            </h1>
+            <p class="hero-subtitle">Transform your ideas into reality with our cutting-edge solutions and expert team of designers and developers.</p>
+            <div class="hero-cta">
+                <button class="hero-btn hero-btn--primary">Get Started</button>
+                <button class="hero-btn hero-btn--secondary">Learn More</button>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="arrow"></div>
+        </div>
+    </section>
+
+    <!-- Variant: Split Entrance -->
+    <section class="section hero hero-split" id="heroSplit">
+        <div class="section-header" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%);">
+            <h2>Split Entrance</h2>
+            <p>Lines reveal with staggered timing from the left</p>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title split-title">
+                <span class="line"><span class="line-inner">Innovation</span></span>
+                <span class="line"><span class="line-inner">meets</span></span>
+                <span class="line"><span class="line-inner"><span class="highlight">design</span></span></span>
+            </h1>
+            <p class="hero-subtitle split-subtitle">Crafting tomorrow's solutions today.</p>
+        </div>
+        <button class="replay-btn" data-target="split">Replay</button>
+    </section>
+
+    <!-- Variant: Character Stagger -->
+    <section class="section hero hero-chars" id="heroChars">
+        <div class="section-header" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%);">
+            <h2>Character Stagger</h2>
+            <p>Each character animates individually</p>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title chars-title">CREATIVE</h1>
+            <p class="hero-subtitle chars-subtitle">Where imagination becomes reality</p>
+        </div>
+        <button class="replay-btn" data-target="chars">Replay</button>
+    </section>
+
+    <!-- Variant: Mask Reveal -->
+    <section class="section hero hero-masked" id="heroMasked">
+        <div class="section-header" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%);">
+            <h2>Mask Reveal</h2>
+            <p>Text revealed by animating mask overlay</p>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title masked-title">
+                <span style="position: relative; display: inline-block;">
+                    REVEALED
+                    <span class="title-mask"></span>
+                </span>
+            </h1>
+            <p class="hero-subtitle masked-subtitle">Dramatic unveiling effect</p>
+        </div>
+        <button class="replay-btn" data-target="masked">Replay</button>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Line-by-line reveal (overflow hidden technique)</span>
+<span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>({ <span class="property">delay</span>: <span class="number">0.5</span> });
+
+<span class="comment">// Animate lines up from hidden</span>
+tl.<span class="function">to</span>(<span class="string">'.line-inner'</span>, {
+    <span class="property">y</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">stagger</span>: <span class="number">0.15</span>,
+    <span class="property">ease</span>: <span class="string">"power4.out"</span>
+})
+<span class="comment">// Fade in subtitle</span>
+.<span class="function">to</span>(<span class="string">'.hero-subtitle'</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>
+}, <span class="string">"-=0.5"</span>)
+<span class="comment">// Animate CTA buttons</span>
+.<span class="function">to</span>(<span class="string">'.hero-btn'</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">y</span>: <span class="number">0</span>,
+    <span class="property">stagger</span>: <span class="number">0.1</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>
+}, <span class="string">"-=0.4"</span>);</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Character stagger with split</span>
+<span class="keyword">function</span> <span class="function">splitChars</span>(element) {
+    <span class="keyword">const</span> text = element.<span class="property">textContent</span>;
+    element.<span class="property">innerHTML</span> = text.<span class="function">split</span>(<span class="string">''</span>)
+        .<span class="function">map</span>(char => <span class="string">`&lt;span class="char"&gt;</span>${char}<span class="string">&lt;/span&gt;`</span>)
+        .<span class="function">join</span>(<span class="string">''</span>);
+}
+
+<span class="function">splitChars</span>(title);
+
+gsap.<span class="function">from</span>(<span class="string">'.char'</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">100</span>,
+    <span class="property">rotateX</span>: <span class="number">-90</span>,
+    <span class="property">stagger</span>: <span class="number">0.05</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Mask reveal technique</span>
+<span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+<span class="comment">// Animate mask away to reveal text beneath</span>
+tl.<span class="function">to</span>(<span class="string">'.title-mask'</span>, {
+    <span class="property">scaleX</span>: <span class="number">0</span>,
+    <span class="property">transformOrigin</span>: <span class="string">'right center'</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">'power4.inOut'</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Complete hero sequence timeline</span>
+<span class="keyword">const</span> heroTl = gsap.<span class="function">timeline</span>({ <span class="property">delay</span>: <span class="number">0.3</span> });
+
+heroTl
+    <span class="comment">// Background glow</span>
+    .<span class="function">to</span>(<span class="string">'.hero-bg'</span>, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">1.5</span> })
+    <span class="comment">// Eyebrow label</span>
+    .<span class="function">to</span>(<span class="string">'.hero-eyebrow'</span>, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">0.6</span> }, <span class="number">0</span>)
+    <span class="comment">// Title lines</span>
+    .<span class="function">to</span>(<span class="string">'.line-inner'</span>, {
+        <span class="property">y</span>: <span class="number">0</span>, <span class="property">stagger</span>: <span class="number">0.12</span>, <span class="property">duration</span>: <span class="number">0.9</span>, <span class="property">ease</span>: <span class="string">"power4.out"</span>
+    }, <span class="number">0.2</span>)
+    <span class="comment">// Subtitle</span>
+    .<span class="function">to</span>(<span class="string">'.hero-subtitle'</span>, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">0.8</span> }, <span class="string">"-=0.4"</span>)
+    <span class="comment">// CTAs</span>
+    .<span class="function">to</span>(<span class="string">'.hero-btn'</span>, {
+        <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">y</span>: <span class="number">0</span>, <span class="property">stagger</span>: <span class="number">0.1</span>, <span class="property">duration</span>: <span class="number">0.5</span>
+    }, <span class="string">"-=0.3"</span>)
+    <span class="comment">// Scroll indicator</span>
+    .<span class="function">to</span>(<span class="string">'.scroll-indicator'</span>, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">0.6</span> }, <span class="string">"-=0.2"</span>);</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // MAIN HERO ANIMATION
+        // =====================
+
+        const mainHeroTl = gsap.timeline({ delay: 0.3 });
+
+        mainHeroTl
+            // Background glow
+            .to('.hero-bg', { opacity: 1, duration: 1.5 })
+            // Eyebrow
+            .to('.hero-eyebrow', { opacity: 1, duration: 0.6 }, 0)
+            // Title lines
+            .to('#heroMain .line-inner', {
+                y: 0,
+                stagger: 0.12,
+                duration: 0.9,
+                ease: "power4.out"
+            }, 0.2)
+            // Subtitle
+            .to('#heroMain .hero-subtitle', { opacity: 1, duration: 0.8 }, "-=0.4")
+            // CTAs
+            .to('.hero-btn', {
+                opacity: 1,
+                y: 0,
+                stagger: 0.1,
+                duration: 0.5
+            }, "-=0.3")
+            // Scroll indicator
+            .to('.scroll-indicator', { opacity: 1, duration: 0.6 }, "-=0.2");
+
+        // =====================
+        // SPLIT ENTRANCE VARIANT
+        // =====================
+
+        function playSplitAnimation() {
+            gsap.set('.split-title .line-inner', { y: '100%', opacity: 1 });
+            gsap.set('.split-subtitle', { opacity: 0 });
+
+            const tl = gsap.timeline();
+
+            tl.to('.split-title .line-inner', {
+                y: 0,
+                stagger: 0.2,
+                duration: 1,
+                ease: "power4.out"
+            })
+            .to('.split-subtitle', {
+                opacity: 0.7,
+                duration: 0.6
+            }, "-=0.4");
+        }
+
+        ScrollTrigger.create({
+            trigger: '#heroSplit',
+            start: 'top 60%',
+            onEnter: playSplitAnimation,
+            once: true
+        });
+
+        // =====================
+        // CHARACTER STAGGER VARIANT
+        // =====================
+
+        const charsTitle = document.querySelector('.chars-title');
+        const charsTitleText = charsTitle.textContent;
+
+        // Split into characters
+        charsTitle.innerHTML = charsTitleText.split('').map(char =>
+            `<span class="char">${char}</span>`
+        ).join('');
+
+        const chars = charsTitle.querySelectorAll('.char');
+
+        function playCharsAnimation() {
+            gsap.set(chars, { opacity: 0, y: 100, rotateX: -90 });
+            gsap.set('.chars-subtitle', { opacity: 0 });
+
+            const tl = gsap.timeline();
+
+            tl.to(chars, {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                stagger: 0.05,
+                duration: 0.8,
+                ease: "back.out(1.7)"
+            })
+            .to('.chars-subtitle', {
+                opacity: 0.7,
+                duration: 0.6
+            }, "-=0.4");
+        }
+
+        ScrollTrigger.create({
+            trigger: '#heroChars',
+            start: 'top 60%',
+            onEnter: playCharsAnimation,
+            once: true
+        });
+
+        // =====================
+        // MASK REVEAL VARIANT
+        // =====================
+
+        function playMaskedAnimation() {
+            gsap.set('.title-mask', { scaleX: 1 });
+            gsap.set('.masked-subtitle', { opacity: 0 });
+
+            const tl = gsap.timeline();
+
+            tl.to('.title-mask', {
+                scaleX: 0,
+                transformOrigin: 'right center',
+                duration: 1,
+                ease: 'power4.inOut'
+            })
+            .to('.masked-subtitle', {
+                opacity: 0.7,
+                duration: 0.6
+            }, "-=0.3");
+        }
+
+        ScrollTrigger.create({
+            trigger: '#heroMasked',
+            start: 'top 60%',
+            onEnter: playMaskedAnimation,
+            once: true
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                switch(target) {
+                    case 'split':
+                        playSplitAnimation();
+                        break;
+                    case 'chars':
+                        playCharsAnimation();
+                        break;
+                    case 'masked':
+                        playMaskedAnimation();
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

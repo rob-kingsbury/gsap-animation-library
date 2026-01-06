@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typewriter Effects | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           TYPEWRITER EFFECTS
+           Text that types out character by character
+           with various cursor and style options
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Typewriter cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: #c9a227;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+
+        .cursor--thin {
+            width: 2px;
+        }
+
+        .cursor--block {
+            width: 0.6em;
+            opacity: 0.7;
+        }
+
+        .cursor--underscore {
+            width: 0.6em;
+            height: 3px;
+            vertical-align: baseline;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Section styling */
+        .section {
+            padding: 100px 2rem;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Demo containers */
+        .demo-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Basic Typewriter */
+        .typewriter-basic {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-family: 'Courier New', monospace;
+            min-height: 1.5em;
+        }
+
+        /* Multi-line Typewriter */
+        .typewriter-multi {
+            font-size: 1.25rem;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .typewriter-multi .line {
+            display: block;
+            min-height: 1.8em;
+        }
+
+        /* Rotating Words */
+        .typewriter-rotate {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        .typewriter-rotate .static {
+            color: #f5f5f0;
+        }
+
+        .typewriter-rotate .dynamic {
+            color: #c9a227;
+            font-family: 'Courier New', monospace;
+            min-width: 200px;
+            display: inline-block;
+        }
+
+        /* Terminal Style */
+        .terminal {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .terminal-header {
+            background: #2a2a2a;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-btn--red { background: #ff5f56; }
+        .terminal-btn--yellow { background: #ffbd2e; }
+        .terminal-btn--green { background: #27ca40; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            min-height: 200px;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+        }
+
+        .terminal-prompt {
+            color: #27ca40;
+        }
+
+        .terminal-command {
+            color: #f5f5f0;
+        }
+
+        .terminal-output {
+            color: #888;
+            padding-left: 0;
+        }
+
+        /* Delete and Retype */
+        .typewriter-delete {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-family: 'Courier New', monospace;
+            min-height: 1.5em;
+        }
+
+        /* Speed Variations */
+        .speed-demos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .speed-demo {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: left;
+        }
+
+        .speed-demo h3 {
+            font-size: 0.9rem;
+            color: #c9a227;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .speed-demo-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            min-height: 3em;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .replay-btn {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>
+                <span class="typewriter-hero"></span><span class="cursor"></span>
+            </h1>
+            <p>Classic typewriter effects for engaging text reveals</p>
+        </div>
+    </section>
+
+    <!-- Basic Typewriter -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Basic Typewriter</h2>
+            <p>Simple character-by-character reveal</p>
+        </div>
+        <div class="demo-container">
+            <div class="typewriter-basic">
+                <span class="typewriter-text-1"></span><span class="cursor cursor--thin"></span>
+            </div>
+            <button class="replay-btn" data-target="basic">Replay</button>
+        </div>
+    </section>
+
+    <!-- Rotating Words -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Rotating Words</h2>
+            <p>Cycle through different words with delete and type</p>
+        </div>
+        <div class="demo-container">
+            <div class="typewriter-rotate">
+                <span class="static">We build </span>
+                <span class="dynamic"><span class="rotating-word"></span><span class="cursor"></span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terminal Style -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Terminal Style</h2>
+            <p>Command line interface aesthetic</p>
+        </div>
+        <div class="demo-container">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-btn terminal-btn--red"></div>
+                    <div class="terminal-btn terminal-btn--yellow"></div>
+                    <div class="terminal-btn terminal-btn--green"></div>
+                    <div class="terminal-title">Terminal</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">$ </span>
+                        <span class="terminal-command terminal-cmd-1"></span>
+                    </div>
+                    <div class="terminal-line terminal-output terminal-out-1" style="display: none;"></div>
+                    <div class="terminal-line" style="display: none;">
+                        <span class="terminal-prompt">$ </span>
+                        <span class="terminal-command terminal-cmd-2"></span>
+                    </div>
+                    <div class="terminal-line terminal-output terminal-out-2" style="display: none;"></div>
+                    <div class="terminal-line terminal-final" style="display: none;">
+                        <span class="terminal-prompt">$ </span>
+                        <span class="cursor cursor--block"></span>
+                    </div>
+                </div>
+            </div>
+            <button class="replay-btn" data-target="terminal">Replay</button>
+        </div>
+    </section>
+
+    <!-- Speed Variations -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Speed Variations</h2>
+            <p>Different typing speeds for different effects</p>
+        </div>
+        <div class="speed-demos">
+            <div class="speed-demo">
+                <h3>Slow (Human-like)</h3>
+                <div class="speed-demo-text">
+                    <span class="speed-slow"></span><span class="cursor cursor--thin"></span>
+                </div>
+            </div>
+            <div class="speed-demo">
+                <h3>Medium (Default)</h3>
+                <div class="speed-demo-text">
+                    <span class="speed-medium"></span><span class="cursor cursor--thin"></span>
+                </div>
+            </div>
+            <div class="speed-demo">
+                <h3>Fast (Machine-like)</h3>
+                <div class="speed-demo-text">
+                    <span class="speed-fast"></span><span class="cursor cursor--thin"></span>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button class="replay-btn" data-target="speed">Replay All</button>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic Typewriter with GSAP</span>
+<span class="keyword">function</span> <span class="function">typewriter</span>(element, text, options = {}) {
+    <span class="keyword">const</span> {
+        speed = <span class="number">0.05</span>,     <span class="comment">// seconds per character</span>
+        delay = <span class="number">0</span>,        <span class="comment">// initial delay</span>
+        onComplete = <span class="keyword">null</span>
+    } = options;
+
+    <span class="keyword">const</span> chars = text.<span class="function">split</span>(<span class="string">''</span>);
+    element.<span class="property">textContent</span> = <span class="string">''</span>;
+
+    <span class="keyword">return</span> gsap.<span class="function">to</span>({}, {
+        <span class="property">duration</span>: chars.<span class="property">length</span> * speed,
+        <span class="property">delay</span>: delay,
+        <span class="property">ease</span>: <span class="string">"none"</span>,
+        <span class="property">onUpdate</span>: <span class="keyword">function</span>() {
+            <span class="keyword">const</span> progress = <span class="keyword">this</span>.<span class="function">progress</span>();
+            <span class="keyword">const</span> charIndex = Math.<span class="function">floor</span>(progress * chars.<span class="property">length</span>);
+            element.<span class="property">textContent</span> = text.<span class="function">substring</span>(<span class="number">0</span>, charIndex);
+        },
+        <span class="property">onComplete</span>: () => {
+            element.<span class="property">textContent</span> = text;
+            <span class="keyword">if</span> (onComplete) <span class="function">onComplete</span>();
+        }
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Delete text effect</span>
+<span class="keyword">function</span> <span class="function">deleteText</span>(element, options = {}) {
+    <span class="keyword">const</span> { speed = <span class="number">0.03</span>, delay = <span class="number">0</span>, onComplete } = options;
+    <span class="keyword">const</span> text = element.<span class="property">textContent</span>;
+
+    <span class="keyword">return</span> gsap.<span class="function">to</span>({}, {
+        <span class="property">duration</span>: text.<span class="property">length</span> * speed,
+        <span class="property">delay</span>: delay,
+        <span class="property">ease</span>: <span class="string">"none"</span>,
+        <span class="property">onUpdate</span>: <span class="keyword">function</span>() {
+            <span class="keyword">const</span> progress = <span class="keyword">this</span>.<span class="function">progress</span>();
+            <span class="keyword">const</span> charsToShow = text.<span class="property">length</span> - Math.<span class="function">floor</span>(progress * text.<span class="property">length</span>);
+            element.<span class="property">textContent</span> = text.<span class="function">substring</span>(<span class="number">0</span>, charsToShow);
+        },
+        <span class="property">onComplete</span>: () => {
+            element.<span class="property">textContent</span> = <span class="string">''</span>;
+            <span class="keyword">if</span> (onComplete) <span class="function">onComplete</span>();
+        }
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Rotating words typewriter</span>
+<span class="keyword">const</span> words = [<span class="string">'websites'</span>, <span class="string">'apps'</span>, <span class="string">'experiences'</span>];
+<span class="keyword">let</span> wordIndex = <span class="number">0</span>;
+
+<span class="keyword">function</span> <span class="function">rotateWords</span>() {
+    <span class="keyword">const</span> word = words[wordIndex];
+
+    <span class="comment">// Type the word</span>
+    <span class="function">typewriter</span>(element, word, {
+        <span class="property">speed</span>: <span class="number">0.08</span>,
+        <span class="property">onComplete</span>: () => {
+            <span class="comment">// Wait, then delete</span>
+            gsap.<span class="function">delayedCall</span>(<span class="number">2</span>, () => {
+                <span class="function">deleteText</span>(element, {
+                    <span class="property">speed</span>: <span class="number">0.04</span>,
+                    <span class="property">onComplete</span>: () => {
+                        wordIndex = (wordIndex + <span class="number">1</span>) % words.<span class="property">length</span>;
+                        <span class="function">rotateWords</span>();
+                    }
+                });
+            });
+        }
+    });
+}
+
+<span class="function">rotateWords</span>();</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // TYPEWRITER UTILITY
+        // =====================
+
+        function typewriter(element, text, options = {}) {
+            const {
+                speed = 0.05,
+                delay = 0,
+                onComplete = null
+            } = options;
+
+            const chars = text.split('');
+            element.textContent = '';
+
+            return gsap.to({}, {
+                duration: chars.length * speed,
+                delay: delay,
+                ease: "none",
+                onUpdate: function() {
+                    const progress = this.progress();
+                    const charIndex = Math.floor(progress * chars.length);
+                    element.textContent = text.substring(0, charIndex);
+                },
+                onComplete: () => {
+                    element.textContent = text;
+                    if (onComplete) onComplete();
+                }
+            });
+        }
+
+        function deleteText(element, options = {}) {
+            const { speed = 0.03, delay = 0, onComplete } = options;
+            const text = element.textContent;
+
+            return gsap.to({}, {
+                duration: text.length * speed,
+                delay: delay,
+                ease: "none",
+                onUpdate: function() {
+                    const progress = this.progress();
+                    const charsToShow = text.length - Math.floor(progress * text.length);
+                    element.textContent = text.substring(0, charsToShow);
+                },
+                onComplete: () => {
+                    element.textContent = '';
+                    if (onComplete) onComplete();
+                }
+            });
+        }
+
+        // =====================
+        // HERO ANIMATION
+        // =====================
+
+        const heroText = document.querySelector('.typewriter-hero');
+        typewriter(heroText, 'Typewriter Effects', { speed: 0.08, delay: 0.5 });
+
+        // =====================
+        // BASIC TYPEWRITER
+        // =====================
+
+        const basicText = document.querySelector('.typewriter-text-1');
+        const basicMessage = 'Hello, World! This is a typewriter effect.';
+
+        function playBasicTypewriter() {
+            basicText.textContent = '';
+            typewriter(basicText, basicMessage, { speed: 0.06 });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.typewriter-basic',
+            start: 'top 75%',
+            onEnter: playBasicTypewriter,
+            once: true
+        });
+
+        // =====================
+        // ROTATING WORDS
+        // =====================
+
+        const rotatingElement = document.querySelector('.rotating-word');
+        const words = ['websites', 'applications', 'experiences', 'brands', 'futures'];
+        let wordIndex = 0;
+
+        function rotateWords() {
+            const word = words[wordIndex];
+
+            typewriter(rotatingElement, word, {
+                speed: 0.08,
+                onComplete: () => {
+                    gsap.delayedCall(2, () => {
+                        deleteText(rotatingElement, {
+                            speed: 0.04,
+                            onComplete: () => {
+                                wordIndex = (wordIndex + 1) % words.length;
+                                rotateWords();
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.typewriter-rotate',
+            start: 'top 75%',
+            onEnter: rotateWords,
+            once: true
+        });
+
+        // =====================
+        // TERMINAL
+        // =====================
+
+        function playTerminal() {
+            const cmd1 = document.querySelector('.terminal-cmd-1');
+            const out1 = document.querySelector('.terminal-out-1');
+            const cmd2 = document.querySelector('.terminal-cmd-2');
+            const out2 = document.querySelector('.terminal-out-2');
+            const final = document.querySelector('.terminal-final');
+
+            // Reset
+            cmd1.textContent = '';
+            out1.style.display = 'none';
+            out1.textContent = '';
+            cmd2.parentElement.style.display = 'none';
+            cmd2.textContent = '';
+            out2.style.display = 'none';
+            out2.textContent = '';
+            final.style.display = 'none';
+
+            // Command 1
+            typewriter(cmd1, 'npm install gsap', {
+                speed: 0.05,
+                onComplete: () => {
+                    out1.style.display = 'block';
+                    out1.textContent = 'added 1 package in 2.3s';
+
+                    // Command 2
+                    gsap.delayedCall(0.8, () => {
+                        cmd2.parentElement.style.display = 'block';
+                        typewriter(cmd2, 'gsap --version', {
+                            speed: 0.05,
+                            onComplete: () => {
+                                out2.style.display = 'block';
+                                out2.textContent = '3.12.5';
+
+                                gsap.delayedCall(0.5, () => {
+                                    final.style.display = 'block';
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.terminal',
+            start: 'top 75%',
+            onEnter: playTerminal,
+            once: true
+        });
+
+        // =====================
+        // SPEED VARIATIONS
+        // =====================
+
+        const speedText = 'The quick brown fox jumps over the lazy dog.';
+
+        function playSpeedDemos() {
+            document.querySelector('.speed-slow').textContent = '';
+            document.querySelector('.speed-medium').textContent = '';
+            document.querySelector('.speed-fast').textContent = '';
+
+            typewriter(document.querySelector('.speed-slow'), speedText, { speed: 0.12 });
+            typewriter(document.querySelector('.speed-medium'), speedText, { speed: 0.06 });
+            typewriter(document.querySelector('.speed-fast'), speedText, { speed: 0.02 });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.speed-demos',
+            start: 'top 75%',
+            onEnter: playSpeedDemos,
+            once: true
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                switch(target) {
+                    case 'basic':
+                        playBasicTypewriter();
+                        break;
+                    case 'terminal':
+                        playTerminal();
+                        break;
+                    case 'speed':
+                        playSpeedDemos();
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Text Reveal | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           SPLIT TEXT REVEAL
+           Text split into characters, words, or lines
+           with staggered reveal animations
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content h1 .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotate(10deg);
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            opacity: 0;
+            max-width: 600px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 120px 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+            font-size: 1rem;
+        }
+
+        /* Demo text containers */
+        .demo-text-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Character Animation Demo */
+        .char-demo {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .char-demo .char {
+            display: inline-block;
+        }
+
+        /* Word Animation Demo */
+        .word-demo {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .word-demo .word {
+            display: inline-block;
+            margin-right: 0.3em;
+        }
+
+        /* Line Animation Demo */
+        .line-demo {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .line-demo .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .line-demo .line-inner {
+            display: block;
+        }
+
+        /* Wave Effect Demo */
+        .wave-demo {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 700;
+            color: #c9a227;
+        }
+
+        .wave-demo .char {
+            display: inline-block;
+        }
+
+        /* Scramble Demo */
+        .scramble-demo {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        /* Glitch Demo */
+        .glitch-demo {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            position: relative;
+        }
+
+        /* Mask Reveal Demo */
+        .mask-demo-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mask-demo {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 700;
+        }
+
+        .mask-demo-overlay {
+            position: absolute;
+            inset: 0;
+            background: #c9a227;
+            transform-origin: left;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #c9a227, #e8c547, #c9a227);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Highlight word */
+        .highlight {
+            color: #c9a227;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        /* Replay buttons */
+        .replay-btn {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero with Character Animation -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="split-chars">Split Text Magic</h1>
+            <p>Text animations that bring your headlines to life with character, word, and line-based reveals.</p>
+        </div>
+    </section>
+
+    <!-- Character Animation -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Character Animation</h2>
+            <p>Each character animates individually for dramatic effect</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="char-demo split-chars-demo">
+                Every character tells a story
+            </div>
+            <button class="replay-btn" data-target="char">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Word Animation -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Word Animation</h2>
+            <p>Words reveal one by one for better readability</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="word-demo split-words-demo">
+                Words cascading into view create rhythm and pace for your content
+            </div>
+            <button class="replay-btn" data-target="word">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Line Animation -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Line Animation</h2>
+            <p>Lines slide up from hidden overflow for a polished reveal</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="line-demo split-lines-demo">
+                <span class="line"><span class="line-inner">Lines of text sliding up</span></span>
+                <span class="line"><span class="line-inner">creating elegant reveals</span></span>
+                <span class="line"><span class="line-inner">that feel premium</span></span>
+            </div>
+            <button class="replay-btn" data-target="line">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Wave Animation -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Wave Animation</h2>
+            <p>Characters animate in a wave pattern</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="wave-demo split-wave-demo">
+                WAVE
+            </div>
+            <button class="replay-btn" data-target="wave">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Scramble Text -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Scramble Text</h2>
+            <p>Text decodes from random characters (no plugin required)</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="scramble-demo" data-final="DECODING MESSAGE...">
+                ________________
+            </div>
+            <button class="replay-btn" data-target="scramble">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Mask Reveal -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Mask Reveal</h2>
+            <p>Text revealed by animating overlay mask</p>
+        </div>
+        <div class="demo-text-container">
+            <div class="mask-demo-container">
+                <div class="mask-demo gradient-text">REVEALED</div>
+                <div class="mask-demo-overlay"></div>
+            </div>
+            <button class="replay-btn" data-target="mask">Replay Animation</button>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Split text into characters (vanilla JS)</span>
+<span class="keyword">function</span> <span class="function">splitChars</span>(element) {
+    <span class="keyword">const</span> text = element.<span class="property">textContent</span>;
+    element.<span class="property">innerHTML</span> = text
+        .<span class="function">split</span>(<span class="string">''</span>)
+        .<span class="function">map</span>(char =>
+            char === <span class="string">' '</span>
+                ? <span class="string">' '</span>
+                : <span class="string">`&lt;span class="char"&gt;</span>${char}<span class="string">&lt;/span&gt;`</span>
+        )
+        .<span class="function">join</span>(<span class="string">''</span>);
+    <span class="keyword">return</span> element.<span class="function">querySelectorAll</span>(<span class="string">'.char'</span>);
+}
+
+<span class="comment">// Animate characters</span>
+<span class="keyword">const</span> chars = <span class="function">splitChars</span>(element);
+gsap.<span class="function">from</span>(chars, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">50</span>,
+    <span class="property">rotateX</span>: <span class="number">-90</span>,
+    <span class="property">stagger</span>: <span class="number">0.03</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Split text into words</span>
+<span class="keyword">function</span> <span class="function">splitWords</span>(element) {
+    <span class="keyword">const</span> text = element.<span class="property">textContent</span>;
+    element.<span class="property">innerHTML</span> = text
+        .<span class="function">split</span>(<span class="string">' '</span>)
+        .<span class="function">map</span>(word => <span class="string">`&lt;span class="word"&gt;</span>${word}<span class="string">&lt;/span&gt;`</span>)
+        .<span class="function">join</span>(<span class="string">' '</span>);
+    <span class="keyword">return</span> element.<span class="function">querySelectorAll</span>(<span class="string">'.word'</span>);
+}
+
+gsap.<span class="function">from</span>(words, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">30</span>,
+    <span class="property">stagger</span>: <span class="number">0.08</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Line reveal (CSS overflow hidden on wrapper)</span>
+gsap.<span class="function">from</span>(<span class="string">".line-inner"</span>, {
+    <span class="property">yPercent</span>: <span class="number">100</span>,
+    <span class="property">stagger</span>: <span class="number">0.15</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power4.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Scramble text effect (vanilla JS)</span>
+<span class="keyword">function</span> <span class="function">scrambleText</span>(element, finalText, duration = <span class="number">2</span>) {
+    <span class="keyword">const</span> chars = <span class="string">'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%'</span>;
+    <span class="keyword">let</span> iteration = <span class="number">0</span>;
+
+    <span class="keyword">const</span> interval = <span class="function">setInterval</span>(() => {
+        element.<span class="property">textContent</span> = finalText
+            .<span class="function">split</span>(<span class="string">''</span>)
+            .<span class="function">map</span>((char, i) => {
+                <span class="keyword">if</span> (i < iteration) <span class="keyword">return</span> finalText[i];
+                <span class="keyword">return</span> chars[Math.<span class="function">floor</span>(Math.<span class="function">random</span>() * chars.<span class="property">length</span>)];
+            })
+            .<span class="function">join</span>(<span class="string">''</span>);
+
+        iteration += <span class="number">1</span> / <span class="number">3</span>;
+        <span class="keyword">if</span> (iteration >= finalText.<span class="property">length</span>) <span class="function">clearInterval</span>(interval);
+    }, duration * <span class="number">1000</span> / (finalText.<span class="property">length</span> * <span class="number">3</span>));
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // UTILITY FUNCTIONS
+        // =====================
+
+        // Split text into characters
+        function splitChars(element) {
+            const text = element.textContent;
+            element.innerHTML = text
+                .split('')
+                .map(char => char === ' ' ? ' ' : `<span class="char">${char}</span>`)
+                .join('');
+            return element.querySelectorAll('.char');
+        }
+
+        // Split text into words
+        function splitWords(element) {
+            const text = element.textContent;
+            element.innerHTML = text
+                .split(' ')
+                .map(word => `<span class="word">${word}</span>`)
+                .join(' ');
+            return element.querySelectorAll('.word');
+        }
+
+        // Scramble text effect
+        function scrambleText(element, finalText, duration = 2) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+            let iteration = 0;
+            const totalIterations = finalText.length * 3;
+            const intervalTime = (duration * 1000) / totalIterations;
+
+            const interval = setInterval(() => {
+                element.textContent = finalText
+                    .split('')
+                    .map((char, i) => {
+                        if (char === ' ') return ' ';
+                        if (i < iteration) return finalText[i];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join('');
+
+                iteration += 1 / 3;
+                if (iteration >= finalText.length) {
+                    element.textContent = finalText;
+                    clearInterval(interval);
+                }
+            }, intervalTime);
+        }
+
+        // =====================
+        // HERO ANIMATION
+        // =====================
+
+        const heroTitle = document.querySelector('.hero-content h1');
+        const heroChars = splitChars(heroTitle);
+
+        gsap.to(heroChars, {
+            opacity: 1,
+            y: 0,
+            rotation: 0,
+            stagger: 0.03,
+            duration: 0.8,
+            ease: "back.out(1.7)",
+            delay: 0.3
+        });
+
+        gsap.to('.hero-content p', {
+            opacity: 0.7,
+            duration: 1,
+            delay: 1.2
+        });
+
+        // =====================
+        // CHARACTER DEMO
+        // =====================
+
+        const charDemo = document.querySelector('.split-chars-demo');
+        const charDemoChars = splitChars(charDemo);
+        let charTl;
+
+        function playCharAnimation() {
+            gsap.set(charDemoChars, { opacity: 0, y: 50, rotateX: -90 });
+            charTl = gsap.to(charDemoChars, {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                stagger: 0.03,
+                duration: 0.6,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: charDemo,
+            start: "top 75%",
+            onEnter: playCharAnimation,
+            once: true
+        });
+
+        // =====================
+        // WORD DEMO
+        // =====================
+
+        const wordDemo = document.querySelector('.split-words-demo');
+        const wordDemoWords = splitWords(wordDemo);
+        let wordTl;
+
+        function playWordAnimation() {
+            gsap.set(wordDemoWords, { opacity: 0, y: 30 });
+            wordTl = gsap.to(wordDemoWords, {
+                opacity: 1,
+                y: 0,
+                stagger: 0.08,
+                duration: 0.6,
+                ease: "power3.out"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: wordDemo,
+            start: "top 75%",
+            onEnter: playWordAnimation,
+            once: true
+        });
+
+        // =====================
+        // LINE DEMO
+        // =====================
+
+        const lineInners = document.querySelectorAll('.split-lines-demo .line-inner');
+        let lineTl;
+
+        function playLineAnimation() {
+            gsap.set(lineInners, { yPercent: 100 });
+            lineTl = gsap.to(lineInners, {
+                yPercent: 0,
+                stagger: 0.15,
+                duration: 1,
+                ease: "power4.out"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.split-lines-demo',
+            start: "top 75%",
+            onEnter: playLineAnimation,
+            once: true
+        });
+
+        // =====================
+        // WAVE DEMO
+        // =====================
+
+        const waveDemo = document.querySelector('.split-wave-demo');
+        const waveDemoChars = splitChars(waveDemo);
+        let waveTl;
+
+        function playWaveAnimation() {
+            waveTl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+            waveTl.to(waveDemoChars, {
+                y: -20,
+                stagger: {
+                    each: 0.1,
+                    repeat: 1,
+                    yoyo: true
+                },
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: waveDemo,
+            start: "top 75%",
+            onEnter: playWaveAnimation,
+            once: true
+        });
+
+        // =====================
+        // SCRAMBLE DEMO
+        // =====================
+
+        const scrambleDemo = document.querySelector('.scramble-demo');
+        const scrambleFinalText = scrambleDemo.dataset.final;
+
+        function playScrambleAnimation() {
+            scrambleDemo.textContent = '________________';
+            setTimeout(() => {
+                scrambleText(scrambleDemo, scrambleFinalText, 2);
+            }, 100);
+        }
+
+        ScrollTrigger.create({
+            trigger: scrambleDemo,
+            start: "top 75%",
+            onEnter: playScrambleAnimation,
+            once: true
+        });
+
+        // =====================
+        // MASK REVEAL DEMO
+        // =====================
+
+        const maskOverlay = document.querySelector('.mask-demo-overlay');
+        let maskTl;
+
+        function playMaskAnimation() {
+            gsap.set(maskOverlay, { scaleX: 1 });
+            maskTl = gsap.to(maskOverlay, {
+                scaleX: 0,
+                duration: 1.2,
+                ease: "power4.inOut"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.mask-demo-container',
+            start: "top 75%",
+            onEnter: playMaskAnimation,
+            once: true
+        });
+
+        // Gradient animation
+        gsap.to('.gradient-text', {
+            backgroundPosition: '-200% 0',
+            duration: 3,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                switch(target) {
+                    case 'char':
+                        playCharAnimation();
+                        break;
+                    case 'word':
+                        playWordAnimation();
+                        break;
+                    case 'line':
+                        playLineAnimation();
+                        break;
+                    case 'wave':
+                        if (waveTl) waveTl.restart();
+                        break;
+                    case 'scramble':
+                        playScrambleAnimation();
+                        break;
+                    case 'mask':
+                        gsap.set(maskOverlay, { scaleX: 1, transformOrigin: 'left' });
+                        playMaskAnimation();
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

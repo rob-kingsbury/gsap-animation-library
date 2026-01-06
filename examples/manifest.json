@@ -1,0 +1,175 @@
+{
+  "generated": "2026-01-06T10:44:31.594Z",
+  "totalExamples": 24,
+  "categories": [
+    {
+      "id": "cards",
+      "label": "Card Animations",
+      "icon": "▢",
+      "examples": [
+        {
+          "file": "cards/3d-flip-cards.html",
+          "title": "3D Flip Cards",
+          "description": ""
+        },
+        {
+          "file": "cards/grid-stagger.html",
+          "title": "Grid Stagger Reveals",
+          "description": ""
+        },
+        {
+          "file": "cards/hover-tilt.html",
+          "title": "Hover Tilt Cards",
+          "description": ""
+        },
+        {
+          "file": "cards/stacking-cards.html",
+          "title": "Stacking Cards",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "hero",
+      "label": "Hero Animations",
+      "icon": "★",
+      "examples": [
+        {
+          "file": "hero/animated-gradient.html",
+          "title": "Animated Gradients",
+          "description": ""
+        },
+        {
+          "file": "hero/counter-stats.html",
+          "title": "Counter/Stats Animations",
+          "description": ""
+        },
+        {
+          "file": "hero/hero-text-entrance.html",
+          "title": "Hero Text Entrance",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "micro-interactions",
+      "label": "Micro Interactions",
+      "icon": "✦",
+      "examples": [
+        {
+          "file": "micro-interactions/button-hover.html",
+          "title": "Button Hover Effects",
+          "description": ""
+        },
+        {
+          "file": "micro-interactions/cursor-effects.html",
+          "title": "Cursor Effects",
+          "description": ""
+        },
+        {
+          "file": "micro-interactions/loading-spinners.html",
+          "title": "Loading Spinners",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "navigation",
+      "label": "Navigation",
+      "icon": "☰",
+      "examples": [
+        {
+          "file": "navigation/hamburger-menu.html",
+          "title": "Hamburger Menu Animations",
+          "description": ""
+        },
+        {
+          "file": "navigation/modal-animations.html",
+          "title": "Modal Animations",
+          "description": ""
+        },
+        {
+          "file": "navigation/slide-drawer.html",
+          "title": "Slide-Out Drawers",
+          "description": ""
+        },
+        {
+          "file": "navigation/tab-transitions.html",
+          "title": "Tab Transitions",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "scroll",
+      "label": "Scroll Animations",
+      "icon": "↕",
+      "examples": [
+        {
+          "file": "scroll/horizontal-gallery.html",
+          "title": "Horizontal Scroll Gallery",
+          "description": ""
+        },
+        {
+          "file": "scroll/parallax-layers.html",
+          "title": "Parallax Layers",
+          "description": ""
+        },
+        {
+          "file": "scroll/pin-sections.html",
+          "title": "Pin and Unpin Sections",
+          "description": ""
+        },
+        {
+          "file": "scroll/scroll-progress.html",
+          "title": "Scroll Progress Indicators",
+          "description": ""
+        },
+        {
+          "file": "scroll/scroll-reveals.html",
+          "title": "Scroll-Triggered Reveals",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "label": "Text Animations",
+      "icon": "Aa",
+      "examples": [
+        {
+          "file": "text/kinetic-typography.html",
+          "title": "Kinetic Typography",
+          "description": ""
+        },
+        {
+          "file": "text/split-text-reveal.html",
+          "title": "Split Text Reveal",
+          "description": ""
+        },
+        {
+          "file": "text/text-marquee.html",
+          "title": "Text Marquee",
+          "description": ""
+        },
+        {
+          "file": "text/typewriter.html",
+          "title": "Typewriter Effects",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "standalone",
+      "label": "Standalone",
+      "icon": "◈",
+      "examples": [
+        {
+          "file": "stripe-expanding-slider.html",
+          "title": "Stripe-Style Expanding Slider",
+          "description": "Accept payments online, in person, or through your platform."
+        }
+      ]
+    }
+  ]
+}

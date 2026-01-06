@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Scroll Gallery | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           HORIZONTAL SCROLL GALLERY
+           Transforms vertical scroll into horizontal
+           movement for a gallery of images/cards
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Intro section before the gallery */
+        .intro {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .intro h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        .intro p {
+            font-size: 1.25rem;
+            opacity: 0.7;
+            max-width: 600px;
+        }
+
+        .scroll-hint {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .scroll-hint svg {
+            width: 24px;
+            height: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Horizontal scroll container */
+        .horizontal-section {
+            overflow: hidden;
+        }
+
+        .horizontal-wrapper {
+            display: flex;
+            width: fit-content;
+            /* Gap between gallery items */
+            gap: 3vw;
+            padding: 0 10vw;
+            height: 100vh;
+            align-items: center;
+        }
+
+        /* Gallery items */
+        .gallery-item {
+            flex-shrink: 0;
+            width: 70vw;
+            max-width: 900px;
+            height: 60vh;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            background: #1a1a1a;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Overlay content on each item */
+        .gallery-item-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+
+        .gallery-item-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .gallery-item-content p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            z-index: 100;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #c9a227;
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        /* Outro section */
+        .outro {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .outro h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        /* Code reference section */
+        .code-reference {
+            background: #111;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .gallery-item {
+                width: 85vw;
+                height: 50vh;
+            }
+
+            .horizontal-wrapper {
+                gap: 5vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro Section -->
+    <section class="intro">
+        <h1>Horizontal Gallery</h1>
+        <p>Scroll down to navigate horizontally through the gallery. This technique converts vertical scroll into horizontal movement.</p>
+        <div class="scroll-hint">
+            <span>Scroll to explore</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Horizontal Scroll Section -->
+    <section class="horizontal-section">
+        <div class="horizontal-wrapper">
+            <div class="gallery-item">
+                <img src="https://picsum.photos/900/600?random=1" alt="Gallery image 1">
+                <div class="gallery-item-content">
+                    <h3>Mountain Vista</h3>
+                    <p>Breathtaking peaks reaching toward the clouds</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://picsum.photos/900/600?random=2" alt="Gallery image 2">
+                <div class="gallery-item-content">
+                    <h3>Ocean Depths</h3>
+                    <p>The endless mystery of the deep blue sea</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://picsum.photos/900/600?random=3" alt="Gallery image 3">
+                <div class="gallery-item-content">
+                    <h3>Forest Canopy</h3>
+                    <p>Ancient trees whispering secrets of time</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://picsum.photos/900/600?random=4" alt="Gallery image 4">
+                <div class="gallery-item-content">
+                    <h3>Desert Sands</h3>
+                    <p>Golden dunes stretching to the horizon</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://picsum.photos/900/600?random=5" alt="Gallery image 5">
+                <div class="gallery-item-content">
+                    <h3>City Lights</h3>
+                    <p>Urban landscapes alive with energy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-bar-fill"></div>
+    </div>
+
+    <!-- Outro Section -->
+    <section class="outro">
+        <h2>End of Gallery</h2>
+        <p>Continue scrolling for the code reference</p>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+        <div class="code-block">
+            <pre><code><span class="comment">// Key Pattern: Horizontal Scroll with ScrollTrigger</span>
+
+<span class="comment">// 1. Calculate total scroll distance</span>
+<span class="keyword">const</span> wrapper = document.<span class="function">querySelector</span>(<span class="string">'.horizontal-wrapper'</span>);
+<span class="keyword">const</span> scrollDistance = wrapper.<span class="property">scrollWidth</span> - window.<span class="property">innerWidth</span>;
+
+<span class="comment">// 2. Create the horizontal scroll animation</span>
+gsap.<span class="function">to</span>(wrapper, {
+    <span class="property">x</span>: -scrollDistance,       <span class="comment">// Move left by scroll distance</span>
+    <span class="property">ease</span>: <span class="string">"none"</span>,              <span class="comment">// Linear movement for scroll</span>
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".horizontal-section"</span>,
+        <span class="property">pin</span>: <span class="keyword">true</span>,              <span class="comment">// Pin section during scroll</span>
+        <span class="property">scrub</span>: <span class="number">1</span>,               <span class="comment">// Smooth scrubbing (1 second)</span>
+        <span class="property">end</span>: <span class="string">`+=</span>${scrollDistance}<span class="string">`</span>,  <span class="comment">// Scroll distance</span>
+    }
+});
+
+<span class="comment">// 3. Add progress indicator</span>
+gsap.<span class="function">to</span>(<span class="string">".progress-bar-fill"</span>, {
+    <span class="property">width</span>: <span class="string">"100%"</span>,
+    <span class="property">ease</span>: <span class="string">"none"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".horizontal-section"</span>,
+        <span class="property">scrub</span>: <span class="keyword">true</span>,
+        <span class="property">start</span>: <span class="string">"top top"</span>,
+        <span class="property">end</span>: <span class="string">`+=</span>${scrollDistance}<span class="string">`</span>,
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- GSAP Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Get elements
+        const horizontalWrapper = document.querySelector('.horizontal-wrapper');
+        const horizontalSection = document.querySelector('.horizontal-section');
+
+        // Calculate how far we need to scroll horizontally
+        // Total width of wrapper minus one viewport width
+        const getScrollDistance = () => {
+            return horizontalWrapper.scrollWidth - window.innerWidth;
+        };
+
+        // Create the horizontal scroll animation
+        let scrollTween = gsap.to(horizontalWrapper, {
+            x: () => -getScrollDistance(),
+            ease: "none",
+            scrollTrigger: {
+                trigger: horizontalSection,
+                pin: true,
+                scrub: 1, // Smooth scrubbing with 1 second delay
+                end: () => `+=${getScrollDistance()}`,
+                invalidateOnRefresh: true, // Recalculate on window resize
+            }
+        });
+
+        // Progress bar animation linked to horizontal scroll
+        gsap.to(".progress-bar-fill", {
+            width: "100%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: horizontalSection,
+                scrub: true,
+                start: "top top",
+                end: () => `+=${getScrollDistance()}`,
+            }
+        });
+
+        // Animate gallery items as they come into view
+        const galleryItems = gsap.utils.toArray('.gallery-item');
+
+        galleryItems.forEach((item, i) => {
+            gsap.from(item, {
+                opacity: 0.3,
+                scale: 0.8,
+                scrollTrigger: {
+                    trigger: item,
+                    containerAnimation: scrollTween,
+                    start: "left 80%",
+                    end: "left 20%",
+                    scrub: true,
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+</html>

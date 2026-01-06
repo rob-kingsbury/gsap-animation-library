@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin and Unpin Sections | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           PIN AND UNPIN SECTIONS
+           Sections that stay fixed while content
+           animates, then release and scroll away
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Intro */
+        .intro {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .intro h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .intro h1 span {
+            color: #c9a227;
+        }
+
+        /* Pinned Section with Steps */
+        .pin-section {
+            position: relative;
+            min-height: 400vh; /* Extended scroll area */
+        }
+
+        .pin-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #111;
+        }
+
+        /* Step indicators */
+        .steps-indicator {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .step-dot.is-active {
+            background: #c9a227;
+        }
+
+        .step-dot::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 30px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .step-dot:last-child::after {
+            display: none;
+        }
+
+        /* Content panels that animate */
+        .step-panel {
+            position: absolute;
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .step-panel.is-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-panel h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        .step-panel p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .step-number {
+            font-size: 8rem;
+            font-weight: 700;
+            color: rgba(201, 162, 39, 0.1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        /* Progress line */
+        .progress-line {
+            position: absolute;
+            right: 40px;
+            top: 20%;
+            height: 60%;
+            width: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: #c9a227;
+            border-radius: 2px;
+        }
+
+        /* Split Pin Section */
+        .split-pin-section {
+            position: relative;
+            height: 300vh;
+        }
+
+        .split-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        .split-left {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: #0a0a0a;
+        }
+
+        .split-left-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .split-left-content h2 span {
+            color: #c9a227;
+        }
+
+        .split-left-content p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        .split-right {
+            width: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .split-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .split-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .split-image.is-active {
+            opacity: 1;
+        }
+
+        /* Reveal Pin Section */
+        .reveal-section {
+            position: relative;
+            height: 200vh;
+        }
+
+        .reveal-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            overflow: hidden;
+        }
+
+        .reveal-text {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .reveal-text .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .reveal-bg-circle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: #c9a227;
+            opacity: 0.1;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .steps-indicator,
+            .progress-line {
+                display: none;
+            }
+
+            .split-container {
+                flex-direction: column;
+            }
+
+            .split-left,
+            .split-right {
+                width: 100%;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro -->
+    <section class="intro">
+        <div>
+            <h1>Pin and <span>Unpin</span> Sections</h1>
+            <p>Sections that stay fixed while content animates within them</p>
+        </div>
+    </section>
+
+    <!-- Pinned Section with Steps -->
+    <section class="pin-section">
+        <div class="pin-container">
+            <div class="steps-indicator">
+                <div class="step-dot is-active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+                <div class="step-dot" data-step="4"></div>
+            </div>
+
+            <div class="progress-line">
+                <div class="progress-line-fill"></div>
+            </div>
+
+            <div class="step-panel is-active" data-step="1">
+                <span class="step-number">01</span>
+                <h2>Pin the Container</h2>
+                <p>The section stays fixed in the viewport while you scroll. This creates space for content to animate without the user losing context.</p>
+            </div>
+
+            <div class="step-panel" data-step="2">
+                <span class="step-number">02</span>
+                <h2>Animate Content</h2>
+                <p>While pinned, use scroll progress to trigger animations. Panels can fade, slide, scale, or transform based on how far the user has scrolled.</p>
+            </div>
+
+            <div class="step-panel" data-step="3">
+                <span class="step-number">03</span>
+                <h2>Track Progress</h2>
+                <p>Visual indicators help users understand their position. Progress bars and step dots provide feedback during the pinned sequence.</p>
+            </div>
+
+            <div class="step-panel" data-step="4">
+                <span class="step-number">04</span>
+                <h2>Release and Continue</h2>
+                <p>When the animation completes, the section unpins and normal scrolling resumes. The transition should feel natural and seamless.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Split Screen Pin -->
+    <section class="split-pin-section">
+        <div class="split-container">
+            <div class="split-left">
+                <div class="split-left-content">
+                    <h2>Split Screen <span>Pin</span></h2>
+                    <p>Keep one side pinned while images or content cycle through on the other. Perfect for showcasing features, products, or process steps.</p>
+                </div>
+            </div>
+            <div class="split-right">
+                <div class="split-image is-active" data-index="0">
+                    <img src="https://picsum.photos/800/1000?random=20" alt="Split image 1">
+                </div>
+                <div class="split-image" data-index="1">
+                    <img src="https://picsum.photos/800/1000?random=21" alt="Split image 2">
+                </div>
+                <div class="split-image" data-index="2">
+                    <img src="https://picsum.photos/800/1000?random=22" alt="Split image 3">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Text Reveal Pin -->
+    <section class="reveal-section">
+        <div class="reveal-container">
+            <div class="reveal-bg-circle"></div>
+            <div class="reveal-text">
+                <span class="word">Scroll</span>
+                <span class="word">triggers</span>
+                <span class="word">the</span>
+                <span class="word">reveal</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic Pin Pattern</span>
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: <span class="string">".pin-section"</span>,
+    <span class="property">start</span>: <span class="string">"top top"</span>,
+    <span class="property">end</span>: <span class="string">"+=300%"</span>,        <span class="comment">// Pin for 3x viewport height</span>
+    <span class="property">pin</span>: <span class="string">".pin-container"</span>,  <span class="comment">// Element to pin</span>
+    <span class="property">pinSpacing</span>: <span class="keyword">true</span>,       <span class="comment">// Add spacing after pinned area</span>
+    <span class="property">scrub</span>: <span class="number">1</span>               <span class="comment">// Smooth scrubbing</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Animate content while pinned</span>
+<span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>({
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".pin-section"</span>,
+        <span class="property">start</span>: <span class="string">"top top"</span>,
+        <span class="property">end</span>: <span class="string">"+=300%"</span>,
+        <span class="property">pin</span>: <span class="keyword">true</span>,
+        <span class="property">scrub</span>: <span class="number">1</span>
+    }
+});
+
+<span class="comment">// Step 1 exits</span>
+tl.<span class="function">to</span>(<span class="string">".step-1"</span>, { <span class="property">opacity</span>: <span class="number">0</span>, <span class="property">y</span>: <span class="number">-50</span> });
+
+<span class="comment">// Step 2 enters and exits</span>
+tl.<span class="function">from</span>(<span class="string">".step-2"</span>, { <span class="property">opacity</span>: <span class="number">0</span>, <span class="property">y</span>: <span class="number">50</span> })
+  .<span class="function">to</span>(<span class="string">".step-2"</span>, { <span class="property">opacity</span>: <span class="number">0</span>, <span class="property">y</span>: <span class="number">-50</span> });
+
+<span class="comment">// Step 3 enters...</span>
+tl.<span class="function">from</span>(<span class="string">".step-3"</span>, { <span class="property">opacity</span>: <span class="number">0</span>, <span class="property">y</span>: <span class="number">50</span> });</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Split screen: pin one side only</span>
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: <span class="string">".split-section"</span>,
+    <span class="property">start</span>: <span class="string">"top top"</span>,
+    <span class="property">end</span>: <span class="string">"bottom bottom"</span>,
+    <span class="property">pin</span>: <span class="string">".split-left"</span>,  <span class="comment">// Only pin the left panel</span>
+    <span class="property">pinSpacing</span>: <span class="keyword">false</span>   <span class="comment">// Don't add extra space</span>
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // STEP PANELS ANIMATION
+        // =====================
+        const stepPanels = gsap.utils.toArray('.step-panel');
+        const stepDots = gsap.utils.toArray('.step-dot');
+
+        // Create timeline for step transitions
+        const stepsTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".pin-section",
+                start: "top top",
+                end: "bottom bottom",
+                pin: ".pin-container",
+                scrub: 1,
+                onUpdate: (self) => {
+                    // Update step dots based on progress
+                    const progress = self.progress;
+                    const activeStep = Math.floor(progress * 4);
+
+                    stepDots.forEach((dot, i) => {
+                        dot.classList.toggle('is-active', i <= activeStep);
+                    });
+                }
+            }
+        });
+
+        // Animate progress line
+        gsap.to(".progress-line-fill", {
+            height: "100%",
+            scrollTrigger: {
+                trigger: ".pin-section",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: true
+            }
+        });
+
+        // Step 1 exits
+        stepsTl.to(stepPanels[0], {
+            opacity: 0,
+            y: -100,
+            duration: 0.5
+        });
+
+        // Step 2 enters and exits
+        stepsTl.fromTo(stepPanels[1],
+            { opacity: 0, y: 100 },
+            { opacity: 1, y: 0, duration: 0.5 }
+        ).to(stepPanels[1], {
+            opacity: 0,
+            y: -100,
+            duration: 0.5
+        });
+
+        // Step 3 enters and exits
+        stepsTl.fromTo(stepPanels[2],
+            { opacity: 0, y: 100 },
+            { opacity: 1, y: 0, duration: 0.5 }
+        ).to(stepPanels[2], {
+            opacity: 0,
+            y: -100,
+            duration: 0.5
+        });
+
+        // Step 4 enters
+        stepsTl.fromTo(stepPanels[3],
+            { opacity: 0, y: 100 },
+            { opacity: 1, y: 0, duration: 0.5 }
+        );
+
+        // =====================
+        // SPLIT SCREEN PIN
+        // =====================
+        const splitImages = gsap.utils.toArray('.split-image');
+
+        // Create timeline for split section
+        const splitTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".split-pin-section",
+                start: "top top",
+                end: "bottom bottom",
+                pin: ".split-container",
+                scrub: 1
+            }
+        });
+
+        // Cycle through images
+        splitImages.forEach((img, i) => {
+            if (i > 0) {
+                splitTl.to(splitImages[i - 1], { opacity: 0, duration: 0.5 }, i);
+                splitTl.to(img, { opacity: 1, duration: 0.5 }, i);
+            }
+        });
+
+        // =====================
+        // TEXT REVEAL PIN
+        // =====================
+        const words = gsap.utils.toArray('.reveal-text .word');
+
+        const revealTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".reveal-section",
+                start: "top top",
+                end: "bottom bottom",
+                pin: ".reveal-container",
+                scrub: 1
+            }
+        });
+
+        // Animate background circle
+        revealTl.to(".reveal-bg-circle", {
+            width: "150vmax",
+            height: "150vmax",
+            x: "-50%",
+            y: "-50%",
+            left: "50%",
+            top: "50%",
+            duration: 1
+        }, 0);
+
+        // Animate words staggered
+        words.forEach((word, i) => {
+            revealTl.to(word, {
+                opacity: 1,
+                y: 0,
+                duration: 0.5
+            }, i * 0.2);
+        });
+
+        // Keep visible at end
+        revealTl.to({}, { duration: 0.5 });
+    </script>
+</body>
+</html>

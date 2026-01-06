@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll-Triggered Reveals | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           SCROLL-TRIGGERED REVEALS
+           Various reveal animations triggered on scroll:
+           fade, slide, scale, rotate, clip
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 600px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 100px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .section-header p {
+            opacity: 0.7;
+        }
+
+        /* Grid for demo items */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Demo cards */
+        .demo-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .demo-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .demo-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        /* Initial states for reveals - GSAP will animate FROM these */
+
+        /* Fade variations */
+        .reveal-fade {
+            opacity: 0;
+        }
+
+        .reveal-fade-up {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .reveal-fade-down {
+            opacity: 0;
+            transform: translateY(-60px);
+        }
+
+        .reveal-fade-left {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+
+        .reveal-fade-right {
+            opacity: 0;
+            transform: translateX(60px);
+        }
+
+        /* Scale variations */
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .reveal-scale-up {
+            opacity: 0;
+            transform: scale(1.2);
+        }
+
+        /* Rotate variations */
+        .reveal-rotate {
+            opacity: 0;
+            transform: rotate(-10deg);
+        }
+
+        .reveal-rotate-3d {
+            opacity: 0;
+            transform: perspective(500px) rotateX(30deg);
+        }
+
+        /* Clip variations */
+        .reveal-clip-left {
+            clip-path: inset(0 100% 0 0);
+        }
+
+        .reveal-clip-right {
+            clip-path: inset(0 0 0 100%);
+        }
+
+        .reveal-clip-top {
+            clip-path: inset(100% 0 0 0);
+        }
+
+        .reveal-clip-bottom {
+            clip-path: inset(0 0 100% 0);
+        }
+
+        .reveal-clip-center {
+            clip-path: inset(50% 50% 50% 50%);
+        }
+
+        /* Stagger demo */
+        .stagger-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stagger-item {
+            background: #c9a227;
+            border-radius: 12px;
+            aspect-ratio: 1;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        /* Text reveal demo */
+        .text-reveal-demo {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .text-reveal-demo h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 1.2;
+        }
+
+        .text-reveal-demo h2 .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .text-reveal-demo h2 .line-inner {
+            display: block;
+            transform: translateY(100%);
+        }
+
+        /* Image reveal */
+        .image-reveal-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .image-reveal {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            aspect-ratio: 4/3;
+        }
+
+        .image-reveal img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-reveal-mask {
+            position: absolute;
+            inset: 0;
+            background: #c9a227;
+            transform-origin: left;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Scroll-Triggered <span>Reveals</span></h1>
+            <p>Elements that animate into view as you scroll. Fade, slide, scale, rotate, clip, and more.</p>
+        </div>
+    </section>
+
+    <!-- Fade Reveals -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Fade Reveals</h2>
+            <p>The most common and subtle reveal animations</p>
+        </div>
+
+        <div class="demo-grid">
+            <div class="demo-card reveal-fade">
+                <div class="icon">O</div>
+                <h3>Fade In</h3>
+                <p>Simple opacity transition</p>
+            </div>
+            <div class="demo-card reveal-fade-up">
+                <div class="icon">^</div>
+                <h3>Fade Up</h3>
+                <p>Fade + slide from below</p>
+            </div>
+            <div class="demo-card reveal-fade-down">
+                <div class="icon">v</div>
+                <h3>Fade Down</h3>
+                <p>Fade + slide from above</p>
+            </div>
+            <div class="demo-card reveal-fade-left">
+                <div class="icon">&lt;</div>
+                <h3>Fade Left</h3>
+                <p>Fade + slide from left</p>
+            </div>
+            <div class="demo-card reveal-fade-right">
+                <div class="icon">&gt;</div>
+                <h3>Fade Right</h3>
+                <p>Fade + slide from right</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scale Reveals -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Scale Reveals</h2>
+            <p>Elements that grow or shrink into view</p>
+        </div>
+
+        <div class="demo-grid">
+            <div class="demo-card reveal-scale">
+                <div class="icon">[ ]</div>
+                <h3>Scale In</h3>
+                <p>Grow from smaller size</p>
+            </div>
+            <div class="demo-card reveal-scale-up">
+                <div class="icon">[+]</div>
+                <h3>Scale Down</h3>
+                <p>Shrink from larger size</p>
+            </div>
+            <div class="demo-card reveal-rotate">
+                <div class="icon">@</div>
+                <h3>Rotate In</h3>
+                <p>Slight rotation adds dynamism</p>
+            </div>
+            <div class="demo-card reveal-rotate-3d">
+                <div class="icon">#</div>
+                <h3>3D Rotate</h3>
+                <p>Perspective rotation reveal</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clip Reveals -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Clip-Path Reveals</h2>
+            <p>Reveal content with animated clip-path</p>
+        </div>
+
+        <div class="demo-grid">
+            <div class="demo-card reveal-clip-left">
+                <div class="icon">[&lt;]</div>
+                <h3>Clip from Left</h3>
+                <p>Reveal wipes from left edge</p>
+            </div>
+            <div class="demo-card reveal-clip-right">
+                <div class="icon">[&gt;]</div>
+                <h3>Clip from Right</h3>
+                <p>Reveal wipes from right edge</p>
+            </div>
+            <div class="demo-card reveal-clip-top">
+                <div class="icon">[^]</div>
+                <h3>Clip from Top</h3>
+                <p>Reveal wipes from top edge</p>
+            </div>
+            <div class="demo-card reveal-clip-bottom">
+                <div class="icon">[v]</div>
+                <h3>Clip from Bottom</h3>
+                <p>Reveal wipes from bottom</p>
+            </div>
+            <div class="demo-card reveal-clip-center">
+                <div class="icon">[o]</div>
+                <h3>Clip from Center</h3>
+                <p>Reveal expands from center</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stagger Reveals -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Stagger Reveals</h2>
+            <p>Multiple elements animating in sequence</p>
+        </div>
+
+        <div class="stagger-grid">
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+            <div class="stagger-item"></div>
+        </div>
+    </section>
+
+    <!-- Text Line Reveal -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Text Line Reveals</h2>
+            <p>Lines of text sliding up from hidden overflow</p>
+        </div>
+
+        <div class="text-reveal-demo">
+            <h2>
+                <span class="line"><span class="line-inner">Ideas that move</span></span>
+                <span class="line"><span class="line-inner">people forward</span></span>
+            </h2>
+        </div>
+    </section>
+
+    <!-- Image Mask Reveal -->
+    <section class="section">
+        <div class="section-header reveal-fade-up">
+            <h2>Image Mask Reveals</h2>
+            <p>Images revealed by animating overlay masks</p>
+        </div>
+
+        <div class="image-reveal-container">
+            <div class="image-reveal">
+                <img src="https://picsum.photos/600/450?random=30" alt="Reveal image 1">
+                <div class="image-reveal-mask"></div>
+            </div>
+            <div class="image-reveal">
+                <img src="https://picsum.photos/600/450?random=31" alt="Reveal image 2">
+                <div class="image-reveal-mask"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic reveal pattern with ScrollTrigger</span>
+gsap.<span class="function">from</span>(<span class="string">".reveal-element"</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">60</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".reveal-element"</span>,
+        <span class="property">start</span>: <span class="string">"top 80%"</span>,   <span class="comment">// When top hits 80% of viewport</span>
+        <span class="property">toggleActions</span>: <span class="string">"play none none none"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Batch reveals for better performance</span>
+ScrollTrigger.<span class="function">batch</span>(<span class="string">".reveal-fade-up"</span>, {
+    <span class="property">start</span>: <span class="string">"top 85%"</span>,
+    <span class="property">onEnter</span>: (elements) => {
+        gsap.<span class="function">to</span>(elements, {
+            <span class="property">opacity</span>: <span class="number">1</span>,
+            <span class="property">y</span>: <span class="number">0</span>,
+            <span class="property">stagger</span>: <span class="number">0.1</span>,
+            <span class="property">duration</span>: <span class="number">0.8</span>
+        });
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Clip-path reveal</span>
+gsap.<span class="function">to</span>(<span class="string">".reveal-clip"</span>, {
+    <span class="property">clipPath</span>: <span class="string">"inset(0 0 0 0)"</span>,
+    <span class="property">duration</span>: <span class="number">1.2</span>,
+    <span class="property">ease</span>: <span class="string">"power4.inOut"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".reveal-clip"</span>,
+        <span class="property">start</span>: <span class="string">"top 75%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Stagger grid reveal</span>
+gsap.<span class="function">to</span>(<span class="string">".stagger-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">scale</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">0.5</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">0.8</span>,      <span class="comment">// Total time for all staggers</span>
+        <span class="property">grid</span>: <span class="string">"auto"</span>,      <span class="comment">// Auto-detect grid</span>
+        <span class="property">from</span>: <span class="string">"center"</span>    <span class="comment">// Start from center</span>
+    },
+    <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".stagger-grid"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // FADE REVEALS
+        // =====================
+
+        // Simple fade
+        ScrollTrigger.batch(".reveal-fade", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power2.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // Fade up
+        ScrollTrigger.batch(".reveal-fade-up", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // Fade down
+        ScrollTrigger.batch(".reveal-fade-down", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // Fade left
+        ScrollTrigger.batch(".reveal-fade-left", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // Fade right
+        ScrollTrigger.batch(".reveal-fade-right", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // =====================
+        // SCALE & ROTATE REVEALS
+        // =====================
+
+        ScrollTrigger.batch(".reveal-scale", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "back.out(1.7)",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-scale-up", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-rotate", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    rotation: 0,
+                    duration: 0.8,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-rotate-3d", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    opacity: 1,
+                    rotationX: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+            }
+        });
+
+        // =====================
+        // CLIP-PATH REVEALS
+        // =====================
+
+        ScrollTrigger.batch(".reveal-clip-left", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    clipPath: "inset(0 0 0 0)",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    stagger: 0.15
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-clip-right", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    clipPath: "inset(0 0 0 0)",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    stagger: 0.15
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-clip-top", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    clipPath: "inset(0 0 0 0)",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    stagger: 0.15
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-clip-bottom", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    clipPath: "inset(0 0 0 0)",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    stagger: 0.15
+                });
+            }
+        });
+
+        ScrollTrigger.batch(".reveal-clip-center", {
+            start: "top 85%",
+            onEnter: elements => {
+                gsap.to(elements, {
+                    clipPath: "inset(0 0 0 0)",
+                    duration: 1,
+                    ease: "power4.inOut",
+                    stagger: 0.15
+                });
+            }
+        });
+
+        // =====================
+        // STAGGER GRID REVEAL
+        // =====================
+
+        gsap.to(".stagger-item", {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            stagger: {
+                amount: 0.8,
+                grid: "auto",
+                from: "center"
+            },
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+                trigger: ".stagger-grid",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // TEXT LINE REVEAL
+        // =====================
+
+        gsap.to(".line-inner", {
+            y: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power4.out",
+            scrollTrigger: {
+                trigger: ".text-reveal-demo",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // IMAGE MASK REVEAL
+        // =====================
+
+        gsap.utils.toArray(".image-reveal").forEach((container, i) => {
+            const mask = container.querySelector(".image-reveal-mask");
+            const img = container.querySelector("img");
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: container,
+                    start: "top 75%"
+                }
+            });
+
+            // Animate mask out
+            tl.to(mask, {
+                scaleX: 0,
+                transformOrigin: "right center",
+                duration: 1,
+                ease: "power4.inOut"
+            });
+
+            // Subtle image scale
+            tl.from(img, {
+                scale: 1.2,
+                duration: 1.4,
+                ease: "power3.out"
+            }, 0);
+        });
+    </script>
+</body>
+</html>

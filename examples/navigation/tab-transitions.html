@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Transitions | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           TAB TRANSITIONS
+           Animated tab interfaces with various
+           transition effects
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 60px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Tab Container */
+        .tabs-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Tab List */
+        .tab-list {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .tab-list--pills {
+            background: #1a1a1a;
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .tab-list--underline {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            gap: 0;
+        }
+
+        /* Tab Button */
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #f5f5f0;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-btn:hover {
+            color: #c9a227;
+        }
+
+        .tab-btn.is-active {
+            color: #0a0a0a;
+        }
+
+        /* Pills indicator */
+        .tab-indicator {
+            position: absolute;
+            background: #c9a227;
+            border-radius: 8px;
+            z-index: 0;
+            transition: none; /* GSAP handles animation */
+        }
+
+        .tab-list--pills .tab-indicator {
+            top: 0.5rem;
+            bottom: 0.5rem;
+        }
+
+        /* Underline style */
+        .tab-list--underline .tab-btn {
+            padding: 1rem 1.5rem;
+            border-radius: 0;
+        }
+
+        .tab-list--underline .tab-btn.is-active {
+            color: #c9a227;
+            background: transparent;
+        }
+
+        .tab-list--underline .tab-indicator {
+            height: 3px;
+            bottom: 0;
+            background: #c9a227;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Tab Panels */
+        .tab-panels {
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .tab-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .tab-panel.is-active {
+            position: relative;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tab-panel-content {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .tab-panel h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        .tab-panel p {
+            line-height: 1.7;
+            opacity: 0.8;
+        }
+
+        /* Vertical Tabs */
+        .tabs-vertical {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tabs-vertical .tab-list {
+            flex-direction: column;
+            margin-bottom: 0;
+            min-width: 200px;
+            background: #1a1a1a;
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .tabs-vertical .tab-indicator {
+            top: 0.5rem;
+            left: 0.5rem;
+            right: 0.5rem;
+            width: auto;
+        }
+
+        .tabs-vertical .tab-panels {
+            flex: 1;
+        }
+
+        /* Icon Tabs */
+        .tab-btn--icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+        }
+
+        .tab-btn--icon .icon {
+            font-size: 1.5rem;
+        }
+
+        .tab-btn--icon .label {
+            font-size: 0.85rem;
+        }
+
+        /* Card style tabs */
+        .tab-list--cards {
+            background: transparent;
+            padding: 0;
+        }
+
+        .tab-list--cards .tab-btn {
+            background: #1a1a1a;
+            border-radius: 12px;
+            flex: 1;
+            padding: 1.5rem;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .tab-list--cards .tab-btn.is-active {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        .tab-list--cards .tab-indicator {
+            display: none;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs-vertical {
+                flex-direction: column;
+            }
+
+            .tabs-vertical .tab-list {
+                flex-direction: row;
+                min-width: auto;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Tab <span>Transitions</span></h1>
+            <p>Animated tab interfaces with smooth indicator movements and content transitions</p>
+        </div>
+    </section>
+
+    <!-- Pills Style -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Pills Style</h2>
+            <p>Sliding indicator with fade content transition</p>
+        </div>
+        <div class="tabs-container" data-tabs="pills">
+            <div class="tab-list tab-list--pills">
+                <button class="tab-btn is-active" data-tab="1">Overview</button>
+                <button class="tab-btn" data-tab="2">Features</button>
+                <button class="tab-btn" data-tab="3">Pricing</button>
+                <button class="tab-btn" data-tab="4">Support</button>
+                <div class="tab-indicator"></div>
+            </div>
+            <div class="tab-panels">
+                <div class="tab-panel is-active" data-panel="1">
+                    <div class="tab-panel-content">
+                        <h3>Overview</h3>
+                        <p>Welcome to our comprehensive overview section. This animated tab interface uses GSAP to create smooth transitions between panels while the indicator slides to follow the active tab.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="2">
+                    <div class="tab-panel-content">
+                        <h3>Features</h3>
+                        <p>Our feature set includes responsive design, smooth animations, accessible markup, and customizable styles. The tab indicator animates its position and width to match each tab button.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="3">
+                    <div class="tab-panel-content">
+                        <h3>Pricing</h3>
+                        <p>Choose from flexible pricing options that scale with your needs. The content panels fade smoothly when switching tabs, creating a polished user experience.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="4">
+                    <div class="tab-panel-content">
+                        <h3>Support</h3>
+                        <p>Get help when you need it with our 24/7 support team. This tab system supports keyboard navigation for accessibility compliance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Underline Style -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Underline Style</h2>
+            <p>Sliding underline with slide content transition</p>
+        </div>
+        <div class="tabs-container" data-tabs="underline" data-transition="slide">
+            <div class="tab-list tab-list--underline">
+                <button class="tab-btn is-active" data-tab="1">Dashboard</button>
+                <button class="tab-btn" data-tab="2">Analytics</button>
+                <button class="tab-btn" data-tab="3">Reports</button>
+                <div class="tab-indicator"></div>
+            </div>
+            <div class="tab-panels">
+                <div class="tab-panel is-active" data-panel="1">
+                    <div class="tab-panel-content">
+                        <h3>Dashboard</h3>
+                        <p>Your central hub for all important metrics and quick actions. Content slides in from the direction of the selected tab for intuitive navigation feedback.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="2">
+                    <div class="tab-panel-content">
+                        <h3>Analytics</h3>
+                        <p>Deep dive into your data with comprehensive analytics tools. The underline indicator smoothly slides to follow your selection.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="3">
+                    <div class="tab-panel-content">
+                        <h3>Reports</h3>
+                        <p>Generate and export detailed reports for your team. Slide transitions give users clear feedback about their navigation direction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vertical Tabs -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Vertical Tabs</h2>
+            <p>Side navigation with scale content transition</p>
+        </div>
+        <div class="tabs-container tabs-vertical" data-tabs="vertical" data-transition="scale">
+            <div class="tab-list tab-list--pills">
+                <button class="tab-btn is-active" data-tab="1">Profile</button>
+                <button class="tab-btn" data-tab="2">Security</button>
+                <button class="tab-btn" data-tab="3">Notifications</button>
+                <button class="tab-btn" data-tab="4">Billing</button>
+                <div class="tab-indicator"></div>
+            </div>
+            <div class="tab-panels">
+                <div class="tab-panel is-active" data-panel="1">
+                    <div class="tab-panel-content">
+                        <h3>Profile Settings</h3>
+                        <p>Manage your personal information and preferences. Content scales in for a subtle, modern feel.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="2">
+                    <div class="tab-panel-content">
+                        <h3>Security Settings</h3>
+                        <p>Configure two-factor authentication, manage sessions, and review security logs.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="3">
+                    <div class="tab-panel-content">
+                        <h3>Notification Preferences</h3>
+                        <p>Control which notifications you receive and how you receive them.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="4">
+                    <div class="tab-panel-content">
+                        <h3>Billing Information</h3>
+                        <p>View invoices, update payment methods, and manage your subscription.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card Style -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Card Style</h2>
+            <p>Full card buttons with flip content transition</p>
+        </div>
+        <div class="tabs-container" data-tabs="cards" data-transition="flip">
+            <div class="tab-list tab-list--cards">
+                <button class="tab-btn is-active" data-tab="1">
+                    <strong>Basic</strong><br>
+                    <small>For individuals</small>
+                </button>
+                <button class="tab-btn" data-tab="2">
+                    <strong>Pro</strong><br>
+                    <small>For teams</small>
+                </button>
+                <button class="tab-btn" data-tab="3">
+                    <strong>Enterprise</strong><br>
+                    <small>For organizations</small>
+                </button>
+            </div>
+            <div class="tab-panels">
+                <div class="tab-panel is-active" data-panel="1">
+                    <div class="tab-panel-content">
+                        <h3>Basic Plan</h3>
+                        <p>Perfect for individuals just getting started. Includes all essential features with generous limits.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="2">
+                    <div class="tab-panel-content">
+                        <h3>Pro Plan</h3>
+                        <p>Designed for growing teams. Includes collaboration features, advanced analytics, and priority support.</p>
+                    </div>
+                </div>
+                <div class="tab-panel" data-panel="3">
+                    <div class="tab-panel-content">
+                        <h3>Enterprise Plan</h3>
+                        <p>Full-featured solution for large organizations. Custom integrations, dedicated support, and SLA guarantees.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Animate indicator to active tab</span>
+<span class="keyword">function</span> <span class="function">moveIndicator</span>(indicator, activeBtn) {
+    gsap.<span class="function">to</span>(indicator, {
+        <span class="property">left</span>: activeBtn.<span class="property">offsetLeft</span>,
+        <span class="property">width</span>: activeBtn.<span class="property">offsetWidth</span>,
+        <span class="property">duration</span>: <span class="number">0.4</span>,
+        <span class="property">ease</span>: <span class="string">"power3.out"</span>
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Content transition - Fade</span>
+<span class="keyword">function</span> <span class="function">transitionFade</span>(oldPanel, newPanel) {
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    tl.<span class="function">to</span>(oldPanel, {
+        <span class="property">opacity</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.2</span>,
+        <span class="property">onComplete</span>: () => {
+            oldPanel.classList.<span class="function">remove</span>(<span class="string">'is-active'</span>);
+        }
+    })
+    .<span class="function">fromTo</span>(newPanel,
+        { <span class="property">opacity</span>: <span class="number">0</span> },
+        {
+            <span class="property">opacity</span>: <span class="number">1</span>,
+            <span class="property">duration</span>: <span class="number">0.3</span>,
+            <span class="property">onStart</span>: () => {
+                newPanel.classList.<span class="function">add</span>(<span class="string">'is-active'</span>);
+            }
+        }
+    );
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Content transition - Slide with direction</span>
+<span class="keyword">function</span> <span class="function">transitionSlide</span>(oldPanel, newPanel, direction) {
+    <span class="keyword">const</span> xOffset = direction > <span class="number">0</span> ? <span class="number">50</span> : <span class="number">-50</span>;
+
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    tl.<span class="function">to</span>(oldPanel, {
+        <span class="property">x</span>: -xOffset,
+        <span class="property">opacity</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.25</span>,
+        <span class="property">onComplete</span>: () => {
+            oldPanel.classList.<span class="function">remove</span>(<span class="string">'is-active'</span>);
+            gsap.<span class="function">set</span>(oldPanel, { <span class="property">x</span>: <span class="number">0</span> });
+        }
+    })
+    .<span class="function">fromTo</span>(newPanel,
+        { <span class="property">x</span>: xOffset, <span class="property">opacity</span>: <span class="number">0</span> },
+        {
+            <span class="property">x</span>: <span class="number">0</span>,
+            <span class="property">opacity</span>: <span class="number">1</span>,
+            <span class="property">duration</span>: <span class="number">0.3</span>,
+            <span class="property">onStart</span>: () => {
+                newPanel.classList.<span class="function">add</span>(<span class="string">'is-active'</span>);
+            }
+        }
+    );
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // TABS SYSTEM
+        // =====================
+
+        class Tabs {
+            constructor(container) {
+                this.container = container;
+                this.tabList = container.querySelector('.tab-list');
+                this.tabs = container.querySelectorAll('.tab-btn');
+                this.panels = container.querySelectorAll('.tab-panel');
+                this.indicator = container.querySelector('.tab-indicator');
+                this.transition = container.dataset.transition || 'fade';
+                this.isVertical = container.classList.contains('tabs-vertical');
+                this.currentIndex = 0;
+                this.isAnimating = false;
+
+                this.init();
+            }
+
+            init() {
+                // Initial indicator position
+                const activeTab = this.tabList.querySelector('.tab-btn.is-active');
+                if (activeTab && this.indicator) {
+                    this.setIndicator(activeTab, false);
+                }
+
+                // Tab click handlers
+                this.tabs.forEach((tab, index) => {
+                    tab.addEventListener('click', () => {
+                        if (!this.isAnimating && index !== this.currentIndex) {
+                            this.switchTab(index);
+                        }
+                    });
+                });
+
+                // Keyboard navigation
+                this.tabList.addEventListener('keydown', (e) => {
+                    let newIndex = this.currentIndex;
+
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        newIndex = (this.currentIndex + 1) % this.tabs.length;
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        newIndex = (this.currentIndex - 1 + this.tabs.length) % this.tabs.length;
+                    }
+
+                    if (newIndex !== this.currentIndex) {
+                        this.switchTab(newIndex);
+                        this.tabs[newIndex].focus();
+                    }
+                });
+            }
+
+            setIndicator(tab, animate = true) {
+                if (!this.indicator) return;
+
+                const props = this.isVertical ? {
+                    top: tab.offsetTop,
+                    height: tab.offsetHeight
+                } : {
+                    left: tab.offsetLeft,
+                    width: tab.offsetWidth
+                };
+
+                if (animate) {
+                    gsap.to(this.indicator, {
+                        ...props,
+                        duration: 0.4,
+                        ease: "power3.out"
+                    });
+                } else {
+                    gsap.set(this.indicator, props);
+                }
+            }
+
+            switchTab(newIndex) {
+                this.isAnimating = true;
+                const direction = newIndex > this.currentIndex ? 1 : -1;
+                const oldIndex = this.currentIndex;
+
+                // Update active states
+                this.tabs[oldIndex].classList.remove('is-active');
+                this.tabs[newIndex].classList.add('is-active');
+
+                // Animate indicator
+                this.setIndicator(this.tabs[newIndex]);
+
+                // Animate content
+                this.animateContent(oldIndex, newIndex, direction);
+
+                this.currentIndex = newIndex;
+            }
+
+            animateContent(oldIndex, newIndex, direction) {
+                const oldPanel = this.panels[oldIndex];
+                const newPanel = this.panels[newIndex];
+
+                switch (this.transition) {
+                    case 'slide':
+                        this.transitionSlide(oldPanel, newPanel, direction);
+                        break;
+                    case 'scale':
+                        this.transitionScale(oldPanel, newPanel);
+                        break;
+                    case 'flip':
+                        this.transitionFlip(oldPanel, newPanel);
+                        break;
+                    default:
+                        this.transitionFade(oldPanel, newPanel);
+                }
+            }
+
+            transitionFade(oldPanel, newPanel) {
+                const tl = gsap.timeline({
+                    onComplete: () => { this.isAnimating = false; }
+                });
+
+                tl.to(oldPanel, {
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => {
+                        oldPanel.classList.remove('is-active');
+                    }
+                })
+                .fromTo(newPanel,
+                    { opacity: 0 },
+                    {
+                        opacity: 1,
+                        duration: 0.3,
+                        onStart: () => {
+                            newPanel.classList.add('is-active');
+                        }
+                    }
+                );
+            }
+
+            transitionSlide(oldPanel, newPanel, direction) {
+                const xOffset = direction > 0 ? 50 : -50;
+
+                const tl = gsap.timeline({
+                    onComplete: () => { this.isAnimating = false; }
+                });
+
+                tl.to(oldPanel, {
+                    x: -xOffset,
+                    opacity: 0,
+                    duration: 0.25,
+                    onComplete: () => {
+                        oldPanel.classList.remove('is-active');
+                        gsap.set(oldPanel, { x: 0 });
+                    }
+                })
+                .fromTo(newPanel,
+                    { x: xOffset, opacity: 0 },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        duration: 0.3,
+                        onStart: () => {
+                            newPanel.classList.add('is-active');
+                        }
+                    }
+                );
+            }
+
+            transitionScale(oldPanel, newPanel) {
+                const tl = gsap.timeline({
+                    onComplete: () => { this.isAnimating = false; }
+                });
+
+                tl.to(oldPanel, {
+                    scale: 0.95,
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => {
+                        oldPanel.classList.remove('is-active');
+                        gsap.set(oldPanel, { scale: 1 });
+                    }
+                })
+                .fromTo(newPanel,
+                    { scale: 1.05, opacity: 0 },
+                    {
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: "back.out(1.7)",
+                        onStart: () => {
+                            newPanel.classList.add('is-active');
+                        }
+                    }
+                );
+            }
+
+            transitionFlip(oldPanel, newPanel) {
+                const tl = gsap.timeline({
+                    onComplete: () => { this.isAnimating = false; }
+                });
+
+                tl.to(oldPanel, {
+                    rotationY: -90,
+                    opacity: 0,
+                    duration: 0.25,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        oldPanel.classList.remove('is-active');
+                        gsap.set(oldPanel, { rotationY: 0 });
+                    }
+                })
+                .fromTo(newPanel,
+                    { rotationY: 90, opacity: 0 },
+                    {
+                        rotationY: 0,
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: "power2.out",
+                        onStart: () => {
+                            newPanel.classList.add('is-active');
+                        }
+                    }
+                );
+            }
+        }
+
+        // Initialize all tab containers
+        document.querySelectorAll('[data-tabs]').forEach(container => {
+            new Tabs(container);
+        });
+    </script>
+</body>
+</html>

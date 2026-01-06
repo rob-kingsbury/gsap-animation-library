@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax Layers | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           PARALLAX LAYERS
+           Multi-layer parallax effect with different
+           scroll speeds creating depth illusion
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Parallax Hero Section */
+        .parallax-hero {
+            position: relative;
+            height: 150vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Parallax layers - positioned absolutely */
+        .parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Background layer - moves slowest */
+        .layer-bg {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+        }
+
+        /* Stars layer */
+        .layer-stars {
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 160px 120px, #fff, transparent);
+            background-size: 200px 200px;
+            opacity: 0.5;
+        }
+
+        /* Mountain layers */
+        .layer-mountains-back {
+            bottom: 0;
+            top: auto;
+            height: 60%;
+        }
+
+        .layer-mountains-back::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: #1a1a2e;
+            clip-path: polygon(0% 100%, 15% 40%, 30% 70%, 50% 20%, 70% 60%, 85% 30%, 100% 100%);
+        }
+
+        .layer-mountains-front {
+            bottom: 0;
+            top: auto;
+            height: 45%;
+        }
+
+        .layer-mountains-front::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: #0f0f1a;
+            clip-path: polygon(0% 100%, 10% 60%, 25% 80%, 45% 35%, 60% 70%, 80% 45%, 100% 100%);
+        }
+
+        /* Moon */
+        .layer-moon {
+            pointer-events: none;
+        }
+
+        .moon {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff 0%, #c9a227 50%, #8a7119 100%);
+            box-shadow: 0 0 60px rgba(201, 162, 39, 0.4);
+            position: absolute;
+            top: 15%;
+            right: 20%;
+        }
+
+        /* Text content layer */
+        .layer-content {
+            z-index: 10;
+        }
+
+        .hero-text {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero-text h1 span {
+            color: #c9a227;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Foreground layer - moves fastest */
+        .layer-foreground {
+            bottom: 0;
+            top: auto;
+            height: 20%;
+            pointer-events: none;
+        }
+
+        .layer-foreground::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: #0a0a0a;
+            clip-path: polygon(0% 100%, 5% 50%, 20% 80%, 35% 60%, 55% 90%, 75% 40%, 100% 70%, 100% 100%);
+        }
+
+        /* Section with cards demonstrating different parallax speeds */
+        .speed-demo {
+            padding: 100px 2rem;
+            background: #111;
+        }
+
+        .speed-demo h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: #c9a227;
+        }
+
+        .speed-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .speed-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .speed-card .speed {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .speed-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .speed-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* Image parallax section */
+        .image-parallax {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .parallax-image-container {
+            position: absolute;
+            inset: -100px;
+        }
+
+        .parallax-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-overlay h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Code reference section */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Parallax Hero -->
+    <section class="parallax-hero">
+        <div class="parallax-layer layer-bg"></div>
+        <div class="parallax-layer layer-stars" data-speed="0.1"></div>
+        <div class="parallax-layer layer-moon" data-speed="0.2">
+            <div class="moon"></div>
+        </div>
+        <div class="parallax-layer layer-mountains-back" data-speed="0.3"></div>
+        <div class="parallax-layer layer-mountains-front" data-speed="0.5"></div>
+        <div class="parallax-layer layer-content" data-speed="0.4">
+            <div class="hero-text">
+                <h1>Parallax <span>Layers</span></h1>
+                <p>Multiple layers moving at different speeds create a sense of depth and immersion</p>
+            </div>
+        </div>
+        <div class="parallax-layer layer-foreground" data-speed="0.8"></div>
+    </section>
+
+    <!-- Speed Demo Section -->
+    <section class="speed-demo">
+        <h2>Understanding Parallax Speeds</h2>
+        <div class="speed-cards">
+            <div class="speed-card" data-speed="0.2">
+                <div class="speed">0.2x</div>
+                <h3>Background</h3>
+                <p>Moves very slowly. Creates the illusion of being far away. Use for sky, distant mountains, stars.</p>
+            </div>
+            <div class="speed-card" data-speed="0.5">
+                <div class="speed">0.5x</div>
+                <h3>Midground</h3>
+                <p>Moves at half scroll speed. Good for middle-distance elements like hills or buildings.</p>
+            </div>
+            <div class="speed-card" data-speed="0.8">
+                <div class="speed">0.8x</div>
+                <h3>Near</h3>
+                <p>Moves almost with the scroll. Use for elements that should feel close to the viewer.</p>
+            </div>
+            <div class="speed-card" data-speed="1.2">
+                <div class="speed">1.2x</div>
+                <h3>Foreground</h3>
+                <p>Moves faster than scroll. Creates dramatic depth. Use sparingly for closest elements.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Parallax Section -->
+    <section class="image-parallax">
+        <div class="parallax-image-container">
+            <img src="https://picsum.photos/1920/1200?random=10" alt="Parallax background">
+        </div>
+        <div class="image-overlay">
+            <h2>Image parallax creates depth<br>with a simple technique</h2>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic Parallax Pattern</span>
+<span class="comment">// Different speeds create the illusion of depth</span>
+
+<span class="comment">// 1. Simple Y-axis parallax</span>
+gsap.<span class="function">to</span>(<span class="string">".layer"</span>, {
+    <span class="property">yPercent</span>: <span class="number">-50</span>,  <span class="comment">// Move up 50% of element height</span>
+    <span class="property">ease</span>: <span class="string">"none"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".section"</span>,
+        <span class="property">start</span>: <span class="string">"top bottom"</span>,
+        <span class="property">end</span>: <span class="string">"bottom top"</span>,
+        <span class="property">scrub</span>: <span class="keyword">true</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 2. Speed-based parallax using data attributes</span>
+document.<span class="function">querySelectorAll</span>(<span class="string">'[data-speed]'</span>).<span class="function">forEach</span>(layer => {
+    <span class="keyword">const</span> speed = layer.dataset.<span class="property">speed</span>;
+
+    gsap.<span class="function">to</span>(layer, {
+        <span class="property">yPercent</span>: -<span class="number">100</span> * speed,
+        <span class="property">ease</span>: <span class="string">"none"</span>,
+        <span class="property">scrollTrigger</span>: {
+            <span class="property">trigger</span>: layer.<span class="property">parentElement</span>,
+            <span class="property">start</span>: <span class="string">"top bottom"</span>,
+            <span class="property">end</span>: <span class="string">"bottom top"</span>,
+            <span class="property">scrub</span>: <span class="keyword">true</span>
+        }
+    });
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 3. Image parallax (oversized image in container)</span>
+<span class="comment">// CSS: Container has overflow:hidden, image is 20% taller</span>
+
+gsap.<span class="function">to</span>(<span class="string">".parallax-image"</span>, {
+    <span class="property">yPercent</span>: <span class="number">-20</span>,  <span class="comment">// Move image within container</span>
+    <span class="property">ease</span>: <span class="string">"none"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".image-section"</span>,
+        <span class="property">start</span>: <span class="string">"top bottom"</span>,
+        <span class="property">end</span>: <span class="string">"bottom top"</span>,
+        <span class="property">scrub</span>: <span class="keyword">true</span>
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Parallax layers in hero section
+        // Each layer moves at a different speed based on data-speed attribute
+        document.querySelectorAll('.parallax-layer[data-speed]').forEach(layer => {
+            const speed = parseFloat(layer.dataset.speed);
+
+            gsap.to(layer, {
+                yPercent: -100 * speed,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: ".parallax-hero",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        });
+
+        // Speed demo cards - each moves at its own rate
+        document.querySelectorAll('.speed-card').forEach(card => {
+            const speed = parseFloat(card.dataset.speed);
+
+            gsap.from(card, {
+                y: 100 * speed,
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "top 50%",
+                    scrub: true
+                }
+            });
+        });
+
+        // Image parallax effect
+        gsap.to('.parallax-image-container img', {
+            yPercent: 15,
+            ease: "none",
+            scrollTrigger: {
+                trigger: '.image-parallax',
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Text overlay parallax (moves slower than image)
+        gsap.to('.image-overlay h2', {
+            yPercent: -30,
+            ease: "none",
+            scrollTrigger: {
+                trigger: '.image-parallax',
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Moon glow animation
+        gsap.to('.moon', {
+            boxShadow: "0 0 100px rgba(201, 162, 39, 0.6)",
+            duration: 3,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+    </script>
+</body>
+</html>

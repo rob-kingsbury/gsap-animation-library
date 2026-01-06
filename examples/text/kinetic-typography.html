@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinetic Typography | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           KINETIC TYPOGRAPHY
+           Dynamic, animated text compositions
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-text {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(3rem, 10vw, 10rem);
+            font-weight: 900;
+            line-height: 0.9;
+            text-transform: uppercase;
+        }
+
+        .hero-text h1 .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-text h1 .word {
+            display: inline-block;
+        }
+
+        .hero-text h1 .kinetic {
+            color: #c9a227;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 100px 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Scattered Text */
+        .scattered-container {
+            position: relative;
+            height: 400px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .scattered-word {
+            position: absolute;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+        }
+
+        .scattered-word:nth-child(1) { top: 10%; left: 5%; }
+        .scattered-word:nth-child(2) { top: 30%; left: 60%; color: #c9a227; }
+        .scattered-word:nth-child(3) { top: 50%; left: 20%; }
+        .scattered-word:nth-child(4) { top: 70%; left: 70%; }
+        .scattered-word:nth-child(5) { top: 85%; left: 40%; color: #c9a227; }
+
+        /* Rotating Words Stack */
+        .rotating-stack {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rotating-stack .word {
+            position: absolute;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        /* Scale on Scroll */
+        .scale-text {
+            font-size: clamp(1rem, 3vw, 2rem);
+            font-weight: 300;
+            text-align: center;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .scale-text .word {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .scale-text .word.highlight {
+            color: #c9a227;
+            font-weight: 700;
+        }
+
+        /* Perspective Text */
+        .perspective-container {
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .perspective-text {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            transform-style: preserve-3d;
+        }
+
+        .perspective-text .char {
+            display: inline-block;
+            transform-style: preserve-3d;
+        }
+
+        /* Elastic Text */
+        .elastic-container {
+            text-align: center;
+        }
+
+        .elastic-text {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .elastic-text .char {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .elastic-text:hover .char {
+            animation: elastic 0.8s ease;
+            animation-delay: calc(var(--char-index) * 0.05s);
+        }
+
+        @keyframes elastic {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3); }
+            50% { transform: scale(0.9); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Gravity Fall */
+        .gravity-container {
+            text-align: center;
+            min-height: 300px;
+            position: relative;
+        }
+
+        .gravity-text {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+        }
+
+        .gravity-text .char {
+            display: inline-block;
+            position: relative;
+        }
+
+        /* Wave Text */
+        .wave-container {
+            text-align: center;
+        }
+
+        .wave-text {
+            font-size: clamp(2rem, 7vw, 6rem);
+            font-weight: 900;
+            color: #c9a227;
+        }
+
+        .wave-text .char {
+            display: inline-block;
+        }
+
+        /* Stagger Reveal */
+        .stagger-container {
+            text-align: center;
+        }
+
+        .stagger-text {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .stagger-text .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .stagger-text .line-inner {
+            display: block;
+        }
+
+        /* Magnetic Text */
+        .magnetic-container {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .magnetic-text {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .magnetic-text .char {
+            display: inline-block;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Replay button */
+        .replay-btn {
+            display: block;
+            margin: 2rem auto 0;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>
+                <span class="line"><span class="word">Kinetic</span></span>
+                <span class="line"><span class="word kinetic">Typography</span></span>
+            </h1>
+        </div>
+    </section>
+
+    <!-- Scattered Text -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Scattered Text</h2>
+            <p>Words positioned randomly, animating into view</p>
+        </div>
+        <div class="scattered-container">
+            <div class="scattered-word">Create</div>
+            <div class="scattered-word">Inspire</div>
+            <div class="scattered-word">Design</div>
+            <div class="scattered-word">Build</div>
+            <div class="scattered-word">Innovate</div>
+        </div>
+    </section>
+
+    <!-- Rotating Word Stack -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Rotating Stack</h2>
+            <p>Words cycling through a single position</p>
+        </div>
+        <div class="rotating-stack">
+            <div class="word">Bold</div>
+            <div class="word">Creative</div>
+            <div class="word">Dynamic</div>
+            <div class="word">Powerful</div>
+        </div>
+    </section>
+
+    <!-- Scale on Scroll -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Scale on Scroll</h2>
+            <p>Words scale up as they enter the viewport</p>
+        </div>
+        <div class="scale-text">
+            <span class="word">Great</span>
+            <span class="word highlight">design</span>
+            <span class="word">is</span>
+            <span class="word">not</span>
+            <span class="word">just</span>
+            <span class="word">what</span>
+            <span class="word">it</span>
+            <span class="word highlight">looks</span>
+            <span class="word">like.</span>
+            <span class="word">Great</span>
+            <span class="word highlight">design</span>
+            <span class="word">is</span>
+            <span class="word">how</span>
+            <span class="word">it</span>
+            <span class="word highlight">works.</span>
+        </div>
+    </section>
+
+    <!-- Perspective Text -->
+    <section class="section">
+        <div class="section-header">
+            <h2>3D Perspective</h2>
+            <p>Text rotating in 3D space</p>
+        </div>
+        <div class="perspective-container">
+            <div class="perspective-text">DEPTH</div>
+        </div>
+        <button class="replay-btn" data-target="perspective">Replay</button>
+    </section>
+
+    <!-- Wave Text -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Continuous Wave</h2>
+            <p>Characters animated in a wave pattern</p>
+        </div>
+        <div class="wave-container">
+            <div class="wave-text">FLOWING</div>
+        </div>
+    </section>
+
+    <!-- Gravity Fall -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Gravity Drop</h2>
+            <p>Characters falling with physics-like easing</p>
+        </div>
+        <div class="gravity-container">
+            <div class="gravity-text">GRAVITY</div>
+        </div>
+        <button class="replay-btn" data-target="gravity">Replay</button>
+    </section>
+
+    <!-- Stagger Lines -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Stagger Lines</h2>
+            <p>Lines revealing with staggered timing</p>
+        </div>
+        <div class="stagger-container">
+            <div class="stagger-text">
+                <span class="line"><span class="line-inner">Motion brings</span></span>
+                <span class="line"><span class="line-inner">interfaces to life</span></span>
+                <span class="line"><span class="line-inner">and tells stories</span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Magnetic Text -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Magnetic Effect</h2>
+            <p>Characters respond to mouse position</p>
+        </div>
+        <div class="magnetic-container">
+            <div class="magnetic-text">MAGNETIC</div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Split text into characters</span>
+<span class="keyword">function</span> <span class="function">splitChars</span>(element) {
+    <span class="keyword">const</span> text = element.<span class="property">textContent</span>;
+    element.<span class="property">innerHTML</span> = text.<span class="function">split</span>(<span class="string">''</span>)
+        .<span class="function">map</span>((char, i) =>
+            char === <span class="string">' '</span> ? <span class="string">' '</span> :
+            <span class="string">`&lt;span class="char" style="--char-index:</span>${i}<span class="string">"&gt;</span>${char}<span class="string">&lt;/span&gt;`</span>
+        ).<span class="function">join</span>(<span class="string">''</span>);
+    <span class="keyword">return</span> element.<span class="function">querySelectorAll</span>(<span class="string">'.char'</span>);
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Wave animation with stagger</span>
+<span class="keyword">const</span> chars = <span class="function">splitChars</span>(element);
+
+gsap.<span class="function">to</span>(chars, {
+    <span class="property">y</span>: <span class="number">-30</span>,
+    <span class="property">duration</span>: <span class="number">0.4</span>,
+    <span class="property">ease</span>: <span class="string">"sine.inOut"</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">each</span>: <span class="number">0.1</span>,
+        <span class="property">repeat</span>: <span class="number">-1</span>,
+        <span class="property">yoyo</span>: <span class="keyword">true</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 3D perspective rotation</span>
+gsap.<span class="function">from</span>(chars, {
+    <span class="property">rotationX</span>: <span class="number">-90</span>,
+    <span class="property">rotationY</span>: <span class="number">45</span>,
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">transformOrigin</span>: <span class="string">"50% 50% -50px"</span>,
+    <span class="property">stagger</span>: <span class="number">0.1</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Magnetic effect on mousemove</span>
+element.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+    <span class="keyword">const</span> rect = element.<span class="function">getBoundingClientRect</span>();
+    <span class="keyword">const</span> centerX = rect.<span class="property">left</span> + rect.<span class="property">width</span> / <span class="number">2</span>;
+    <span class="keyword">const</span> centerY = rect.<span class="property">top</span> + rect.<span class="property">height</span> / <span class="number">2</span>;
+
+    chars.<span class="function">forEach</span>(char => {
+        <span class="keyword">const</span> charRect = char.<span class="function">getBoundingClientRect</span>();
+        <span class="keyword">const</span> charCenterX = charRect.<span class="property">left</span> + charRect.<span class="property">width</span> / <span class="number">2</span>;
+        <span class="keyword">const</span> charCenterY = charRect.<span class="property">top</span> + charRect.<span class="property">height</span> / <span class="number">2</span>;
+
+        <span class="keyword">const</span> deltaX = (e.<span class="property">clientX</span> - charCenterX) * <span class="number">0.1</span>;
+        <span class="keyword">const</span> deltaY = (e.<span class="property">clientY</span> - charCenterY) * <span class="number">0.1</span>;
+
+        gsap.<span class="function">to</span>(char, {
+            <span class="property">x</span>: deltaX,
+            <span class="property">y</span>: deltaY,
+            <span class="property">duration</span>: <span class="number">0.3</span>
+        });
+    });
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // UTILITY: SPLIT CHARS
+        // =====================
+        function splitChars(element) {
+            const text = element.textContent;
+            element.innerHTML = text.split('')
+                .map((char, i) =>
+                    char === ' ' ? ' ' :
+                    `<span class="char" style="--char-index:${i}">${char}</span>`
+                ).join('');
+            return element.querySelectorAll('.char');
+        }
+
+        // =====================
+        // HERO ANIMATION
+        // =====================
+        const heroWords = document.querySelectorAll('.hero-text .word');
+        gsap.from(heroWords, {
+            y: 200,
+            opacity: 0,
+            rotationX: -90,
+            stagger: 0.2,
+            duration: 1.2,
+            ease: "power4.out",
+            delay: 0.3
+        });
+
+        // =====================
+        // SCATTERED TEXT
+        // =====================
+        const scatteredWords = document.querySelectorAll('.scattered-word');
+
+        scatteredWords.forEach((word, i) => {
+            gsap.from(word, {
+                x: gsap.utils.random(-200, 200),
+                y: gsap.utils.random(-100, 100),
+                rotation: gsap.utils.random(-30, 30),
+                scale: 0,
+                opacity: 0,
+                duration: 1,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                    trigger: '.scattered-container',
+                    start: 'top 70%'
+                },
+                delay: i * 0.15
+            });
+
+            // Float animation after reveal
+            gsap.to(word, {
+                y: "+=20",
+                duration: 2 + i * 0.3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+                delay: 1 + i * 0.15
+            });
+        });
+
+        // =====================
+        // ROTATING STACK
+        // =====================
+        const rotatingWords = document.querySelectorAll('.rotating-stack .word');
+        let currentIndex = 0;
+
+        function rotateWord() {
+            const current = rotatingWords[currentIndex];
+            const next = rotatingWords[(currentIndex + 1) % rotatingWords.length];
+
+            gsap.to(current, {
+                y: -100,
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.in"
+            });
+
+            gsap.fromTo(next,
+                { y: 100, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.3 }
+            );
+
+            currentIndex = (currentIndex + 1) % rotatingWords.length;
+        }
+
+        // Initial state
+        gsap.set(rotatingWords[0], { opacity: 1 });
+
+        ScrollTrigger.create({
+            trigger: '.rotating-stack',
+            start: 'top 70%',
+            onEnter: () => {
+                gsap.delayedCall(0, rotateWord);
+                setInterval(rotateWord, 2000);
+            },
+            once: true
+        });
+
+        // =====================
+        // SCALE ON SCROLL
+        // =====================
+        const scaleWords = document.querySelectorAll('.scale-text .word');
+
+        scaleWords.forEach((word, i) => {
+            gsap.from(word, {
+                scale: 0.5,
+                opacity: 0,
+                duration: 0.6,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                    trigger: word,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        });
+
+        // =====================
+        // PERSPECTIVE TEXT
+        // =====================
+        const perspectiveText = document.querySelector('.perspective-text');
+        const perspectiveChars = splitChars(perspectiveText);
+
+        function playPerspective() {
+            gsap.from(perspectiveChars, {
+                rotationX: -90,
+                rotationY: 45,
+                opacity: 0,
+                transformOrigin: "50% 50% -50px",
+                stagger: 0.1,
+                duration: 1,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.perspective-container',
+            start: 'top 70%',
+            onEnter: playPerspective,
+            once: true
+        });
+
+        // =====================
+        // WAVE TEXT
+        // =====================
+        const waveText = document.querySelector('.wave-text');
+        const waveChars = splitChars(waveText);
+
+        ScrollTrigger.create({
+            trigger: '.wave-container',
+            start: 'top 70%',
+            onEnter: () => {
+                gsap.to(waveChars, {
+                    y: -30,
+                    duration: 0.4,
+                    ease: "sine.inOut",
+                    stagger: {
+                        each: 0.1,
+                        repeat: -1,
+                        yoyo: true
+                    }
+                });
+            },
+            once: true
+        });
+
+        // =====================
+        // GRAVITY DROP
+        // =====================
+        const gravityText = document.querySelector('.gravity-text');
+        const gravityChars = splitChars(gravityText);
+
+        function playGravity() {
+            gsap.from(gravityChars, {
+                y: -300,
+                opacity: 0,
+                rotation: gsap.utils.random(-180, 180, true),
+                stagger: {
+                    each: 0.1,
+                    from: "random"
+                },
+                duration: 1,
+                ease: "bounce.out"
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '.gravity-container',
+            start: 'top 70%',
+            onEnter: playGravity,
+            once: true
+        });
+
+        // =====================
+        // STAGGER LINES
+        // =====================
+        const staggerLines = document.querySelectorAll('.stagger-text .line-inner');
+
+        gsap.from(staggerLines, {
+            yPercent: 100,
+            opacity: 0,
+            stagger: 0.2,
+            duration: 1,
+            ease: "power4.out",
+            scrollTrigger: {
+                trigger: '.stagger-container',
+                start: 'top 70%'
+            }
+        });
+
+        // =====================
+        // MAGNETIC TEXT
+        // =====================
+        const magneticText = document.querySelector('.magnetic-text');
+        const magneticChars = splitChars(magneticText);
+
+        magneticText.addEventListener('mousemove', (e) => {
+            magneticChars.forEach(char => {
+                const charRect = char.getBoundingClientRect();
+                const charCenterX = charRect.left + charRect.width / 2;
+                const charCenterY = charRect.top + charRect.height / 2;
+
+                const deltaX = (e.clientX - charCenterX) * 0.15;
+                const deltaY = (e.clientY - charCenterY) * 0.15;
+
+                gsap.to(char, {
+                    x: deltaX,
+                    y: deltaY,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        magneticText.addEventListener('mouseleave', () => {
+            gsap.to(magneticChars, {
+                x: 0,
+                y: 0,
+                duration: 0.5,
+                ease: "elastic.out(1, 0.3)"
+            });
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                if (target === 'perspective') {
+                    gsap.set(perspectiveChars, { clearProps: "all" });
+                    playPerspective();
+                } else if (target === 'gravity') {
+                    gsap.set(gravityChars, { clearProps: "all" });
+                    playGravity();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

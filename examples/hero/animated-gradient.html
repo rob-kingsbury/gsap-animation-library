@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Gradients | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           ANIMATED GRADIENTS
+           Various gradient animation techniques for
+           hero backgrounds and text effects
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Section styling */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-label {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #c9a227;
+            background: rgba(10, 10, 10, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            z-index: 10;
+        }
+
+        /* Hero content */
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 600px;
+        }
+
+        /* ===========================
+           1. MOVING GRADIENT BG
+           =========================== */
+        .gradient-move {
+            background: linear-gradient(
+                -45deg,
+                #0a0a0a,
+                #1a1a2e,
+                #16213e,
+                #1a1a1a
+            );
+            background-size: 400% 400%;
+        }
+
+        /* ===========================
+           2. RADIAL PULSE
+           =========================== */
+        .gradient-radial {
+            background: #0a0a0a;
+        }
+
+        .radial-pulse {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at 50% 50%,
+                rgba(201, 162, 39, 0.3) 0%,
+                transparent 50%
+            );
+            opacity: 0;
+        }
+
+        /* ===========================
+           3. GRADIENT TEXT
+           =========================== */
+        .gradient-text-section {
+            background: #0a0a0a;
+        }
+
+        .gradient-text {
+            background: linear-gradient(
+                90deg,
+                #c9a227,
+                #e8c547,
+                #c9a227,
+                #8a7119,
+                #c9a227
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===========================
+           4. MESH GRADIENT
+           =========================== */
+        .gradient-mesh {
+            background: #0a0a0a;
+        }
+
+        .mesh-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+
+        .mesh-blob-1 {
+            width: 500px;
+            height: 500px;
+            background: #c9a227;
+            top: 10%;
+            left: 10%;
+        }
+
+        .mesh-blob-2 {
+            width: 400px;
+            height: 400px;
+            background: #2c7da0;
+            top: 50%;
+            right: 10%;
+        }
+
+        .mesh-blob-3 {
+            width: 350px;
+            height: 350px;
+            background: #9b2226;
+            bottom: 10%;
+            left: 30%;
+        }
+
+        /* ===========================
+           5. AURORA EFFECT
+           =========================== */
+        .gradient-aurora {
+            background: #0a0a0a;
+        }
+
+        .aurora-layer {
+            position: absolute;
+            inset: 0;
+            opacity: 0.6;
+        }
+
+        .aurora-1 {
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(39, 201, 162, 0.2) 30%,
+                rgba(201, 162, 39, 0.3) 50%,
+                transparent 70%
+            );
+            transform: translateY(100%) skewY(-5deg);
+        }
+
+        .aurora-2 {
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(162, 39, 201, 0.2) 40%,
+                rgba(39, 162, 201, 0.3) 60%,
+                transparent 80%
+            );
+            transform: translateY(100%) skewY(5deg);
+        }
+
+        /* ===========================
+           6. SPOTLIGHT
+           =========================== */
+        .gradient-spotlight {
+            background: #0a0a0a;
+        }
+
+        .spotlight {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(
+                circle,
+                rgba(201, 162, 39, 0.15) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ===========================
+           7. WAVE GRADIENT
+           =========================== */
+        .gradient-wave {
+            background: #0a0a0a;
+        }
+
+        .wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(201, 162, 39, 0.1) 100%
+            );
+            border-radius: 50% 50% 0 0;
+        }
+
+        .wave-1 { opacity: 0.7; }
+        .wave-2 { opacity: 0.5; }
+        .wave-3 { opacity: 0.3; }
+
+        /* Code Reference */
+        .code-reference {
+            background: #111;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- 1. Moving Gradient Background -->
+    <section class="section gradient-move" id="gradientMove">
+        <span class="section-label">Moving Gradient</span>
+        <div class="hero-content">
+            <h1 class="hero-title">Flowing Colors</h1>
+            <p class="hero-subtitle">Background gradient that smoothly shifts through colors using background-position animation</p>
+        </div>
+    </section>
+
+    <!-- 2. Radial Pulse -->
+    <section class="section gradient-radial" id="gradientRadial">
+        <span class="section-label">Radial Pulse</span>
+        <div class="radial-pulse"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Pulsing Glow</h1>
+            <p class="hero-subtitle">Radial gradient that pulses outward creating a breathing effect</p>
+        </div>
+    </section>
+
+    <!-- 3. Gradient Text -->
+    <section class="section gradient-text-section" id="gradientText">
+        <span class="section-label">Gradient Text</span>
+        <div class="hero-content">
+            <h1 class="hero-title gradient-text">Shimmering Text</h1>
+            <p class="hero-subtitle">Text filled with animated gradient for a metallic shine effect</p>
+        </div>
+    </section>
+
+    <!-- 4. Mesh Gradient -->
+    <section class="section gradient-mesh" id="gradientMesh">
+        <span class="section-label">Mesh Gradient</span>
+        <div class="mesh-blob mesh-blob-1"></div>
+        <div class="mesh-blob mesh-blob-2"></div>
+        <div class="mesh-blob mesh-blob-3"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Organic Flow</h1>
+            <p class="hero-subtitle">Blurred shapes creating a dynamic mesh gradient effect</p>
+        </div>
+    </section>
+
+    <!-- 5. Aurora Effect -->
+    <section class="section gradient-aurora" id="gradientAurora">
+        <span class="section-label">Aurora Effect</span>
+        <div class="aurora-layer aurora-1"></div>
+        <div class="aurora-layer aurora-2"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Northern Lights</h1>
+            <p class="hero-subtitle">Layered gradients moving like aurora borealis</p>
+        </div>
+    </section>
+
+    <!-- 6. Spotlight -->
+    <section class="section gradient-spotlight" id="gradientSpotlight">
+        <span class="section-label">Spotlight (Move Mouse)</span>
+        <div class="spotlight" id="spotlight"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Follow the Light</h1>
+            <p class="hero-subtitle">Gradient spotlight that follows cursor movement</p>
+        </div>
+    </section>
+
+    <!-- 7. Wave Gradient -->
+    <section class="section gradient-wave" id="gradientWave">
+        <span class="section-label">Wave Gradient</span>
+        <div class="wave-container">
+            <div class="wave wave-1"></div>
+            <div class="wave wave-2"></div>
+            <div class="wave wave-3"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Ocean Waves</h1>
+            <p class="hero-subtitle">Layered waves creating gentle motion</p>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 1. Moving gradient background</span>
+gsap.<span class="function">to</span>(<span class="string">'.gradient-move'</span>, {
+    <span class="property">backgroundPosition</span>: <span class="string">'100% 100%'</span>,
+    <span class="property">duration</span>: <span class="number">10</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">yoyo</span>: <span class="keyword">true</span>,
+    <span class="property">ease</span>: <span class="string">"sine.inOut"</span>
+});
+
+<span class="comment">/* CSS */</span>
+.gradient-move {
+    <span class="property">background</span>: linear-gradient(-45deg, #color1, #color2, #color3, #color4);
+    <span class="property">background-size</span>: 400% 400%;
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 2. Radial pulse</span>
+gsap.<span class="function">to</span>(<span class="string">'.radial-pulse'</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">scale</span>: <span class="number">1.5</span>,
+    <span class="property">duration</span>: <span class="number">2</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">yoyo</span>: <span class="keyword">true</span>,
+    <span class="property">ease</span>: <span class="string">"sine.inOut"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 3. Gradient text shimmer</span>
+gsap.<span class="function">to</span>(<span class="string">'.gradient-text'</span>, {
+    <span class="property">backgroundPosition</span>: <span class="string">'-200% 0'</span>,
+    <span class="property">duration</span>: <span class="number">3</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">ease</span>: <span class="string">"none"</span>
+});
+
+<span class="comment">/* CSS */</span>
+.gradient-text {
+    <span class="property">background</span>: linear-gradient(90deg, #gold, #light, #gold, #dark, #gold);
+    <span class="property">background-size</span>: 200% 100%;
+    <span class="property">-webkit-background-clip</span>: text;
+    <span class="property">-webkit-text-fill-color</span>: transparent;
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 4. Mesh gradient blobs</span>
+gsap.<span class="function">to</span>(<span class="string">'.mesh-blob-1'</span>, {
+    <span class="property">x</span>: <span class="number">100</span>,
+    <span class="property">y</span>: <span class="number">50</span>,
+    <span class="property">scale</span>: <span class="number">1.2</span>,
+    <span class="property">duration</span>: <span class="number">8</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">yoyo</span>: <span class="keyword">true</span>,
+    <span class="property">ease</span>: <span class="string">"sine.inOut"</span>
+});
+
+<span class="comment">/* CSS */</span>
+.mesh-blob {
+    <span class="property">filter</span>: blur(80px);
+    <span class="property">border-radius</span>: 50%;
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 5. Mouse-following spotlight</span>
+document.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+    gsap.<span class="function">to</span>(<span class="string">'.spotlight'</span>, {
+        <span class="property">left</span>: e.<span class="property">clientX</span>,
+        <span class="property">top</span>: e.<span class="property">clientY</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>,
+        <span class="property">ease</span>: <span class="string">"power2.out"</span>
+    });
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // 1. MOVING GRADIENT
+        // =====================
+
+        gsap.to('.gradient-move', {
+            backgroundPosition: '100% 100%',
+            duration: 10,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // =====================
+        // 2. RADIAL PULSE
+        // =====================
+
+        gsap.to('.radial-pulse', {
+            opacity: 1,
+            scale: 1.5,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // =====================
+        // 3. GRADIENT TEXT
+        // =====================
+
+        gsap.to('.gradient-text', {
+            backgroundPosition: '-200% 0',
+            duration: 3,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // =====================
+        // 4. MESH GRADIENT BLOBS
+        // =====================
+
+        gsap.to('.mesh-blob-1', {
+            x: 100,
+            y: 50,
+            scale: 1.2,
+            duration: 8,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        gsap.to('.mesh-blob-2', {
+            x: -80,
+            y: -60,
+            scale: 0.9,
+            duration: 10,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 1
+        });
+
+        gsap.to('.mesh-blob-3', {
+            x: 60,
+            y: -40,
+            scale: 1.1,
+            duration: 9,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 2
+        });
+
+        // =====================
+        // 5. AURORA EFFECT
+        // =====================
+
+        gsap.to('.aurora-1', {
+            y: '-100%',
+            x: '20%',
+            duration: 15,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        gsap.to('.aurora-2', {
+            y: '-80%',
+            x: '-20%',
+            duration: 12,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 2
+        });
+
+        // =====================
+        // 6. SPOTLIGHT
+        // =====================
+
+        const spotlight = document.getElementById('spotlight');
+        const spotlightSection = document.getElementById('gradientSpotlight');
+
+        spotlightSection.addEventListener('mousemove', (e) => {
+            const rect = spotlightSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            gsap.to(spotlight, {
+                left: x,
+                top: y,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+
+        spotlightSection.addEventListener('mouseenter', () => {
+            gsap.to(spotlight, { opacity: 1, duration: 0.3 });
+        });
+
+        spotlightSection.addEventListener('mouseleave', () => {
+            gsap.to(spotlight, { opacity: 0, duration: 0.3 });
+        });
+
+        // Initial position
+        gsap.set(spotlight, { opacity: 0 });
+
+        // =====================
+        // 7. WAVE GRADIENT
+        // =====================
+
+        gsap.to('.wave-1', {
+            x: '25%',
+            duration: 8,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        gsap.to('.wave-2', {
+            x: '-20%',
+            duration: 10,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 1
+        });
+
+        gsap.to('.wave-3', {
+            x: '15%',
+            duration: 12,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 2
+        });
+    </script>
+</body>
+</html>

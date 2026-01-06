@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Flip Cards | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           3D FLIP CARDS
+           Cards that flip to reveal back content
+           with various trigger methods
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 80px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Basic Flip Card */
+        .flip-card {
+            perspective: 1000px;
+            height: 350px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, #c9a227 0%, #8a7119 100%);
+            color: #0a0a0a;
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .flip-card-front h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flip-card-front p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .flip-card-back h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .flip-card-back p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .flip-hint {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Hover Flip Cards */
+        .flip-card--hover:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card--hover.is-flipped .flip-card-inner {
+            transform: rotateY(0deg);
+        }
+
+        /* Vertical Flip */
+        .flip-card--vertical.is-flipped .flip-card-inner {
+            transform: rotateX(180deg);
+        }
+
+        .flip-card--vertical .flip-card-back {
+            transform: rotateX(180deg);
+        }
+
+        /* GSAP Controlled Flip */
+        .flip-card--gsap .flip-card-inner {
+            transition: none; /* GSAP handles animation */
+        }
+
+        /* Scroll Triggered Flip */
+        .flip-card--scroll .flip-card-inner {
+            transition: none;
+        }
+
+        /* Staggered reveal cards */
+        .reveal-card {
+            height: 300px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: rotateY(-90deg);
+            transform-origin: left center;
+        }
+
+        .reveal-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .reveal-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Interactive Demo Card */
+        .demo-card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .demo-flip-card {
+            perspective: 1000px;
+            width: 300px;
+            height: 400px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        .control-btn.active {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>3D <span>Flip</span> Cards</h1>
+            <p>Interactive cards that flip to reveal content on the back</p>
+        </div>
+    </section>
+
+    <!-- Click to Flip -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Click to Flip</h2>
+            <p>Click on cards to flip them over</p>
+        </div>
+        <div class="card-grid">
+            <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[D]</div>
+                        <h3>Design</h3>
+                        <p>Creating beautiful interfaces</p>
+                        <div class="flip-hint">Click to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Design Services</h3>
+                        <p>We craft pixel-perfect designs that communicate your brand's story and engage your audience.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[</>]</div>
+                        <h3>Develop</h3>
+                        <p>Building robust solutions</p>
+                        <div class="flip-hint">Click to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Development</h3>
+                        <p>From concept to deployment, we build scalable applications using modern technologies.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[>_]</div>
+                        <h3>Deploy</h3>
+                        <p>Launching to the world</p>
+                        <div class="flip-hint">Click to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Deployment</h3>
+                        <p>We handle hosting, CI/CD, and monitoring to ensure your applications run smoothly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hover to Flip -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Hover to Flip</h2>
+            <p>Cards flip on mouse hover</p>
+        </div>
+        <div class="card-grid">
+            <div class="flip-card flip-card--hover">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[1]</div>
+                        <h3>Strategy</h3>
+                        <p>Planning for success</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Strategic Planning</h3>
+                        <p>We analyze your goals and create a roadmap for achieving measurable results.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card flip-card--hover">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[2]</div>
+                        <h3>Execute</h3>
+                        <p>Bringing plans to life</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Execution</h3>
+                        <p>Our team transforms strategies into tangible outcomes with precision and creativity.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card flip-card--hover">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[3]</div>
+                        <h3>Optimize</h3>
+                        <p>Continuous improvement</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Optimization</h3>
+                        <p>We iterate based on data and feedback to maximize performance over time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vertical Flip -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Vertical Flip</h2>
+            <p>Cards flip along the X-axis</p>
+        </div>
+        <div class="card-grid">
+            <div class="flip-card flip-card--vertical" onclick="this.classList.toggle('is-flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[^]</div>
+                        <h3>Flip Up</h3>
+                        <p>Vertical rotation reveals content</p>
+                        <div class="flip-hint">Click to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Hidden Content</h3>
+                        <p>This content was revealed by flipping the card vertically along the X-axis.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card flip-card--vertical" onclick="this.classList.toggle('is-flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[^]</div>
+                        <h3>Flip Up</h3>
+                        <p>Alternative flip direction</p>
+                        <div class="flip-hint">Click to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>Another View</h3>
+                        <p>Vertical flips work great for revealing details or alternate information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GSAP Controlled -->
+    <section class="section">
+        <div class="section-header">
+            <h2>GSAP Controlled Flip</h2>
+            <p>Precise control over flip animation with custom easing</p>
+        </div>
+        <div class="demo-card-container">
+            <div class="demo-flip-card flip-card flip-card--gsap" id="gsapCard">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-icon">[G]</div>
+                        <h3>GSAP Flip</h3>
+                        <p>Animated with GreenSock</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3>GSAP Power</h3>
+                        <p>Custom easing, callbacks, and precise timing control with GSAP.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="control-btn" id="flipBtn">Flip Card</button>
+                <button class="control-btn" id="flipBackBtn">Flip Back</button>
+                <button class="control-btn" id="flipBounceBtn">Bounce Flip</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scroll Triggered Flip -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Scroll-Triggered Reveal</h2>
+            <p>Cards flip in as you scroll</p>
+        </div>
+        <div class="card-grid">
+            <div class="reveal-card">
+                <h3>Card One</h3>
+                <p>Revealed on scroll with staggered timing</p>
+            </div>
+            <div class="reveal-card">
+                <h3>Card Two</h3>
+                <p>Each card flips in sequence</p>
+            </div>
+            <div class="reveal-card">
+                <h3>Card Three</h3>
+                <p>Creating a cascading effect</p>
+            </div>
+            <div class="reveal-card">
+                <h3>Card Four</h3>
+                <p>Perfect for showcasing features</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// CSS-based flip (simplest approach)</span>
+<span class="comment">// HTML: Toggle class on click</span>
+card.<span class="function">addEventListener</span>(<span class="string">'click'</span>, () => {
+    card.classList.<span class="function">toggle</span>(<span class="string">'is-flipped'</span>);
+});
+
+<span class="comment">/* CSS */</span>
+.flip-card {
+    <span class="property">perspective</span>: <span class="number">1000px</span>;
+}
+
+.flip-card-inner {
+    <span class="property">transform-style</span>: preserve-3d;
+    <span class="property">transition</span>: transform <span class="number">0.8s</span> ease;
+}
+
+.flip-card.is-flipped .flip-card-inner {
+    <span class="property">transform</span>: <span class="function">rotateY</span>(<span class="number">180deg</span>);
+}
+
+.flip-card-front, .flip-card-back {
+    <span class="property">backface-visibility</span>: hidden;
+}
+
+.flip-card-back {
+    <span class="property">transform</span>: <span class="function">rotateY</span>(<span class="number">180deg</span>);
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// GSAP-controlled flip</span>
+<span class="keyword">function</span> <span class="function">flipCard</span>(card, options = {}) {
+    <span class="keyword">const</span> {
+        duration = <span class="number">0.8</span>,
+        ease = <span class="string">"power2.inOut"</span>,
+        direction = <span class="string">"horizontal"</span>
+    } = options;
+
+    <span class="keyword">const</span> inner = card.<span class="function">querySelector</span>(<span class="string">'.flip-card-inner'</span>);
+    <span class="keyword">const</span> isFlipped = card.classList.<span class="function">contains</span>(<span class="string">'is-flipped'</span>);
+    <span class="keyword">const</span> rotation = direction === <span class="string">'horizontal'</span> ? <span class="string">'rotateY'</span> : <span class="string">'rotateX'</span>;
+
+    gsap.<span class="function">to</span>(inner, {
+        [rotation]: isFlipped ? <span class="number">0</span> : <span class="number">180</span>,
+        duration,
+        ease,
+        <span class="property">onComplete</span>: () => {
+            card.classList.<span class="function">toggle</span>(<span class="string">'is-flipped'</span>);
+        }
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Scroll-triggered reveal with stagger</span>
+gsap.<span class="function">to</span>(<span class="string">".reveal-card"</span>, {
+    <span class="property">rotateY</span>: <span class="number">0</span>,
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">stagger</span>: <span class="number">0.15</span>,
+    <span class="property">ease</span>: <span class="string">"back.out(1.4)"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".card-grid"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Bounce flip effect</span>
+<span class="keyword">function</span> <span class="function">bounceFlip</span>(card) {
+    <span class="keyword">const</span> inner = card.<span class="function">querySelector</span>(<span class="string">'.flip-card-inner'</span>);
+
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    tl.<span class="function">to</span>(inner, {
+        <span class="property">scale</span>: <span class="number">0.9</span>,
+        <span class="property">duration</span>: <span class="number">0.2</span>
+    })
+    .<span class="function">to</span>(inner, {
+        <span class="property">rotateY</span>: <span class="number">180</span>,
+        <span class="property">duration</span>: <span class="number">0.6</span>,
+        <span class="property">ease</span>: <span class="string">"power2.inOut"</span>
+    })
+    .<span class="function">to</span>(inner, {
+        <span class="property">scale</span>: <span class="number">1</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>,
+        <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>
+    }, <span class="string">"-=0.2"</span>);
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // GSAP CONTROLLED FLIP
+        // =====================
+        const gsapCard = document.getElementById('gsapCard');
+        const gsapCardInner = gsapCard.querySelector('.flip-card-inner');
+        let isFlipped = false;
+
+        document.getElementById('flipBtn').addEventListener('click', () => {
+            if (!isFlipped) {
+                gsap.to(gsapCardInner, {
+                    rotateY: 180,
+                    duration: 0.8,
+                    ease: "power2.inOut",
+                    onComplete: () => { isFlipped = true; }
+                });
+            }
+        });
+
+        document.getElementById('flipBackBtn').addEventListener('click', () => {
+            if (isFlipped) {
+                gsap.to(gsapCardInner, {
+                    rotateY: 0,
+                    duration: 0.8,
+                    ease: "power2.inOut",
+                    onComplete: () => { isFlipped = false; }
+                });
+            }
+        });
+
+        document.getElementById('flipBounceBtn').addEventListener('click', () => {
+            const targetRotation = isFlipped ? 0 : 180;
+
+            const tl = gsap.timeline({
+                onComplete: () => { isFlipped = !isFlipped; }
+            });
+
+            tl.to(gsapCardInner, {
+                scale: 0.9,
+                duration: 0.2
+            })
+            .to(gsapCardInner, {
+                rotateY: targetRotation,
+                duration: 0.6,
+                ease: "power2.inOut"
+            })
+            .to(gsapCardInner, {
+                scale: 1,
+                duration: 0.3,
+                ease: "back.out(1.7)"
+            }, "-=0.2");
+        });
+
+        // =====================
+        // SCROLL TRIGGERED REVEAL
+        // =====================
+        gsap.to(".reveal-card", {
+            rotateY: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "back.out(1.4)",
+            scrollTrigger: {
+                trigger: ".reveal-card",
+                start: "top 80%"
+            }
+        });
+    </script>
+</body>
+</html>

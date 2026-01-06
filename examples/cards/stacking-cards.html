@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacking Cards | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           STACKING CARDS
+           Cards that stack and unstack on scroll
+           with various animation patterns
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        .scroll-hint {
+            margin-top: 3rem;
+            opacity: 0.5;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Stacking section */
+        .stacking-section {
+            position: relative;
+            min-height: 400vh;
+        }
+
+        .stacking-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Stack cards */
+        .stack-card {
+            position: absolute;
+            width: 90%;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 500px;
+            background: #1a1a1a;
+            border-radius: 24px;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transform-origin: center top;
+        }
+
+        .stack-card:nth-child(1) {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .stack-card:nth-child(2) {
+            background: linear-gradient(135deg, #1a2e1a 0%, #163e16 100%);
+        }
+
+        .stack-card:nth-child(3) {
+            background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%);
+        }
+
+        .stack-card:nth-child(4) {
+            background: linear-gradient(135deg, #2e2e1a 0%, #3e3e16 100%);
+        }
+
+        .stack-card-number {
+            font-size: 8rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.1);
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            line-height: 1;
+        }
+
+        .stack-card h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        .stack-card p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.7;
+            max-width: 500px;
+        }
+
+        /* Fan out section */
+        .fanout-section {
+            position: relative;
+            min-height: 300vh;
+            background: #111;
+        }
+
+        .fanout-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fanout-card {
+            position: absolute;
+            width: 280px;
+            height: 380px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            transform-origin: center bottom;
+            overflow: hidden;
+        }
+
+        .fanout-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 50%, rgba(0,0,0,0.8));
+        }
+
+        .fanout-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .fanout-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .fanout-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .fanout-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Horizontal Stack */
+        .horizontal-section {
+            position: relative;
+            min-height: 300vh;
+        }
+
+        .horizontal-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-left: 10%;
+            overflow: hidden;
+        }
+
+        .horizontal-card {
+            flex-shrink: 0;
+            width: 350px;
+            height: 450px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            margin-right: -200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .horizontal-card:nth-child(1) { z-index: 5; }
+        .horizontal-card:nth-child(2) { z-index: 4; }
+        .horizontal-card:nth-child(3) { z-index: 3; }
+        .horizontal-card:nth-child(4) { z-index: 2; }
+        .horizontal-card:nth-child(5) { z-index: 1; }
+
+        .horizontal-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--card-color, #c9a227) 0%, transparent 100%);
+            opacity: 0.1;
+        }
+
+        .horizontal-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .horizontal-card p {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            position: relative;
+        }
+
+        /* Section headers */
+        .section-intro {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .section-intro h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            color: #c9a227;
+        }
+
+        .section-intro p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Stacking <span>Cards</span></h1>
+            <p>Cards that stack, fan out, and reveal as you scroll through the page</p>
+            <div class="scroll-hint">Scroll to explore</div>
+        </div>
+    </section>
+
+    <!-- Vertical Stacking -->
+    <section class="section-intro">
+        <div>
+            <h2>Vertical Stack</h2>
+            <p>Cards stack on top of each other and shrink as new ones appear</p>
+        </div>
+    </section>
+
+    <section class="stacking-section">
+        <div class="stacking-container">
+            <div class="stack-card">
+                <span class="stack-card-number">01</span>
+                <h2>First Card</h2>
+                <p>This card starts at full size and will shrink and move up as you scroll, making room for the next card to appear on top.</p>
+            </div>
+            <div class="stack-card">
+                <span class="stack-card-number">02</span>
+                <h2>Second Card</h2>
+                <p>Each subsequent card slides in from below and takes focus while previous cards compress above.</p>
+            </div>
+            <div class="stack-card">
+                <span class="stack-card-number">03</span>
+                <h2>Third Card</h2>
+                <p>The stacking effect creates a sense of depth and progression through your content.</p>
+            </div>
+            <div class="stack-card">
+                <span class="stack-card-number">04</span>
+                <h2>Fourth Card</h2>
+                <p>Perfect for showcasing features, steps in a process, or scrollytelling narratives.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fan Out -->
+    <section class="section-intro">
+        <div>
+            <h2>Fan Out Effect</h2>
+            <p>Cards spread out from a central stack like a hand of playing cards</p>
+        </div>
+    </section>
+
+    <section class="fanout-section">
+        <div class="fanout-container">
+            <div class="fanout-card">
+                <img src="https://picsum.photos/300/400?random=10" alt="Card 1">
+                <div class="fanout-card-content">
+                    <h3>Mountain Trek</h3>
+                    <p>Adventure awaits</p>
+                </div>
+            </div>
+            <div class="fanout-card">
+                <img src="https://picsum.photos/300/400?random=11" alt="Card 2">
+                <div class="fanout-card-content">
+                    <h3>Ocean View</h3>
+                    <p>Endless horizons</p>
+                </div>
+            </div>
+            <div class="fanout-card">
+                <img src="https://picsum.photos/300/400?random=12" alt="Card 3">
+                <div class="fanout-card-content">
+                    <h3>Forest Path</h3>
+                    <p>Nature's beauty</p>
+                </div>
+            </div>
+            <div class="fanout-card">
+                <img src="https://picsum.photos/300/400?random=13" alt="Card 4">
+                <div class="fanout-card-content">
+                    <h3>City Lights</h3>
+                    <p>Urban energy</p>
+                </div>
+            </div>
+            <div class="fanout-card">
+                <img src="https://picsum.photos/300/400?random=14" alt="Card 5">
+                <div class="fanout-card-content">
+                    <h3>Desert Sun</h3>
+                    <p>Golden sands</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horizontal Stack -->
+    <section class="section-intro">
+        <div>
+            <h2>Horizontal Spread</h2>
+            <p>Stacked cards that spread out horizontally</p>
+        </div>
+    </section>
+
+    <section class="horizontal-section">
+        <div class="horizontal-container">
+            <div class="horizontal-card" style="--card-color: #c9a227;">
+                <h3>Strategy</h3>
+                <p>Planning for success with data-driven insights</p>
+            </div>
+            <div class="horizontal-card" style="--card-color: #27c9a2;">
+                <h3>Design</h3>
+                <p>Creating beautiful, functional interfaces</p>
+            </div>
+            <div class="horizontal-card" style="--card-color: #a227c9;">
+                <h3>Development</h3>
+                <p>Building robust, scalable solutions</p>
+            </div>
+            <div class="horizontal-card" style="--card-color: #c92727;">
+                <h3>Launch</h3>
+                <p>Deploying with confidence and care</p>
+            </div>
+            <div class="horizontal-card" style="--card-color: #2796c9;">
+                <h3>Optimize</h3>
+                <p>Continuous improvement and iteration</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Vertical stacking cards</span>
+<span class="keyword">const</span> cards = gsap.utils.<span class="function">toArray</span>(<span class="string">'.stack-card'</span>);
+<span class="keyword">const</span> spacing = <span class="number">40</span>; <span class="comment">// Space between stacked cards</span>
+<span class="keyword">const</span> scaleFactor = <span class="number">0.05</span>; <span class="comment">// How much each card shrinks</span>
+
+cards.<span class="function">forEach</span>((card, i) => {
+    <span class="comment">// Initial state: all cards except first are below</span>
+    gsap.<span class="function">set</span>(card, {
+        <span class="property">y</span>: i === <span class="number">0</span> ? <span class="number">0</span> : <span class="string">'100vh'</span>,
+        <span class="property">zIndex</span>: cards.<span class="property">length</span> - i
+    });
+
+    <span class="keyword">if</span> (i > <span class="number">0</span>) {
+        <span class="comment">// Animate each card in</span>
+        ScrollTrigger.<span class="function">create</span>({
+            <span class="property">trigger</span>: <span class="string">'.stacking-section'</span>,
+            <span class="property">start</span>: <span class="string">`</span>${(i - <span class="number">1</span>) * <span class="number">25</span>}<span class="string">% top`</span>,
+            <span class="property">end</span>: <span class="string">`</span>${i * <span class="number">25</span>}<span class="string">% top`</span>,
+            <span class="property">scrub</span>: <span class="keyword">true</span>,
+            <span class="property">onUpdate</span>: (self) => {
+                gsap.<span class="function">set</span>(card, {
+                    <span class="property">y</span>: (<span class="number">1</span> - self.<span class="property">progress</span>) * window.<span class="property">innerHeight</span>
+                });
+            }
+        });
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Fan out effect</span>
+<span class="keyword">const</span> fanCards = gsap.utils.<span class="function">toArray</span>(<span class="string">'.fanout-card'</span>);
+<span class="keyword">const</span> totalCards = fanCards.<span class="property">length</span>;
+<span class="keyword">const</span> spreadAngle = <span class="number">60</span>; <span class="comment">// Total angle spread</span>
+
+gsap.<span class="function">set</span>(fanCards, { <span class="property">rotation</span>: <span class="number">0</span>, <span class="property">x</span>: <span class="number">0</span> });
+
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: <span class="string">'.fanout-section'</span>,
+    <span class="property">start</span>: <span class="string">'top top'</span>,
+    <span class="property">end</span>: <span class="string">'bottom bottom'</span>,
+    <span class="property">scrub</span>: <span class="number">1</span>,
+    <span class="property">onUpdate</span>: (self) => {
+        fanCards.<span class="function">forEach</span>((card, i) => {
+            <span class="keyword">const</span> offset = i - (totalCards - <span class="number">1</span>) / <span class="number">2</span>;
+            <span class="keyword">const</span> rotation = offset * (spreadAngle / totalCards) * self.<span class="property">progress</span>;
+            <span class="keyword">const</span> x = offset * <span class="number">80</span> * self.<span class="property">progress</span>;
+
+            gsap.<span class="function">set</span>(card, { <span class="property">rotation</span>, <span class="property">x</span> });
+        });
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Horizontal spread</span>
+<span class="keyword">const</span> hCards = gsap.utils.<span class="function">toArray</span>(<span class="string">'.horizontal-card'</span>);
+
+hCards.<span class="function">forEach</span>((card, i) => {
+    gsap.<span class="function">to</span>(card, {
+        <span class="property">x</span>: i * <span class="number">220</span>, <span class="comment">// Spread distance</span>
+        <span class="property">ease</span>: <span class="string">'none'</span>,
+        <span class="property">scrollTrigger</span>: {
+            <span class="property">trigger</span>: <span class="string">'.horizontal-section'</span>,
+            <span class="property">start</span>: <span class="string">'top top'</span>,
+            <span class="property">end</span>: <span class="string">'bottom bottom'</span>,
+            <span class="property">scrub</span>: <span class="number">1</span>
+        }
+    });
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // VERTICAL STACKING CARDS
+        // =====================
+
+        const stackCards = gsap.utils.toArray('.stack-card');
+        const stackSection = document.querySelector('.stacking-section');
+
+        stackCards.forEach((card, i) => {
+            // Set initial z-index (first card on top initially)
+            gsap.set(card, {
+                zIndex: stackCards.length - i
+            });
+
+            // For cards after the first, animate them in
+            if (i > 0) {
+                gsap.set(card, { y: '100%' });
+
+                // Card enters
+                ScrollTrigger.create({
+                    trigger: stackSection,
+                    start: () => `${(i - 1) * 25}% top`,
+                    end: () => `${i * 25}% top`,
+                    scrub: true,
+                    onUpdate: (self) => {
+                        gsap.set(card, {
+                            y: (1 - self.progress) * 100 + '%'
+                        });
+                    }
+                });
+            }
+
+            // All cards except last shrink and move up as subsequent cards arrive
+            if (i < stackCards.length - 1) {
+                ScrollTrigger.create({
+                    trigger: stackSection,
+                    start: () => `${i * 25}% top`,
+                    end: () => `${(i + 1) * 25}% top`,
+                    scrub: true,
+                    onUpdate: (self) => {
+                        const scale = 1 - (self.progress * 0.05);
+                        const yOffset = -self.progress * 60;
+
+                        gsap.set(card, {
+                            scale: scale,
+                            y: yOffset
+                        });
+                    }
+                });
+            }
+        });
+
+        // =====================
+        // FAN OUT CARDS
+        // =====================
+
+        const fanCards = gsap.utils.toArray('.fanout-card');
+        const fanSection = document.querySelector('.fanout-section');
+        const totalFanCards = fanCards.length;
+        const spreadAngle = 60;
+
+        // Set initial state - all cards stacked
+        gsap.set(fanCards, {
+            rotation: 0,
+            x: 0,
+            y: 0
+        });
+
+        // Set z-index so middle card is on top
+        fanCards.forEach((card, i) => {
+            const middleIndex = Math.floor(totalFanCards / 2);
+            const distanceFromMiddle = Math.abs(i - middleIndex);
+            gsap.set(card, { zIndex: totalFanCards - distanceFromMiddle });
+        });
+
+        ScrollTrigger.create({
+            trigger: fanSection,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 1,
+            onUpdate: (self) => {
+                fanCards.forEach((card, i) => {
+                    const offset = i - (totalFanCards - 1) / 2;
+                    const rotation = offset * (spreadAngle / totalFanCards) * self.progress;
+                    const x = offset * 80 * self.progress;
+                    const y = Math.abs(offset) * 20 * self.progress;
+
+                    gsap.set(card, {
+                        rotation: rotation,
+                        x: x,
+                        y: y
+                    });
+                });
+            }
+        });
+
+        // =====================
+        // HORIZONTAL SPREAD
+        // =====================
+
+        const hCards = gsap.utils.toArray('.horizontal-card');
+        const hSection = document.querySelector('.horizontal-section');
+
+        hCards.forEach((card, i) => {
+            gsap.to(card, {
+                x: i * 200,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: hSection,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 1
+                }
+            });
+        });
+    </script>
+</body>
+</html>

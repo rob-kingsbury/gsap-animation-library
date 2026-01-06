@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Marquee | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           TEXT MARQUEE
+           Infinite scrolling text in various styles
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Marquee container */
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .marquee-content {
+            display: inline-flex;
+            animation: none; /* GSAP will handle this */
+        }
+
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        /* Basic Marquee */
+        .marquee--basic {
+            padding: 2rem 0;
+            background: #111;
+        }
+
+        .marquee--basic .marquee-item {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .marquee--basic .separator {
+            width: 12px;
+            height: 12px;
+            background: #c9a227;
+            border-radius: 50%;
+            margin: 0 1rem;
+        }
+
+        /* Outlined Marquee */
+        .marquee--outlined {
+            padding: 3rem 0;
+        }
+
+        .marquee--outlined .marquee-item {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            -webkit-text-stroke: 2px #f5f5f0;
+            color: transparent;
+            letter-spacing: 0.02em;
+        }
+
+        .marquee--outlined .marquee-item:nth-child(even) {
+            -webkit-text-stroke-color: #c9a227;
+        }
+
+        /* Two-row opposing direction */
+        .marquee-double {
+            background: #111;
+            padding: 2rem 0;
+        }
+
+        .marquee--row1 .marquee-item,
+        .marquee--row2 .marquee-item {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 600;
+        }
+
+        .marquee--row1 {
+            margin-bottom: 1rem;
+        }
+
+        /* Image + Text Marquee */
+        .marquee--mixed {
+            padding: 3rem 0;
+        }
+
+        .marquee--mixed .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .marquee--mixed .marquee-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .marquee--mixed .marquee-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Hover pause marquee */
+        .marquee--hover-pause {
+            padding: 2rem 0;
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        .marquee--hover-pause .marquee-item {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .marquee--hover-pause .marquee-item span {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .marquee--hover-pause:hover .marquee-item span {
+            transform: skewX(-10deg);
+        }
+
+        /* Gradient fade edges */
+        .marquee--gradient {
+            padding: 3rem 0;
+        }
+
+        .marquee--gradient::before,
+        .marquee--gradient::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 150px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .marquee--gradient::before {
+            left: 0;
+            background: linear-gradient(90deg, #0a0a0a, transparent);
+        }
+
+        .marquee--gradient::after {
+            right: 0;
+            background: linear-gradient(-90deg, #0a0a0a, transparent);
+        }
+
+        .marquee--gradient .marquee-item {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #c9a227;
+        }
+
+        /* Vertical marquee */
+        .marquee-vertical-container {
+            height: 300px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            padding: 0 2rem;
+        }
+
+        .marquee-vertical {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+        }
+
+        .marquee-vertical .marquee-content {
+            flex-direction: column;
+        }
+
+        .marquee-vertical .marquee-item {
+            padding: 1rem 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+            text-align: center;
+            white-space: normal;
+        }
+
+        /* Scroll-triggered speed */
+        .marquee--scroll-speed {
+            padding: 3rem 0;
+            background: #111;
+        }
+
+        .marquee--scroll-speed .marquee-item {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .marquee-vertical-container {
+                gap: 2rem;
+            }
+
+            .marquee--gradient::before,
+            .marquee--gradient::after {
+                width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Text <span>Marquee</span></h1>
+        <p>Infinite scrolling text animations for headers, footers, and visual impact</p>
+    </section>
+
+    <!-- Basic Marquee -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Basic Marquee</h2>
+            <p>Simple horizontal scrolling text</p>
+        </div>
+        <div class="marquee marquee--basic">
+            <div class="marquee-content" data-direction="left" data-speed="30">
+                <div class="marquee-item">Design<span class="separator"></span></div>
+                <div class="marquee-item">Develop<span class="separator"></span></div>
+                <div class="marquee-item">Deliver<span class="separator"></span></div>
+                <div class="marquee-item">Design<span class="separator"></span></div>
+                <div class="marquee-item">Develop<span class="separator"></span></div>
+                <div class="marquee-item">Deliver<span class="separator"></span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Outlined Marquee -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Outlined Text</h2>
+            <p>Large outlined typography with alternating colors</p>
+        </div>
+        <div class="marquee marquee--outlined">
+            <div class="marquee-content" data-direction="right" data-speed="50">
+                <div class="marquee-item">Creative</div>
+                <div class="marquee-item">Studio</div>
+                <div class="marquee-item">Creative</div>
+                <div class="marquee-item">Studio</div>
+                <div class="marquee-item">Creative</div>
+                <div class="marquee-item">Studio</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two-row Opposing -->
+    <section class="section marquee-double">
+        <div class="section-header">
+            <h2>Opposing Directions</h2>
+            <p>Two rows moving in opposite directions</p>
+        </div>
+        <div class="marquee marquee--row1">
+            <div class="marquee-content" data-direction="left" data-speed="25">
+                <div class="marquee-item">Innovation</div>
+                <div class="marquee-item">Excellence</div>
+                <div class="marquee-item">Quality</div>
+                <div class="marquee-item">Innovation</div>
+                <div class="marquee-item">Excellence</div>
+                <div class="marquee-item">Quality</div>
+            </div>
+        </div>
+        <div class="marquee marquee--row2">
+            <div class="marquee-content" data-direction="right" data-speed="25">
+                <div class="marquee-item">Strategy</div>
+                <div class="marquee-item">Design</div>
+                <div class="marquee-item">Development</div>
+                <div class="marquee-item">Strategy</div>
+                <div class="marquee-item">Design</div>
+                <div class="marquee-item">Development</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hover Pause -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Hover to Pause</h2>
+            <p>Marquee pauses on hover for readability</p>
+        </div>
+        <div class="marquee marquee--hover-pause" data-hover-pause="true">
+            <div class="marquee-content" data-direction="left" data-speed="40">
+                <div class="marquee-item"><span>Breaking News</span></div>
+                <div class="marquee-item"><span>Latest Updates</span></div>
+                <div class="marquee-item"><span>Hot Off The Press</span></div>
+                <div class="marquee-item"><span>Breaking News</span></div>
+                <div class="marquee-item"><span>Latest Updates</span></div>
+                <div class="marquee-item"><span>Hot Off The Press</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gradient Fade -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Gradient Fade Edges</h2>
+            <p>Smooth fade at edges for seamless appearance</p>
+        </div>
+        <div class="marquee marquee--gradient">
+            <div class="marquee-content" data-direction="left" data-speed="35">
+                <div class="marquee-item">Infinite</div>
+                <div class="marquee-item">Seamless</div>
+                <div class="marquee-item">Smooth</div>
+                <div class="marquee-item">Infinite</div>
+                <div class="marquee-item">Seamless</div>
+                <div class="marquee-item">Smooth</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scroll Speed Control -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Scroll-Controlled Speed</h2>
+            <p>Marquee speeds up as you scroll</p>
+        </div>
+        <div class="marquee marquee--scroll-speed">
+            <div class="marquee-content scroll-speed-marquee" data-direction="left" data-speed="20">
+                <div class="marquee-item">Velocity</div>
+                <div class="marquee-item">Motion</div>
+                <div class="marquee-item">Speed</div>
+                <div class="marquee-item">Velocity</div>
+                <div class="marquee-item">Motion</div>
+                <div class="marquee-item">Speed</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic infinite marquee with GSAP</span>
+<span class="keyword">function</span> <span class="function">initMarquee</span>(selector) {
+    <span class="keyword">const</span> marquee = document.<span class="function">querySelector</span>(selector);
+    <span class="keyword">const</span> content = marquee.<span class="function">querySelector</span>(<span class="string">'.marquee-content'</span>);
+
+    <span class="comment">// Clone content for seamless loop</span>
+    <span class="keyword">const</span> clone = content.<span class="function">cloneNode</span>(<span class="keyword">true</span>);
+    marquee.<span class="function">appendChild</span>(clone);
+
+    <span class="comment">// Calculate total width</span>
+    <span class="keyword">const</span> contentWidth = content.<span class="property">offsetWidth</span>;
+
+    <span class="comment">// Create seamless loop animation</span>
+    gsap.<span class="function">to</span>([content, clone], {
+        <span class="property">xPercent</span>: <span class="number">-100</span>,
+        <span class="property">duration</span>: <span class="number">20</span>,
+        <span class="property">ease</span>: <span class="string">"none"</span>,
+        <span class="property">repeat</span>: <span class="number">-1</span>,
+        <span class="property">modifiers</span>: {
+            <span class="function">xPercent</span>: gsap.utils.<span class="function">wrap</span>(<span class="number">-100</span>, <span class="number">0</span>)
+        }
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Horizontal loop helper (from GSAP docs)</span>
+<span class="keyword">function</span> <span class="function">horizontalLoop</span>(items, config) {
+    config = config || {};
+    <span class="keyword">let</span> tl = gsap.<span class="function">timeline</span>({
+        <span class="property">repeat</span>: config.<span class="property">repeat</span>,
+        <span class="property">paused</span>: config.<span class="property">paused</span>
+    });
+
+    <span class="keyword">const</span> length = items.<span class="property">length</span>;
+    <span class="keyword">const</span> startX = items[<span class="number">0</span>].<span class="function">offsetLeft</span>;
+    <span class="keyword">const</span> widths = [];
+    <span class="keyword">const</span> xPercents = [];
+    <span class="keyword">let</span> totalWidth = <span class="number">0</span>;
+
+    <span class="comment">// Measure and position items</span>
+    items.<span class="function">forEach</span>((item, i) => {
+        widths[i] = item.<span class="property">offsetWidth</span>;
+        xPercents[i] = <span class="function">snap</span>(item.<span class="property">offsetLeft</span> / widths[i] * <span class="number">100</span>);
+        totalWidth += widths[i];
+    });
+
+    <span class="comment">// ... animation logic</span>
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Pause on hover</span>
+marquee.<span class="function">addEventListener</span>(<span class="string">'mouseenter'</span>, () => {
+    gsap.<span class="function">to</span>(tween, { <span class="property">timeScale</span>: <span class="number">0</span>, <span class="property">duration</span>: <span class="number">0.5</span> });
+});
+
+marquee.<span class="function">addEventListener</span>(<span class="string">'mouseleave'</span>, () => {
+    gsap.<span class="function">to</span>(tween, { <span class="property">timeScale</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">0.5</span> });
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Scroll-based speed variation</span>
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: marquee,
+    <span class="property">start</span>: <span class="string">"top bottom"</span>,
+    <span class="property">end</span>: <span class="string">"bottom top"</span>,
+    <span class="property">onUpdate</span>: (self) => {
+        <span class="comment">// Increase speed based on scroll velocity</span>
+        <span class="keyword">const</span> velocity = self.<span class="property">getVelocity</span>();
+        <span class="keyword">const</span> speedMultiplier = <span class="number">1</span> + Math.<span class="function">abs</span>(velocity) / <span class="number">1000</span>;
+        tween.<span class="property">timeScale</span>(speedMultiplier);
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // MARQUEE INITIALIZATION
+        // =====================
+
+        const marquees = [];
+
+        document.querySelectorAll('.marquee').forEach(marquee => {
+            const content = marquee.querySelector('.marquee-content');
+            const direction = content.dataset.direction || 'left';
+            const speed = parseFloat(content.dataset.speed) || 30;
+            const hoverPause = marquee.dataset.hoverPause === 'true';
+
+            // Clone content for seamless loop
+            const clone = content.cloneNode(true);
+            marquee.appendChild(clone);
+
+            // Set initial position for right-moving marquees
+            if (direction === 'right') {
+                gsap.set([content, clone], { xPercent: -100 });
+            }
+
+            // Calculate animation direction
+            const xPercentEnd = direction === 'left' ? -100 : 0;
+            const xPercentStart = direction === 'left' ? 0 : -100;
+
+            // Create animation
+            const tween = gsap.to([content, clone], {
+                xPercent: xPercentEnd,
+                duration: speed,
+                ease: "none",
+                repeat: -1,
+                modifiers: {
+                    xPercent: gsap.utils.wrap(xPercentStart, xPercentEnd)
+                }
+            });
+
+            // Store reference
+            marquees.push({ marquee, tween });
+
+            // Hover pause functionality
+            if (hoverPause) {
+                marquee.addEventListener('mouseenter', () => {
+                    gsap.to(tween, { timeScale: 0, duration: 0.5 });
+                });
+
+                marquee.addEventListener('mouseleave', () => {
+                    gsap.to(tween, { timeScale: 1, duration: 0.5 });
+                });
+            }
+        });
+
+        // =====================
+        // SCROLL SPEED VARIATION
+        // =====================
+
+        const scrollSpeedMarquee = document.querySelector('.marquee--scroll-speed');
+        if (scrollSpeedMarquee) {
+            const marqueeData = marquees.find(m => m.marquee === scrollSpeedMarquee);
+
+            if (marqueeData) {
+                ScrollTrigger.create({
+                    trigger: scrollSpeedMarquee,
+                    start: "top bottom",
+                    end: "bottom top",
+                    onUpdate: (self) => {
+                        const velocity = Math.abs(self.getVelocity());
+                        const speedMultiplier = 1 + velocity / 500;
+                        marqueeData.tween.timeScale(Math.min(speedMultiplier, 5));
+                    }
+                });
+
+                // Reset speed when not scrolling
+                let scrollTimeout;
+                window.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        gsap.to(marqueeData.tween, { timeScale: 1, duration: 0.5 });
+                    }, 100);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSAP Animation Library - Examples Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface-hover: #1a1a1a;
+      --border: rgba(255,255,255,0.1);
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.6);
+      --accent: #667eea;
+      --accent-glow: rgba(102, 126, 234, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .header-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .header-links a:hover {
+      border-color: var(--accent);
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .header-links a.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .header-links a.primary:hover {
+      background: #5a6fd6;
+    }
+
+    /* Main Content */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      padding: 2rem;
+      background: var(--surface);
+      border-radius: 12px;
+      margin-bottom: 3rem;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Category Section */
+    .category {
+      margin-bottom: 4rem;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .category-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .category-count {
+      margin-left: auto;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      background: var(--surface);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+    }
+
+    /* Example Grid */
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Example Card */
+    .example-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .example-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--accent);
+    }
+
+    .example-preview {
+      height: 180px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .example-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 40%, rgba(102, 126, 234, 0.1) 50%, transparent 60%);
+      background-size: 200% 200%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .example-preview-icon {
+      font-size: 3rem;
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    .example-info {
+      padding: 1.25rem;
+    }
+
+    .example-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .example-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.75rem; }
+      .stats { flex-direction: column; gap: 1.5rem; }
+      .examples-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GSAP Animation Library</h1>
+    <p>A collection of production-ready scroll animations, text effects, and UI interactions built with GSAP and ScrollTrigger.</p>
+    <div class="header-links">
+      <a href="index.html" class="primary">Page Builder Tool</a>
+      <a href="../">Documentation</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="totalExamples">--</div>
+        <div class="stat-label">Examples</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="totalCategories">--</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Copy-Paste Ready</div>
+      </div>
+    </div>
+
+    <div id="categoriesContainer">
+      <div class="loading">Loading examples...</div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Built for <a href="../../stompers-redesign/">Swamp City Stompers</a> | GSAP + ScrollTrigger + Lenis</p>
+  </footer>
+
+  <script>
+    // Category icons mapping
+    const categoryIcons = {
+      scroll: '↕',
+      text: 'Aa',
+      cards: '▢',
+      navigation: '☰',
+      hero: '★',
+      'micro-interactions': '✦',
+      standalone: '◈'
+    };
+
+    // Preview icons for examples (fallback)
+    const previewIcons = {
+      'horizontal': '↔',
+      'parallax': '≡',
+      'progress': '▬',
+      'pin': '📌',
+      'reveal': '👁',
+      'split': '✎',
+      'typewriter': '⌨',
+      'marquee': '⇄',
+      'kinetic': '✨',
+      'flip': '🔄',
+      'tilt': '◇',
+      'stack': '📁',
+      'grid': '▦',
+      'hamburger': '☰',
+      'drawer': '◀',
+      'tab': '▬',
+      'modal': '□',
+      'hero': '💬',
+      'counter': '📊',
+      'gradient': '🌈',
+      'button': '🔘',
+      'cursor': '👆',
+      'loading': '⏳',
+      'stripe': '▶'
+    };
+
+    function getPreviewIcon(title) {
+      const lower = title.toLowerCase();
+      for (const [key, icon] of Object.entries(previewIcons)) {
+        if (lower.includes(key)) return icon;
+      }
+      return '✦';
+    }
+
+    async function loadGallery() {
+      try {
+        const res = await fetch('manifest.json');
+        const manifest = await res.json();
+
+        // Update stats
+        document.getElementById('totalExamples').textContent = manifest.totalExamples;
+        document.getElementById('totalCategories').textContent = manifest.categories.length;
+
+        // Build categories HTML
+        const container = document.getElementById('categoriesContainer');
+        let html = '';
+
+        for (const category of manifest.categories) {
+          html += `
+            <section class="category">
+              <div class="category-header">
+                <div class="category-icon">${category.icon}</div>
+                <h2 class="category-title">${category.label}</h2>
+                <span class="category-count">${category.examples.length} example${category.examples.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div class="examples-grid">
+          `;
+
+          for (const example of category.examples) {
+            const icon = getPreviewIcon(example.title);
+            html += `
+              <a href="${example.file}" class="example-card">
+                <div class="example-preview">
+                  <span class="example-preview-icon">${icon}</span>
+                </div>
+                <div class="example-info">
+                  <h3 class="example-title">${example.title}</h3>
+                  ${example.description ? `<p class="example-desc">${example.description}</p>` : ''}
+                </div>
+              </a>
+            `;
+          }
+
+          html += `
+              </div>
+            </section>
+          `;
+        }
+
+        // Add Page Builder as special card
+        html += `
+          <section class="category">
+            <div class="category-header">
+              <div class="category-icon">🛠</div>
+              <h2 class="category-title">Tools</h2>
+              <span class="category-count">1 tool</span>
+            </div>
+            <div class="examples-grid">
+              <a href="index.html" class="example-card">
+                <div class="example-preview" style="background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%);">
+                  <span class="example-preview-icon" style="opacity: 1;">🛠</span>
+                </div>
+                <div class="example-info">
+                  <h3 class="example-title">Page Builder Tool</h3>
+                  <p class="example-desc">Interactive tool to combine animations and export complete pages.</p>
+                </div>
+              </a>
+            </div>
+          </section>
+        `;
+
+        container.innerHTML = html;
+
+      } catch (e) {
+        console.error('Failed to load manifest:', e);
+        document.getElementById('categoriesContainer').innerHTML = `
+          <div class="loading">Failed to load examples. Make sure manifest.json exists.</div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadGallery);
+  </script>
+</body>
+</html>

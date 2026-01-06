@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursor Effects | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           CURSOR EFFECTS
+           Custom cursor animations and followers
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        /* Custom cursor */
+        .cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: #f5f5f0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #f5f5f0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            min-height: 100vh;
+            padding: 100px 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Interactive elements */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .interactive-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .interactive-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .interactive-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Link hover area */
+        .link-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .hover-link {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f5f5f0;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .hover-link:hover {
+            color: #c9a227;
+        }
+
+        .hover-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #c9a227;
+            transition: width 0.3s ease;
+        }
+
+        .hover-link:hover::after {
+            width: 100%;
+        }
+
+        /* Image hover area */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .image-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Magnetic area */
+        .magnetic-area {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .magnetic-item {
+            width: 120px;
+            height: 120px;
+            background: #c9a227;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #0a0a0a;
+        }
+
+        /* Trail effect area */
+        .trail-area {
+            height: 400px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trail-area p {
+            font-size: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .trail-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #c9a227;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Text scramble area */
+        .scramble-text {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                cursor: auto;
+            }
+
+            .cursor {
+                display: none;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursors -->
+    <div class="cursor cursor-dot" id="cursorDot"></div>
+    <div class="cursor cursor-ring" id="cursorRing"></div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Cursor <span>Effects</span></h1>
+            <p>Custom cursor animations that respond to different elements</p>
+        </div>
+    </section>
+
+    <!-- Basic Cursor Following -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Custom Cursor</h2>
+            <p>Cursor with dot and ring that follows with delay</p>
+        </div>
+        <div class="interactive-grid">
+            <div class="interactive-card" data-cursor="grow">
+                <h3>Hover Here</h3>
+                <p>Cursor ring grows on hover</p>
+            </div>
+            <div class="interactive-card" data-cursor="grow">
+                <h3>Interactive</h3>
+                <p>Indicates clickable areas</p>
+            </div>
+            <div class="interactive-card" data-cursor="grow">
+                <h3>Smooth Motion</h3>
+                <p>GSAP provides smooth following</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Link Hover -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Link Hover States</h2>
+            <p>Cursor changes appearance on links</p>
+        </div>
+        <div class="link-area">
+            <a href="#" class="hover-link" data-cursor="text">About</a>
+            <a href="#" class="hover-link" data-cursor="text">Work</a>
+            <a href="#" class="hover-link" data-cursor="text">Contact</a>
+        </div>
+    </section>
+
+    <!-- Image Hover -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Image Hover</h2>
+            <p>Cursor shows "View" text on images</p>
+        </div>
+        <div class="image-grid">
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=1" alt="Image 1">
+            </div>
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=2" alt="Image 2">
+            </div>
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=3" alt="Image 3">
+            </div>
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=4" alt="Image 4">
+            </div>
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=5" alt="Image 5">
+            </div>
+            <div class="image-item" data-cursor="view">
+                <img src="https://picsum.photos/400/400?random=6" alt="Image 6">
+            </div>
+        </div>
+    </section>
+
+    <!-- Magnetic Elements -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Magnetic Elements</h2>
+            <p>Elements that attract the cursor</p>
+        </div>
+        <div class="magnetic-area">
+            <div class="magnetic-item" data-magnetic>[1]</div>
+            <div class="magnetic-item" data-magnetic>[2]</div>
+            <div class="magnetic-item" data-magnetic>[3]</div>
+        </div>
+    </section>
+
+    <!-- Trail Effect -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Cursor Trail</h2>
+            <p>Move cursor inside the box to see trail effect</p>
+        </div>
+        <div class="trail-area" id="trailArea">
+            <p>Move cursor here</p>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic cursor following</span>
+<span class="keyword">const</span> cursorDot = document.<span class="function">querySelector</span>(<span class="string">'.cursor-dot'</span>);
+<span class="keyword">const</span> cursorRing = document.<span class="function">querySelector</span>(<span class="string">'.cursor-ring'</span>);
+
+document.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+    <span class="comment">// Dot follows immediately</span>
+    gsap.<span class="function">to</span>(cursorDot, {
+        <span class="property">x</span>: e.<span class="property">clientX</span>,
+        <span class="property">y</span>: e.<span class="property">clientY</span>,
+        <span class="property">duration</span>: <span class="number">0.1</span>
+    });
+
+    <span class="comment">// Ring follows with delay</span>
+    gsap.<span class="function">to</span>(cursorRing, {
+        <span class="property">x</span>: e.<span class="property">clientX</span>,
+        <span class="property">y</span>: e.<span class="property">clientY</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>,
+        <span class="property">ease</span>: <span class="string">"power2.out"</span>
+    });
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Cursor state changes on hover</span>
+document.<span class="function">querySelectorAll</span>(<span class="string">'[data-cursor="grow"]'</span>).<span class="function">forEach</span>(el => {
+    el.<span class="function">addEventListener</span>(<span class="string">'mouseenter'</span>, () => {
+        gsap.<span class="function">to</span>(cursorRing, {
+            <span class="property">scale</span>: <span class="number">2</span>,
+            <span class="property">opacity</span>: <span class="number">0.3</span>,
+            <span class="property">duration</span>: <span class="number">0.3</span>
+        });
+    });
+
+    el.<span class="function">addEventListener</span>(<span class="string">'mouseleave'</span>, () => {
+        gsap.<span class="function">to</span>(cursorRing, {
+            <span class="property">scale</span>: <span class="number">1</span>,
+            <span class="property">opacity</span>: <span class="number">0.5</span>,
+            <span class="property">duration</span>: <span class="number">0.3</span>
+        });
+    });
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Magnetic effect</span>
+magneticEl.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+    <span class="keyword">const</span> rect = magneticEl.<span class="function">getBoundingClientRect</span>();
+    <span class="keyword">const</span> x = e.<span class="property">clientX</span> - rect.<span class="property">left</span> - rect.<span class="property">width</span> / <span class="number">2</span>;
+    <span class="keyword">const</span> y = e.<span class="property">clientY</span> - rect.<span class="property">top</span> - rect.<span class="property">height</span> / <span class="number">2</span>;
+
+    gsap.<span class="function">to</span>(magneticEl, {
+        <span class="property">x</span>: x * <span class="number">0.3</span>,
+        <span class="property">y</span>: y * <span class="number">0.3</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>
+    });
+});
+
+magneticEl.<span class="function">addEventListener</span>(<span class="string">'mouseleave'</span>, () => {
+    gsap.<span class="function">to</span>(magneticEl, {
+        <span class="property">x</span>: <span class="number">0</span>,
+        <span class="property">y</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.5</span>,
+        <span class="property">ease</span>: <span class="string">"elastic.out(1, 0.3)"</span>
+    });
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // CUSTOM CURSOR
+        // =====================
+
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorRing = document.getElementById('cursorRing');
+
+        // Follow cursor
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursorDot, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1
+            });
+
+            gsap.to(cursorRing, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+
+        // Hide cursor when leaving window
+        document.addEventListener('mouseleave', () => {
+            gsap.to([cursorDot, cursorRing], { opacity: 0, duration: 0.2 });
+        });
+
+        document.addEventListener('mouseenter', () => {
+            gsap.to([cursorDot, cursorRing], { opacity: 1, duration: 0.2 });
+        });
+
+        // =====================
+        // CURSOR STATES
+        // =====================
+
+        // Grow on interactive elements
+        document.querySelectorAll('[data-cursor="grow"]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursorRing, {
+                    scale: 2,
+                    opacity: 0.2,
+                    duration: 0.3
+                });
+            });
+
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursorRing, {
+                    scale: 1,
+                    opacity: 0.5,
+                    duration: 0.3
+                });
+            });
+        });
+
+        // Text cursor on links
+        document.querySelectorAll('[data-cursor="text"]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursorDot, { scale: 0, duration: 0.2 });
+                gsap.to(cursorRing, {
+                    scale: 2.5,
+                    borderWidth: 1,
+                    duration: 0.3
+                });
+            });
+
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursorDot, { scale: 1, duration: 0.2 });
+                gsap.to(cursorRing, {
+                    scale: 1,
+                    borderWidth: 2,
+                    duration: 0.3
+                });
+            });
+        });
+
+        // View cursor on images
+        document.querySelectorAll('[data-cursor="view"]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursorRing, {
+                    scale: 3,
+                    opacity: 0.8,
+                    backgroundColor: '#c9a227',
+                    borderColor: '#c9a227',
+                    duration: 0.3
+                });
+                gsap.to(cursorDot, { opacity: 0, duration: 0.2 });
+            });
+
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursorRing, {
+                    scale: 1,
+                    opacity: 0.5,
+                    backgroundColor: 'transparent',
+                    borderColor: '#f5f5f0',
+                    duration: 0.3
+                });
+                gsap.to(cursorDot, { opacity: 1, duration: 0.2 });
+            });
+        });
+
+        // =====================
+        // MAGNETIC ELEMENTS
+        // =====================
+
+        document.querySelectorAll('[data-magnetic]').forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                gsap.to(el, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        });
+
+        // =====================
+        // CURSOR TRAIL
+        // =====================
+
+        const trailArea = document.getElementById('trailArea');
+        const trailDots = [];
+        const numDots = 20;
+
+        // Create trail dots
+        for (let i = 0; i < numDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'trail-dot';
+            trailArea.appendChild(dot);
+            trailDots.push(dot);
+        }
+
+        trailArea.addEventListener('mousemove', (e) => {
+            const rect = trailArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            trailDots.forEach((dot, i) => {
+                gsap.to(dot, {
+                    x: x,
+                    y: y,
+                    opacity: 1 - (i / numDots),
+                    scale: 1 - (i / numDots) * 0.5,
+                    duration: 0.1 + (i * 0.02),
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        trailArea.addEventListener('mouseleave', () => {
+            trailDots.forEach(dot => {
+                gsap.to(dot, {
+                    opacity: 0,
+                    duration: 0.3
+                });
+            });
+        });
+    </script>
+</body>
+</html>

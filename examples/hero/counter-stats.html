@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter/Stats Animations | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           COUNTER/STATS ANIMATIONS
+           Animated number counters for statistics
+           and metrics display
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section */
+        .section {
+            padding: 80px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Stat Card */
+        .stat-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #c9a227, #e8c547);
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+
+        .stat-number {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #c9a227;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .stat-suffix {
+            font-size: 0.6em;
+            opacity: 0.8;
+        }
+
+        .stat-prefix {
+            font-size: 0.6em;
+            opacity: 0.8;
+        }
+
+        /* Large stat display */
+        .stat-large {
+            padding: 3rem 2rem;
+        }
+
+        .stat-large .stat-number {
+            font-size: clamp(4rem, 10vw, 8rem);
+        }
+
+        /* Progress bar stat */
+        .stat-progress {
+            text-align: left;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c9a227, #e8c547);
+            border-radius: 4px;
+            width: 0;
+        }
+
+        /* Circular progress */
+        .stat-circular {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .circular-progress {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .circular-progress svg {
+            transform: rotate(-90deg);
+        }
+
+        .circular-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 8;
+        }
+
+        .circular-fill {
+            fill: none;
+            stroke: #c9a227;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 377; /* 2 * PI * 60 */
+            stroke-dashoffset: 377;
+        }
+
+        .circular-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c9a227;
+        }
+
+        /* Odometer style */
+        .stat-odometer {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .odometer-digit {
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c9a227;
+            min-width: 60px;
+            overflow: hidden;
+            height: 70px;
+            position: relative;
+        }
+
+        .digit-inner {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Animated icon stat */
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #c9a227;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        /* Comparison stat */
+        .stat-comparison {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .comparison-item {
+            text-align: center;
+        }
+
+        .comparison-vs {
+            font-size: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .comparison-old {
+            opacity: 0.5;
+        }
+
+        .comparison-old .stat-number {
+            color: #f5f5f0;
+            text-decoration: line-through;
+        }
+
+        .comparison-new .stat-number {
+            color: #27ca40;
+        }
+
+        .comparison-arrow {
+            font-size: 1.5rem;
+            color: #27ca40;
+            margin-left: 0.5rem;
+        }
+
+        /* Replay button */
+        .replay-btn {
+            display: block;
+            margin: 2rem auto 0;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Counter <span>Animations</span></h1>
+            <p>Animated number counters that count up to target values with various styles</p>
+        </div>
+    </section>
+
+    <!-- Basic Counters -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Basic Counters</h2>
+            <p>Numbers that count up from zero</p>
+        </div>
+        <div class="stats-grid" id="basicStats">
+            <div class="stat-card">
+                <div class="stat-number" data-value="150">0</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="98" data-suffix="%">0%</div>
+                <div class="stat-label">Client Satisfaction</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="12" data-suffix="+">0+</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="2.5" data-suffix="M" data-decimals="1">0M</div>
+                <div class="stat-label">Users Worldwide</div>
+            </div>
+        </div>
+        <button class="replay-btn" data-target="basic">Replay</button>
+    </section>
+
+    <!-- Progress Bar Stats -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Progress Bar Stats</h2>
+            <p>Numbers with animated progress bars</p>
+        </div>
+        <div class="stats-grid" id="progressStats">
+            <div class="stat-card stat-progress">
+                <div class="stat-number" data-value="92" data-suffix="%">0%</div>
+                <div class="stat-label">Performance Score</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" data-progress="92"></div>
+                </div>
+            </div>
+            <div class="stat-card stat-progress">
+                <div class="stat-number" data-value="87" data-suffix="%">0%</div>
+                <div class="stat-label">Accessibility</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" data-progress="87"></div>
+                </div>
+            </div>
+            <div class="stat-card stat-progress">
+                <div class="stat-number" data-value="95" data-suffix="%">0%</div>
+                <div class="stat-label">Best Practices</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" data-progress="95"></div>
+                </div>
+            </div>
+            <div class="stat-card stat-progress">
+                <div class="stat-number" data-value="100" data-suffix="%">0%</div>
+                <div class="stat-label">SEO Score</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" data-progress="100"></div>
+                </div>
+            </div>
+        </div>
+        <button class="replay-btn" data-target="progress">Replay</button>
+    </section>
+
+    <!-- Circular Progress -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Circular Progress</h2>
+            <p>SVG-based circular counters</p>
+        </div>
+        <div class="stats-grid" id="circularStats">
+            <div class="stat-card stat-circular">
+                <div class="circular-progress">
+                    <svg viewBox="0 0 130 130">
+                        <circle class="circular-bg" cx="65" cy="65" r="60"></circle>
+                        <circle class="circular-fill" cx="65" cy="65" r="60" data-progress="75"></circle>
+                    </svg>
+                    <span class="circular-value" data-value="75">0</span>
+                </div>
+                <div class="stat-label">Task Completion</div>
+            </div>
+            <div class="stat-card stat-circular">
+                <div class="circular-progress">
+                    <svg viewBox="0 0 130 130">
+                        <circle class="circular-bg" cx="65" cy="65" r="60"></circle>
+                        <circle class="circular-fill" cx="65" cy="65" r="60" data-progress="89"></circle>
+                    </svg>
+                    <span class="circular-value" data-value="89">0</span>
+                </div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-card stat-circular">
+                <div class="circular-progress">
+                    <svg viewBox="0 0 130 130">
+                        <circle class="circular-bg" cx="65" cy="65" r="60"></circle>
+                        <circle class="circular-fill" cx="65" cy="65" r="60" data-progress="62"></circle>
+                    </svg>
+                    <span class="circular-value" data-value="62">0</span>
+                </div>
+                <div class="stat-label">Goal Progress</div>
+            </div>
+        </div>
+        <button class="replay-btn" data-target="circular">Replay</button>
+    </section>
+
+    <!-- Large Feature Stat -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Feature Stat</h2>
+            <p>Large prominent numbers with icons</p>
+        </div>
+        <div class="stats-grid" id="featureStats">
+            <div class="stat-card stat-large">
+                <div class="stat-icon">[*]</div>
+                <div class="stat-number">
+                    <span class="stat-prefix">$</span>
+                    <span data-value="4.2" data-decimals="1">0</span>
+                    <span class="stat-suffix">B</span>
+                </div>
+                <div class="stat-label">Revenue Generated</div>
+            </div>
+            <div class="stat-card stat-large">
+                <div class="stat-icon">[+]</div>
+                <div class="stat-number">
+                    <span data-value="500" data-suffix="K">0</span>
+                    <span class="stat-suffix">+</span>
+                </div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+        <button class="replay-btn" data-target="feature">Replay</button>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic counter animation</span>
+<span class="keyword">function</span> <span class="function">animateCounter</span>(element, target, options = {}) {
+    <span class="keyword">const</span> {
+        duration = <span class="number">2</span>,
+        decimals = <span class="number">0</span>,
+        suffix = <span class="string">''</span>,
+        prefix = <span class="string">''</span>
+    } = options;
+
+    <span class="keyword">const</span> obj = { value: <span class="number">0</span> };
+
+    gsap.<span class="function">to</span>(obj, {
+        <span class="property">value</span>: target,
+        <span class="property">duration</span>: duration,
+        <span class="property">ease</span>: <span class="string">"power2.out"</span>,
+        <span class="property">onUpdate</span>: () => {
+            element.<span class="property">textContent</span> = prefix +
+                obj.<span class="property">value</span>.<span class="function">toFixed</span>(decimals) +
+                suffix;
+        }
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Progress bar animation</span>
+gsap.<span class="function">to</span>(<span class="string">'.progress-fill'</span>, {
+    <span class="property">width</span>: element.dataset.<span class="property">progress</span> + <span class="string">'%'</span>,
+    <span class="property">duration</span>: <span class="number">1.5</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Circular SVG progress</span>
+<span class="keyword">const</span> circumference = <span class="number">2</span> * Math.<span class="property">PI</span> * <span class="number">60</span>; <span class="comment">// radius = 60</span>
+<span class="keyword">const</span> progress = element.dataset.<span class="property">progress</span>;
+<span class="keyword">const</span> offset = circumference - (progress / <span class="number">100</span>) * circumference;
+
+gsap.<span class="function">to</span>(circle, {
+    <span class="property">strokeDashoffset</span>: offset,
+    <span class="property">duration</span>: <span class="number">2</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Trigger on scroll into view</span>
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: <span class="string">'.stats-grid'</span>,
+    <span class="property">start</span>: <span class="string">'top 75%'</span>,
+    <span class="property">onEnter</span>: () => {
+        <span class="comment">// Animate all counters</span>
+        document.<span class="function">querySelectorAll</span>(<span class="string">'[data-value]'</span>).<span class="function">forEach</span>(el => {
+            <span class="function">animateCounter</span>(el, el.dataset.<span class="property">value</span>);
+        });
+    },
+    <span class="property">once</span>: <span class="keyword">true</span>
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // COUNTER ANIMATION
+        // =====================
+
+        function animateCounter(element, options = {}) {
+            const target = parseFloat(element.dataset.value);
+            const decimals = parseInt(element.dataset.decimals) || 0;
+            const suffix = element.dataset.suffix || '';
+            const duration = options.duration || 2;
+
+            const obj = { value: 0 };
+
+            gsap.to(obj, {
+                value: target,
+                duration: duration,
+                ease: "power2.out",
+                onUpdate: () => {
+                    element.textContent = obj.value.toFixed(decimals) + suffix;
+                }
+            });
+        }
+
+        // =====================
+        // BASIC STATS
+        // =====================
+
+        function playBasicStats() {
+            const stats = document.querySelectorAll('#basicStats .stat-number');
+
+            stats.forEach(stat => {
+                const suffix = stat.dataset.suffix || '';
+                stat.textContent = '0' + suffix;
+                animateCounter(stat);
+            });
+
+            // Animate top bar
+            gsap.fromTo('#basicStats .stat-card::before', {
+                scaleX: 0
+            }, {
+                scaleX: 1,
+                duration: 1.5,
+                stagger: 0.1
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '#basicStats',
+            start: 'top 75%',
+            onEnter: playBasicStats,
+            once: true
+        });
+
+        // =====================
+        // PROGRESS BAR STATS
+        // =====================
+
+        function playProgressStats() {
+            const stats = document.querySelectorAll('#progressStats .stat-number');
+            const fills = document.querySelectorAll('#progressStats .progress-fill');
+
+            stats.forEach(stat => {
+                stat.textContent = '0%';
+                animateCounter(stat);
+            });
+
+            fills.forEach(fill => {
+                gsap.fromTo(fill,
+                    { width: 0 },
+                    {
+                        width: fill.dataset.progress + '%',
+                        duration: 1.5,
+                        ease: "power3.out",
+                        delay: 0.3
+                    }
+                );
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '#progressStats',
+            start: 'top 75%',
+            onEnter: playProgressStats,
+            once: true
+        });
+
+        // =====================
+        // CIRCULAR PROGRESS
+        // =====================
+
+        function playCircularStats() {
+            const circumference = 2 * Math.PI * 60;
+
+            document.querySelectorAll('#circularStats .circular-fill').forEach(circle => {
+                const progress = parseFloat(circle.dataset.progress);
+                const offset = circumference - (progress / 100) * circumference;
+
+                gsap.fromTo(circle,
+                    { strokeDashoffset: circumference },
+                    {
+                        strokeDashoffset: offset,
+                        duration: 2,
+                        ease: "power3.out"
+                    }
+                );
+            });
+
+            document.querySelectorAll('#circularStats .circular-value').forEach(value => {
+                const target = parseFloat(value.dataset.value);
+                const obj = { val: 0 };
+
+                gsap.to(obj, {
+                    val: target,
+                    duration: 2,
+                    ease: "power2.out",
+                    onUpdate: () => {
+                        value.textContent = Math.round(obj.val) + '%';
+                    }
+                });
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '#circularStats',
+            start: 'top 75%',
+            onEnter: playCircularStats,
+            once: true
+        });
+
+        // =====================
+        // FEATURE STATS
+        // =====================
+
+        function playFeatureStats() {
+            // Icons
+            gsap.fromTo('#featureStats .stat-icon',
+                { opacity: 0, scale: 0 },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.6,
+                    ease: "back.out(1.7)",
+                    stagger: 0.2
+                }
+            );
+
+            // Numbers
+            document.querySelectorAll('#featureStats [data-value]').forEach(el => {
+                animateCounter(el, { duration: 2.5 });
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '#featureStats',
+            start: 'top 75%',
+            onEnter: playFeatureStats,
+            once: true
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                switch(target) {
+                    case 'basic':
+                        playBasicStats();
+                        break;
+                    case 'progress':
+                        playProgressStats();
+                        break;
+                    case 'circular':
+                        playCircularStats();
+                        break;
+                    case 'feature':
+                        playFeatureStats();
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

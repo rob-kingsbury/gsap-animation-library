@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamburger Menu Animations | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           HAMBURGER MENU ANIMATIONS
+           Various hamburger-to-X transitions and
+           full-screen menu reveals
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 200vh;
+        }
+
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c9a227;
+        }
+
+        /* Hamburger Button Base */
+        .hamburger {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .hamburger-line {
+            position: absolute;
+            left: 5px;
+            width: 30px;
+            height: 3px;
+            background: #f5f5f0;
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+
+        .hamburger:hover .hamburger-line {
+            background: #c9a227;
+        }
+
+        .hamburger-line--top { top: 10px; }
+        .hamburger-line--middle { top: 18px; }
+        .hamburger-line--bottom { top: 26px; }
+
+        /* Full Screen Menu */
+        .menu {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0a;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: circle(0% at calc(100% - 52px) 40px);
+            transition: clip-path 0.5s ease-in-out;
+        }
+
+        .menu.is-open {
+            clip-path: circle(150% at calc(100% - 52px) 40px);
+        }
+
+        .menu-content {
+            text-align: center;
+        }
+
+        .menu-nav {
+            list-style: none;
+        }
+
+        .menu-nav li {
+            margin: 1.5rem 0;
+        }
+
+        .menu-nav a {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #f5f5f0;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .menu-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #c9a227;
+            transition: width 0.3s ease;
+        }
+
+        .menu-nav a:hover::after {
+            width: 100%;
+        }
+
+        .menu-nav a:hover {
+            color: #c9a227;
+        }
+
+        /* Hero Content */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            padding-top: 80px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 2rem;
+            background: #111;
+        }
+
+        .demo-section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 3rem;
+        }
+
+        /* Hamburger Variants Grid */
+        .hamburger-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hamburger-demo {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hamburger-demo h3 {
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .hamburger-demo p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-top: 0.5rem;
+        }
+
+        /* Demo hamburger buttons - larger for visibility */
+        .demo-hamburger {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            position: relative;
+            margin: 0 auto;
+            background: #0a0a0a;
+            border-radius: 12px;
+        }
+
+        .demo-hamburger .line {
+            position: absolute;
+            left: 12px;
+            width: 36px;
+            height: 4px;
+            background: #f5f5f0;
+            border-radius: 2px;
+        }
+
+        .demo-hamburger .line-1 { top: 16px; }
+        .demo-hamburger .line-2 { top: 28px; }
+        .demo-hamburger .line-3 { top: 40px; }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Header with Hamburger -->
+    <header class="header">
+        <div class="logo">GSAP</div>
+        <div class="hamburger" id="mainHamburger">
+            <span class="hamburger-line hamburger-line--top"></span>
+            <span class="hamburger-line hamburger-line--middle"></span>
+            <span class="hamburger-line hamburger-line--bottom"></span>
+        </div>
+    </header>
+
+    <!-- Full Screen Menu -->
+    <nav class="menu" id="mainMenu">
+        <div class="menu-content">
+            <ul class="menu-nav">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Work</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Hamburger <span>Menu</span></h1>
+        <p>Click the hamburger icon in the header to see the full-screen menu animation. Below are various hamburger transformation styles.</p>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <h2>Hamburger Transformation Styles</h2>
+        <div class="hamburger-grid">
+            <!-- Style 1: Classic X -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-classic">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Classic X</h3>
+                <p>Lines rotate to form X</p>
+            </div>
+
+            <!-- Style 2: Arrow -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-arrow">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Arrow</h3>
+                <p>Transforms into arrow</p>
+            </div>
+
+            <!-- Style 3: Squeeze -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-squeeze">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Squeeze</h3>
+                <p>Middle line fades out</p>
+            </div>
+
+            <!-- Style 4: Spin -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-spin">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Spin</h3>
+                <p>Rotates while morphing</p>
+            </div>
+
+            <!-- Style 5: Elastic -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-elastic">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Elastic</h3>
+                <p>Bouncy transformation</p>
+            </div>
+
+            <!-- Style 6: Minus -->
+            <div class="hamburger-demo">
+                <div class="demo-hamburger" id="ham-minus">
+                    <span class="line line-1"></span>
+                    <span class="line line-2"></span>
+                    <span class="line line-3"></span>
+                </div>
+                <h3>Minus</h3>
+                <p>Collapses to single line</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Classic X transformation</span>
+<span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>({ <span class="property">paused</span>: <span class="keyword">true</span> });
+
+tl.<span class="function">to</span>(<span class="string">'.line-1'</span>, {
+    <span class="property">y</span>: <span class="number">12</span>,           <span class="comment">// Move to center</span>
+    <span class="property">rotation</span>: <span class="number">45</span>,    <span class="comment">// Rotate 45 degrees</span>
+    <span class="property">duration</span>: <span class="number">0.3</span>
+})
+.<span class="function">to</span>(<span class="string">'.line-2'</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,       <span class="comment">// Fade out middle line</span>
+    <span class="property">duration</span>: <span class="number">0.1</span>
+}, <span class="number">0</span>)
+.<span class="function">to</span>(<span class="string">'.line-3'</span>, {
+    <span class="property">y</span>: <span class="number">-12</span>,          <span class="comment">// Move to center</span>
+    <span class="property">rotation</span>: <span class="number">-45</span>,   <span class="comment">// Rotate -45 degrees</span>
+    <span class="property">duration</span>: <span class="number">0.3</span>
+}, <span class="number">0</span>);
+
+<span class="comment">// Toggle on click</span>
+hamburger.<span class="function">addEventListener</span>(<span class="string">'click'</span>, () => {
+    isOpen ? tl.<span class="function">reverse</span>() : tl.<span class="function">play</span>();
+    isOpen = !isOpen;
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Full-screen menu reveal</span>
+<span class="keyword">const</span> menuTl = gsap.<span class="function">timeline</span>({ <span class="property">paused</span>: <span class="keyword">true</span> });
+
+<span class="comment">// Circle clip-path reveal</span>
+menuTl.<span class="function">to</span>(<span class="string">'.menu'</span>, {
+    <span class="property">clipPath</span>: <span class="string">'circle(150% at calc(100% - 52px) 40px)'</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">ease</span>: <span class="string">'power4.inOut'</span>
+})
+<span class="comment">// Stagger in menu items</span>
+.<span class="function">from</span>(<span class="string">'.menu-nav a'</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">50</span>,
+    <span class="property">stagger</span>: <span class="number">0.1</span>,
+    <span class="property">duration</span>: <span class="number">0.5</span>,
+    <span class="property">ease</span>: <span class="string">'power3.out'</span>
+}, <span class="string">'-=0.4'</span>);</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Alternative: Slide reveal from right</span>
+<span class="keyword">const</span> slideTl = gsap.<span class="function">timeline</span>({ <span class="property">paused</span>: <span class="keyword">true</span> });
+
+slideTl.<span class="function">to</span>(<span class="string">'.menu'</span>, {
+    <span class="property">x</span>: <span class="number">0</span>,            <span class="comment">// Slide from right (start at x: 100%)</span>
+    <span class="property">duration</span>: <span class="number">0.5</span>,
+    <span class="property">ease</span>: <span class="string">'power3.inOut'</span>
+})
+.<span class="function">from</span>(<span class="string">'.menu-nav li'</span>, {
+    <span class="property">x</span>: <span class="number">100</span>,
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">stagger</span>: <span class="number">0.08</span>,
+    <span class="property">duration</span>: <span class="number">0.4</span>
+}, <span class="string">'-=0.2'</span>);</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // MAIN MENU ANIMATION
+        // =====================
+
+        const mainHamburger = document.getElementById('mainHamburger');
+        const mainMenu = document.getElementById('mainMenu');
+        const menuLinks = document.querySelectorAll('.menu-nav a');
+
+        let isMainMenuOpen = false;
+
+        // Hamburger to X animation
+        const mainHamTl = gsap.timeline({ paused: true });
+
+        mainHamTl
+            .to('.hamburger-line--top', {
+                y: 8,
+                rotation: 45,
+                duration: 0.3,
+                ease: "power2.inOut"
+            })
+            .to('.hamburger-line--middle', {
+                opacity: 0,
+                duration: 0.1
+            }, 0)
+            .to('.hamburger-line--bottom', {
+                y: -8,
+                rotation: -45,
+                duration: 0.3,
+                ease: "power2.inOut"
+            }, 0);
+
+        // Menu reveal animation
+        const menuTl = gsap.timeline({ paused: true });
+
+        menuTl
+            .to(mainMenu, {
+                clipPath: 'circle(150% at calc(100% - 52px) 40px)',
+                duration: 0.8,
+                ease: 'power4.inOut'
+            })
+            .to(menuLinks, {
+                opacity: 1,
+                y: 0,
+                stagger: 0.1,
+                duration: 0.5,
+                ease: 'power3.out'
+            }, '-=0.4');
+
+        mainHamburger.addEventListener('click', () => {
+            if (isMainMenuOpen) {
+                menuTl.reverse();
+                mainHamTl.reverse();
+            } else {
+                // Reset menu links before playing
+                gsap.set(menuLinks, { opacity: 0, y: 50 });
+                menuTl.play(0);
+                mainHamTl.play();
+            }
+            isMainMenuOpen = !isMainMenuOpen;
+        });
+
+        // Close menu when clicking a link
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                menuTl.reverse();
+                mainHamTl.reverse();
+                isMainMenuOpen = false;
+            });
+        });
+
+        // =====================
+        // DEMO HAMBURGERS
+        // =====================
+
+        // Helper to create toggle behavior
+        function createHamburgerAnimation(id, animation) {
+            const el = document.getElementById(id);
+            let isOpen = false;
+
+            el.addEventListener('click', () => {
+                if (isOpen) {
+                    animation.reverse();
+                } else {
+                    animation.play(0);
+                }
+                isOpen = !isOpen;
+            });
+        }
+
+        // 1. Classic X
+        const classicTl = gsap.timeline({ paused: true });
+        classicTl
+            .to('#ham-classic .line-1', { y: 12, rotation: 45, duration: 0.3 })
+            .to('#ham-classic .line-2', { opacity: 0, duration: 0.1 }, 0)
+            .to('#ham-classic .line-3', { y: -12, rotation: -45, duration: 0.3 }, 0);
+        createHamburgerAnimation('ham-classic', classicTl);
+
+        // 2. Arrow
+        const arrowTl = gsap.timeline({ paused: true });
+        arrowTl
+            .to('#ham-arrow .line-1', { y: 6, x: 6, rotation: 45, width: 20, duration: 0.3 })
+            .to('#ham-arrow .line-3', { y: -6, x: 6, rotation: -45, width: 20, duration: 0.3 }, 0);
+        createHamburgerAnimation('ham-arrow', arrowTl);
+
+        // 3. Squeeze
+        const squeezeTl = gsap.timeline({ paused: true });
+        squeezeTl
+            .to('#ham-squeeze .line-2', { scaleX: 0, duration: 0.2 })
+            .to('#ham-squeeze .line-1', { y: 12, rotation: 45, duration: 0.3 }, 0.1)
+            .to('#ham-squeeze .line-3', { y: -12, rotation: -45, duration: 0.3 }, 0.1);
+        createHamburgerAnimation('ham-squeeze', squeezeTl);
+
+        // 4. Spin
+        const spinTl = gsap.timeline({ paused: true });
+        spinTl
+            .to('#ham-spin', { rotation: 180, duration: 0.5 })
+            .to('#ham-spin .line-1', { y: 12, rotation: 45, duration: 0.3 }, 0)
+            .to('#ham-spin .line-2', { opacity: 0, duration: 0.2 }, 0)
+            .to('#ham-spin .line-3', { y: -12, rotation: -45, duration: 0.3 }, 0);
+        createHamburgerAnimation('ham-spin', spinTl);
+
+        // 5. Elastic
+        const elasticTl = gsap.timeline({ paused: true });
+        elasticTl
+            .to('#ham-elastic .line-1', { y: 12, rotation: 45, duration: 0.5, ease: "elastic.out(1, 0.5)" })
+            .to('#ham-elastic .line-2', { opacity: 0, scaleX: 0, duration: 0.2 }, 0)
+            .to('#ham-elastic .line-3', { y: -12, rotation: -45, duration: 0.5, ease: "elastic.out(1, 0.5)" }, 0);
+        createHamburgerAnimation('ham-elastic', elasticTl);
+
+        // 6. Minus
+        const minusTl = gsap.timeline({ paused: true });
+        minusTl
+            .to('#ham-minus .line-1', { y: 12, duration: 0.3 })
+            .to('#ham-minus .line-3', { y: -12, duration: 0.3 }, 0)
+            .to('#ham-minus .line-2', { scaleX: 1.2, duration: 0.2 }, 0.1);
+        createHamburgerAnimation('ham-minus', minusTl);
+    </script>
+</body>
+</html>

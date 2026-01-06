@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Animations | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           MODAL ANIMATIONS
+           Various entrance and exit animations
+           for modal dialogs
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        /* Trigger buttons grid */
+        .trigger-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .trigger-btn {
+            padding: 1rem 1.5rem;
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f5f5f0;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .trigger-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+            border-color: #c9a227;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            padding: 2rem;
+        }
+
+        .modal-overlay.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modal Container */
+        .modal {
+            background: #1a1a1a;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            color: #c9a227;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            color: #f5f5f0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-body p {
+            line-height: 1.7;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn--secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #f5f5f0;
+        }
+
+        .modal-btn--secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .modal-btn--primary {
+            background: #c9a227;
+            border: 1px solid #c9a227;
+            color: #0a0a0a;
+        }
+
+        .modal-btn--primary:hover {
+            background: #e8c547;
+        }
+
+        /* Animation-specific initial states (GSAP will handle these) */
+        .modal--fade {
+            opacity: 0;
+        }
+
+        .modal--zoom {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        .modal--slide-up {
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        .modal--slide-down {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+
+        .modal--flip {
+            transform: perspective(600px) rotateX(-90deg);
+            transform-origin: top center;
+        }
+
+        .modal--rotate {
+            transform: scale(0.5) rotate(-180deg);
+            opacity: 0;
+        }
+
+        .modal--bounce {
+            transform: scale(0);
+        }
+
+        .modal--newspaper {
+            transform: scale(0) rotate(720deg);
+            opacity: 0;
+        }
+
+        /* Code Reference */
+        .code-section {
+            background: #111;
+            padding: 4rem 2rem;
+        }
+
+        .code-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Modal <span>Animations</span></h1>
+        <p>Click the buttons below to see different modal entrance animations</p>
+        <div class="trigger-grid">
+            <button class="trigger-btn" data-animation="fade">Fade In</button>
+            <button class="trigger-btn" data-animation="zoom">Zoom In</button>
+            <button class="trigger-btn" data-animation="slide-up">Slide Up</button>
+            <button class="trigger-btn" data-animation="slide-down">Slide Down</button>
+            <button class="trigger-btn" data-animation="flip">3D Flip</button>
+            <button class="trigger-btn" data-animation="rotate">Rotate In</button>
+            <button class="trigger-btn" data-animation="bounce">Bounce In</button>
+            <button class="trigger-btn" data-animation="newspaper">Newspaper</button>
+        </div>
+    </section>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Modal Title</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This modal demonstrates the <strong id="animationName">animation</strong> entrance effect.</p>
+                <p>Click outside the modal, press Escape, or click the X button to close it with the reverse animation.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn--secondary" id="modalCancel">Cancel</button>
+                <button class="modal-btn modal-btn--primary" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Section -->
+    <section class="code-section">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Modal animation configurations</span>
+<span class="keyword">const</span> animations = {
+    fade: {
+        <span class="property">from</span>: { <span class="property">opacity</span>: <span class="number">0</span> },
+        <span class="property">to</span>: { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">0.3</span> }
+    },
+    zoom: {
+        <span class="property">from</span>: { <span class="property">scale</span>: <span class="number">0.8</span>, <span class="property">opacity</span>: <span class="number">0</span> },
+        <span class="property">to</span>: { <span class="property">scale</span>: <span class="number">1</span>, <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span> }
+    },
+    <span class="string">'slide-up'</span>: {
+        <span class="property">from</span>: { <span class="property">y</span>: <span class="number">100</span>, <span class="property">opacity</span>: <span class="number">0</span> },
+        <span class="property">to</span>: { <span class="property">y</span>: <span class="number">0</span>, <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">ease</span>: <span class="string">"power3.out"</span> }
+    },
+    bounce: {
+        <span class="property">from</span>: { <span class="property">scale</span>: <span class="number">0</span> },
+        <span class="property">to</span>: { <span class="property">scale</span>: <span class="number">1</span>, <span class="property">ease</span>: <span class="string">"elastic.out(1, 0.5)"</span>, <span class="property">duration</span>: <span class="number">0.8</span> }
+    }
+};</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Open modal with animation</span>
+<span class="keyword">function</span> <span class="function">openModal</span>(animationType) {
+    <span class="keyword">const</span> config = animations[animationType];
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    <span class="comment">// Show overlay</span>
+    tl.<span class="function">to</span>(overlay, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">visibility</span>: <span class="string">'visible'</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>
+    });
+
+    <span class="comment">// Animate modal</span>
+    tl.<span class="function">fromTo</span>(modal, config.<span class="property">from</span>, config.<span class="property">to</span>, <span class="string">"-=0.1"</span>);
+
+    <span class="keyword">return</span> tl;
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Close modal (reverse animation)</span>
+<span class="keyword">function</span> <span class="function">closeModal</span>(animationType) {
+    <span class="keyword">const</span> config = animations[animationType];
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    <span class="comment">// Reverse modal animation</span>
+    tl.<span class="function">to</span>(modal, {
+        ...config.<span class="property">from</span>,
+        <span class="property">duration</span>: <span class="number">0.25</span>,
+        <span class="property">ease</span>: <span class="string">"power2.in"</span>
+    });
+
+    <span class="comment">// Hide overlay</span>
+    tl.<span class="function">to</span>(overlay, {
+        <span class="property">opacity</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.2</span>,
+        <span class="property">onComplete</span>: () => {
+            gsap.<span class="function">set</span>(overlay, { <span class="property">visibility</span>: <span class="string">'hidden'</span> });
+        }
+    }, <span class="string">"-=0.1"</span>);
+
+    <span class="keyword">return</span> tl;
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // MODAL SYSTEM
+        // =====================
+
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const animationName = document.getElementById('animationName');
+        const modalClose = document.getElementById('modalClose');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalConfirm = document.getElementById('modalConfirm');
+
+        let currentAnimation = null;
+        let isOpen = false;
+
+        // Animation configurations
+        const animations = {
+            fade: {
+                from: { opacity: 0 },
+                to: { opacity: 1, duration: 0.3, ease: "power2.out" }
+            },
+            zoom: {
+                from: { scale: 0.8, opacity: 0 },
+                to: { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }
+            },
+            'slide-up': {
+                from: { y: 100, opacity: 0 },
+                to: { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }
+            },
+            'slide-down': {
+                from: { y: -100, opacity: 0 },
+                to: { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }
+            },
+            flip: {
+                from: { rotationX: -90, transformPerspective: 600, transformOrigin: "top center" },
+                to: { rotationX: 0, duration: 0.5, ease: "power3.out" }
+            },
+            rotate: {
+                from: { scale: 0.5, rotation: -180, opacity: 0 },
+                to: { scale: 1, rotation: 0, opacity: 1, duration: 0.5, ease: "back.out(1.4)" }
+            },
+            bounce: {
+                from: { scale: 0 },
+                to: { scale: 1, duration: 0.8, ease: "elastic.out(1, 0.5)" }
+            },
+            newspaper: {
+                from: { scale: 0, rotation: 720, opacity: 0 },
+                to: { scale: 1, rotation: 0, opacity: 1, duration: 0.7, ease: "power3.out" }
+            }
+        };
+
+        // Formatted names for display
+        const animationNames = {
+            fade: "Fade In",
+            zoom: "Zoom In",
+            'slide-up': "Slide Up",
+            'slide-down': "Slide Down",
+            flip: "3D Flip",
+            rotate: "Rotate In",
+            bounce: "Bounce In",
+            newspaper: "Newspaper Spin"
+        };
+
+        // Open modal
+        function openModal(animationType) {
+            if (isOpen) return;
+
+            currentAnimation = animationType;
+            isOpen = true;
+
+            // Update content
+            modalTitle.textContent = animationNames[animationType];
+            animationName.textContent = animationNames[animationType].toLowerCase();
+
+            const config = animations[animationType];
+            const tl = gsap.timeline();
+
+            // Set initial state
+            gsap.set(modal, config.from);
+
+            // Show overlay
+            tl.to(modalOverlay, {
+                opacity: 1,
+                visibility: 'visible',
+                duration: 0.3
+            });
+
+            // Animate modal
+            tl.to(modal, config.to, "-=0.1");
+
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            if (!isOpen) return;
+
+            const config = animations[currentAnimation];
+            const tl = gsap.timeline();
+
+            // Build reverse properties
+            const reverseProps = { ...config.from };
+            reverseProps.duration = 0.25;
+            reverseProps.ease = "power2.in";
+
+            // Animate modal out
+            tl.to(modal, reverseProps);
+
+            // Hide overlay
+            tl.to(modalOverlay, {
+                opacity: 0,
+                duration: 0.2,
+                onComplete: () => {
+                    gsap.set(modalOverlay, { visibility: 'hidden' });
+                    gsap.set(modal, { clearProps: "all" });
+                    isOpen = false;
+                    document.body.style.overflow = '';
+                }
+            }, "-=0.1");
+        }
+
+        // Event listeners for trigger buttons
+        document.querySelectorAll('[data-animation]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                openModal(btn.dataset.animation);
+            });
+        });
+
+        // Close button events
+        modalClose.addEventListener('click', closeModal);
+        modalCancel.addEventListener('click', closeModal);
+        modalConfirm.addEventListener('click', closeModal);
+
+        // Click outside to close
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        // Escape key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

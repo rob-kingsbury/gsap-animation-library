@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Stagger Reveals | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           GRID STAGGER REVEALS
+           Grid items animating in with various
+           stagger patterns and directions
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 80px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid--4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .grid--3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid--mixed {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 200px);
+        }
+
+        /* Grid items */
+        .grid-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 150px;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .grid-item:hover::before {
+            opacity: 1;
+        }
+
+        .grid-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            position: relative;
+        }
+
+        .grid-item p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .grid-item-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: #c9a227;
+        }
+
+        /* Card with image */
+        .grid-item--image {
+            padding: 0;
+            height: 250px;
+        }
+
+        .grid-item--image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .grid-item--image .content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+        }
+
+        /* Mixed grid large item */
+        .grid-item--large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        /* Direction indicators */
+        .direction-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #c9a227;
+            color: #0a0a0a;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Control buttons */
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover,
+        .control-btn.active {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Stats grid */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c9a227;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Portfolio grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .portfolio-item {
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .portfolio-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .portfolio-item:hover .portfolio-item-overlay {
+            opacity: 1;
+        }
+
+        .portfolio-item-overlay span {
+            color: #c9a227;
+            font-weight: 600;
+        }
+
+        /* Masonry-style */
+        .masonry-grid {
+            columns: 3;
+            column-gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .masonry-item img {
+            width: 100%;
+            display: block;
+        }
+
+        .masonry-item-content {
+            padding: 1rem;
+        }
+
+        .masonry-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .masonry-item p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .grid--4 { grid-template-columns: repeat(2, 1fr); }
+            .grid--3 { grid-template-columns: repeat(2, 1fr); }
+            .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+            .masonry-grid { columns: 2; }
+        }
+
+        @media (max-width: 600px) {
+            .grid--4,
+            .grid--3 { grid-template-columns: 1fr; }
+            .portfolio-grid { grid-template-columns: 1fr; }
+            .masonry-grid { columns: 1; }
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Grid <span>Stagger</span> Reveals</h1>
+            <p>Various patterns for animating grid items with staggered timing</p>
+        </div>
+    </section>
+
+    <!-- Stagger Directions -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Stagger Directions</h2>
+            <p>Choose different starting points for the stagger animation</p>
+        </div>
+        <div class="controls" id="directionControls">
+            <button class="control-btn active" data-from="start">From Start</button>
+            <button class="control-btn" data-from="end">From End</button>
+            <button class="control-btn" data-from="center">From Center</button>
+            <button class="control-btn" data-from="edges">From Edges</button>
+            <button class="control-btn" data-from="random">Random</button>
+        </div>
+        <div class="grid grid--4" id="directionGrid">
+            <div class="grid-item"><div class="grid-item-icon">[1]</div><h3>Item 1</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[2]</div><h3>Item 2</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[3]</div><h3>Item 3</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[4]</div><h3>Item 4</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[5]</div><h3>Item 5</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[6]</div><h3>Item 6</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[7]</div><h3>Item 7</h3></div>
+            <div class="grid-item"><div class="grid-item-icon">[8]</div><h3>Item 8</h3></div>
+        </div>
+    </section>
+
+    <!-- Grid-Aware Stagger -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Grid-Aware Stagger</h2>
+            <p>GSAP detects grid layout for wave-like animations</p>
+        </div>
+        <div class="controls" id="gridControls">
+            <button class="control-btn active" data-axis="x">Left to Right</button>
+            <button class="control-btn" data-axis="y">Top to Bottom</button>
+            <button class="control-btn" data-axis="both">Diagonal</button>
+        </div>
+        <div class="grid grid--4" id="gridAwareGrid">
+            <div class="grid-item"><span class="stat-number">01</span><p>First</p></div>
+            <div class="grid-item"><span class="stat-number">02</span><p>Second</p></div>
+            <div class="grid-item"><span class="stat-number">03</span><p>Third</p></div>
+            <div class="grid-item"><span class="stat-number">04</span><p>Fourth</p></div>
+            <div class="grid-item"><span class="stat-number">05</span><p>Fifth</p></div>
+            <div class="grid-item"><span class="stat-number">06</span><p>Sixth</p></div>
+            <div class="grid-item"><span class="stat-number">07</span><p>Seventh</p></div>
+            <div class="grid-item"><span class="stat-number">08</span><p>Eighth</p></div>
+            <div class="grid-item"><span class="stat-number">09</span><p>Ninth</p></div>
+            <div class="grid-item"><span class="stat-number">10</span><p>Tenth</p></div>
+            <div class="grid-item"><span class="stat-number">11</span><p>Eleventh</p></div>
+            <div class="grid-item"><span class="stat-number">12</span><p>Twelfth</p></div>
+        </div>
+    </section>
+
+    <!-- Portfolio Grid -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Portfolio Grid</h2>
+            <p>Image grid with scroll-triggered reveal</p>
+        </div>
+        <div class="portfolio-grid" id="portfolioGrid">
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=20" alt="Portfolio 1">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=21" alt="Portfolio 2">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=22" alt="Portfolio 3">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=23" alt="Portfolio 4">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=24" alt="Portfolio 5">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+            <div class="portfolio-item">
+                <img src="https://picsum.photos/400/400?random=25" alt="Portfolio 6">
+                <div class="portfolio-item-overlay"><span>View Project</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Masonry Grid -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Masonry Layout</h2>
+            <p>Variable height items with staggered reveals</p>
+        </div>
+        <div class="masonry-grid" id="masonryGrid">
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/300?random=30" alt="Masonry 1">
+                <div class="masonry-item-content">
+                    <h3>Project Alpha</h3>
+                    <p>Brand identity design</p>
+                </div>
+            </div>
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/500?random=31" alt="Masonry 2">
+                <div class="masonry-item-content">
+                    <h3>Project Beta</h3>
+                    <p>Web development</p>
+                </div>
+            </div>
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/350?random=32" alt="Masonry 3">
+                <div class="masonry-item-content">
+                    <h3>Project Gamma</h3>
+                    <p>Mobile app design</p>
+                </div>
+            </div>
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/400?random=33" alt="Masonry 4">
+                <div class="masonry-item-content">
+                    <h3>Project Delta</h3>
+                    <p>Marketing campaign</p>
+                </div>
+            </div>
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/280?random=34" alt="Masonry 5">
+                <div class="masonry-item-content">
+                    <h3>Project Epsilon</h3>
+                    <p>UI/UX redesign</p>
+                </div>
+            </div>
+            <div class="masonry-item">
+                <img src="https://picsum.photos/400/450?random=35" alt="Masonry 6">
+                <div class="masonry-item-content">
+                    <h3>Project Zeta</h3>
+                    <p>E-commerce platform</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic stagger with direction</span>
+gsap.<span class="function">from</span>(<span class="string">".grid-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">50</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">0.8</span>,      <span class="comment">// Total time for all items</span>
+        <span class="property">from</span>: <span class="string">"start"</span>     <span class="comment">// "start", "end", "center", "edges", "random"</span>
+    },
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Grid-aware stagger for wave effects</span>
+gsap.<span class="function">from</span>(<span class="string">".grid-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">scale</span>: <span class="number">0.8</span>,
+    <span class="property">duration</span>: <span class="number">0.5</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">1</span>,
+        <span class="property">grid</span>: <span class="string">"auto"</span>,      <span class="comment">// Auto-detect grid layout</span>
+        <span class="property">axis</span>: <span class="string">"x"</span>,        <span class="comment">// "x", "y", or null for diagonal</span>
+        <span class="property">from</span>: <span class="string">"start"</span>
+    },
+    <span class="property">ease</span>: <span class="string">"back.out(1.7)"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// ScrollTrigger batch for performance</span>
+ScrollTrigger.<span class="function">batch</span>(<span class="string">".grid-item"</span>, {
+    <span class="property">start</span>: <span class="string">"top 85%"</span>,
+    <span class="property">onEnter</span>: (elements) => {
+        gsap.<span class="function">from</span>(elements, {
+            <span class="property">opacity</span>: <span class="number">0</span>,
+            <span class="property">y</span>: <span class="number">60</span>,
+            <span class="property">stagger</span>: <span class="number">0.1</span>,
+            <span class="property">duration</span>: <span class="number">0.8</span>
+        });
+    },
+    <span class="property">once</span>: <span class="keyword">true</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Custom stagger function</span>
+gsap.<span class="function">from</span>(<span class="string">".grid-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">y</span>: <span class="number">30</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: <span class="keyword">function</span>(index, target, list) {
+        <span class="comment">// Custom timing based on position</span>
+        <span class="keyword">const</span> rect = target.<span class="function">getBoundingClientRect</span>();
+        <span class="keyword">const</span> distFromCenter = Math.<span class="function">abs</span>(
+            rect.<span class="property">left</span> + rect.<span class="property">width</span>/<span class="number">2</span> - window.<span class="property">innerWidth</span>/<span class="number">2</span>
+        );
+        <span class="keyword">return</span> distFromCenter * <span class="number">0.001</span>;
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // DIRECTION STAGGER DEMO
+        // =====================
+
+        const directionGrid = document.getElementById('directionGrid');
+        const directionItems = directionGrid.querySelectorAll('.grid-item');
+        const directionControls = document.getElementById('directionControls');
+
+        function animateDirection(from) {
+            // Reset
+            gsap.set(directionItems, { opacity: 0, y: 50, scale: 0.8 });
+
+            // Animate
+            gsap.to(directionItems, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.6,
+                stagger: {
+                    amount: 0.8,
+                    from: from
+                },
+                ease: "back.out(1.7)"
+            });
+        }
+
+        directionControls.addEventListener('click', (e) => {
+            if (e.target.classList.contains('control-btn')) {
+                directionControls.querySelectorAll('.control-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                animateDirection(e.target.dataset.from);
+            }
+        });
+
+        // Initial animation
+        ScrollTrigger.create({
+            trigger: directionGrid,
+            start: 'top 75%',
+            onEnter: () => animateDirection('start'),
+            once: true
+        });
+
+        // =====================
+        // GRID-AWARE STAGGER
+        // =====================
+
+        const gridAwareGrid = document.getElementById('gridAwareGrid');
+        const gridAwareItems = gridAwareGrid.querySelectorAll('.grid-item');
+        const gridControls = document.getElementById('gridControls');
+
+        function animateGridAware(axis) {
+            gsap.set(gridAwareItems, { opacity: 0, scale: 0.5 });
+
+            gsap.to(gridAwareItems, {
+                opacity: 1,
+                scale: 1,
+                duration: 0.5,
+                stagger: {
+                    amount: 1,
+                    grid: "auto",
+                    axis: axis === 'both' ? null : axis,
+                    from: "start"
+                },
+                ease: "power3.out"
+            });
+        }
+
+        gridControls.addEventListener('click', (e) => {
+            if (e.target.classList.contains('control-btn')) {
+                gridControls.querySelectorAll('.control-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                animateGridAware(e.target.dataset.axis);
+            }
+        });
+
+        ScrollTrigger.create({
+            trigger: gridAwareGrid,
+            start: 'top 75%',
+            onEnter: () => animateGridAware('x'),
+            once: true
+        });
+
+        // =====================
+        // PORTFOLIO GRID
+        // =====================
+
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+        gsap.from(portfolioItems, {
+            opacity: 0,
+            y: 80,
+            scale: 0.9,
+            duration: 0.8,
+            stagger: {
+                amount: 0.6,
+                grid: "auto",
+                from: "center"
+            },
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: '#portfolioGrid',
+                start: 'top 75%'
+            }
+        });
+
+        // =====================
+        // MASONRY GRID
+        // =====================
+
+        const masonryItems = document.querySelectorAll('.masonry-item');
+
+        gsap.from(masonryItems, {
+            opacity: 0,
+            y: 60,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: '#masonryGrid',
+                start: 'top 75%'
+            }
+        });
+    </script>
+</body>
+</html>

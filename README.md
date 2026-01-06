@@ -202,10 +202,31 @@ Text is split into individual characters that explode outward from center toward
 
 Open `examples/index.html` in your browser to use the visual page builder:
 
-1. Select animations from the sidebar
-2. Preview the wireframe layout
-3. Generate ready-to-use code
-4. Copy and customize for your project
+1. Select animations from the sidebar (6 core animations with full preview/export)
+2. Preview the wireframe layout with live scroll animations
+3. Generate ready-to-use HTML, CSS, and JavaScript
+4. Export as a standalone HTML file
+5. Browse 24+ additional example animations for reference
+
+### Building the Examples Manifest
+
+When adding new examples, regenerate the manifest:
+
+```bash
+cd examples
+node build-manifest.cjs
+```
+
+This scans all example folders and updates `manifest.json`, which the Page Builder loads dynamically.
+
+### Example Categories
+
+- **Scroll** - Horizontal gallery, parallax, pin sections, reveals
+- **Text** - Split text, typewriter, marquee, kinetic typography
+- **Cards** - 3D flip, hover tilt, stacking, grid stagger
+- **Navigation** - Hamburger menu, drawers, tabs, modals
+- **Hero** - Text entrance, counter stats, animated gradients
+- **Micro-interactions** - Button hover, cursor effects, loaders
 
 ---
 

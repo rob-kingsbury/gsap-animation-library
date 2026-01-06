@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide-Out Drawers | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           SLIDE-OUT DRAWERS
+           Off-canvas panels that slide in from
+           various directions with different effects
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Main content */
+        .main-content {
+            min-height: 100vh;
+            transition: transform 0.5s ease;
+        }
+
+        .main-content.is-pushed {
+            transform: translateX(300px);
+        }
+
+        .main-content.is-pushed-right {
+            transform: translateX(-300px);
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        /* Trigger buttons */
+        .trigger-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 500px;
+        }
+
+        .trigger-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .trigger-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 998;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Base drawer styles */
+        .drawer {
+            position: fixed;
+            background: #1a1a1a;
+            z-index: 999;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .drawer-header h2 {
+            font-size: 1.25rem;
+            color: #c9a227;
+        }
+
+        .drawer-close {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            color: #f5f5f0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .drawer-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .drawer-nav {
+            list-style: none;
+        }
+
+        .drawer-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .drawer-nav a {
+            display: block;
+            padding: 1rem;
+            color: #f5f5f0;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .drawer-nav a:hover {
+            background: rgba(201, 162, 39, 0.1);
+            color: #c9a227;
+        }
+
+        /* Left Drawer */
+        .drawer--left {
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            transform: translateX(-100%);
+        }
+
+        /* Right Drawer */
+        .drawer--right {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 320px;
+            transform: translateX(100%);
+        }
+
+        .drawer--right .drawer-nav a {
+            transform: translateX(20px);
+        }
+
+        /* Top Drawer */
+        .drawer--top {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            transform: translateY(-100%);
+        }
+
+        .drawer--top .drawer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .drawer--top .drawer-nav a {
+            transform: translateY(-20px);
+        }
+
+        /* Bottom Drawer */
+        .drawer--bottom {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40vh;
+            transform: translateY(100%);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .drawer--bottom .drawer-nav a {
+            transform: translateY(20px);
+        }
+
+        /* Drawer handle for bottom drawer */
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin: 0 auto 1rem;
+        }
+
+        /* Section for more content */
+        .section {
+            padding: 100px 2rem;
+            background: #111;
+        }
+
+        .section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Left Drawer -->
+    <aside class="drawer drawer--left" id="drawerLeft">
+        <div class="drawer-header">
+            <h2>Navigation</h2>
+            <button class="drawer-close" data-close>&times;</button>
+        </div>
+        <div class="drawer-content">
+            <ul class="drawer-nav">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Right Drawer -->
+    <aside class="drawer drawer--right" id="drawerRight">
+        <div class="drawer-header">
+            <h2>Settings</h2>
+            <button class="drawer-close" data-close>&times;</button>
+        </div>
+        <div class="drawer-content">
+            <ul class="drawer-nav">
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Preferences</a></li>
+                <li><a href="#">Notifications</a></li>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Help</a></li>
+                <li><a href="#">Log Out</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Top Drawer -->
+    <aside class="drawer drawer--top" id="drawerTop">
+        <div class="drawer-header">
+            <h2>Quick Links</h2>
+            <button class="drawer-close" data-close>&times;</button>
+        </div>
+        <div class="drawer-content">
+            <ul class="drawer-nav">
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="#">Reports</a></li>
+                <li><a href="#">Messages</a></li>
+                <li><a href="#">Calendar</a></li>
+                <li><a href="#">Tasks</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Bottom Drawer -->
+    <aside class="drawer drawer--bottom" id="drawerBottom">
+        <div class="drawer-handle"></div>
+        <div class="drawer-header">
+            <h2>Share</h2>
+            <button class="drawer-close" data-close>&times;</button>
+        </div>
+        <div class="drawer-content">
+            <ul class="drawer-nav">
+                <li><a href="#">Copy Link</a></li>
+                <li><a href="#">Share to Twitter</a></li>
+                <li><a href="#">Share to Facebook</a></li>
+                <li><a href="#">Share to LinkedIn</a></li>
+                <li><a href="#">Email</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <section class="hero">
+            <h1>Slide-Out <span>Drawers</span></h1>
+            <p>Off-canvas panels that slide in from any direction with smooth GSAP animations</p>
+            <div class="trigger-grid">
+                <button class="trigger-btn" data-drawer="left">Left Drawer</button>
+                <button class="trigger-btn" data-drawer="right">Right Drawer</button>
+                <button class="trigger-btn" data-drawer="top">Top Drawer</button>
+                <button class="trigger-btn" data-drawer="bottom">Bottom Drawer</button>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Drawer Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Multiple Directions</h3>
+                    <p>Drawers can slide in from left, right, top, or bottom depending on your needs.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Staggered Content</h3>
+                    <p>Menu items animate in with staggered timing for a polished reveal effect.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Push Effect</h3>
+                    <p>Main content can optionally push aside when drawers open (left/right).</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Overlay Dismiss</h3>
+                    <p>Click the overlay or press Escape to close the drawer quickly.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Reference -->
+        <section class="code-reference">
+            <h2>Code Reference</h2>
+
+            <div class="code-block">
+                <pre><code><span class="comment">// Basic drawer animation</span>
+<span class="keyword">function</span> <span class="function">openDrawer</span>(drawer, direction) {
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    <span class="comment">// Determine transform based on direction</span>
+    <span class="keyword">const</span> transforms = {
+        left: { x: <span class="number">0</span> },
+        right: { x: <span class="number">0</span> },
+        top: { y: <span class="number">0</span> },
+        bottom: { y: <span class="number">0</span> }
+    };
+
+    tl.<span class="function">to</span>(drawer, {
+        ...transforms[direction],
+        <span class="property">duration</span>: <span class="number">0.5</span>,
+        <span class="property">ease</span>: <span class="string">"power3.out"</span>
+    })
+    .<span class="function">to</span>(drawer.<span class="function">querySelectorAll</span>(<span class="string">'.drawer-nav a'</span>), {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">x</span>: <span class="number">0</span>,
+        <span class="property">y</span>: <span class="number">0</span>,
+        <span class="property">stagger</span>: <span class="number">0.05</span>,
+        <span class="property">duration</span>: <span class="number">0.3</span>
+    }, <span class="string">"-=0.2"</span>);
+
+    <span class="keyword">return</span> tl;
+}</code></pre>
+            </div>
+
+            <div class="code-block">
+                <pre><code><span class="comment">// Push main content effect</span>
+<span class="keyword">if</span> (direction === <span class="string">'left'</span>) {
+    gsap.<span class="function">to</span>(<span class="string">'.main-content'</span>, {
+        <span class="property">x</span>: drawerWidth,
+        <span class="property">duration</span>: <span class="number">0.5</span>,
+        <span class="property">ease</span>: <span class="string">"power3.out"</span>
+    });
+}
+
+<span class="comment">// Overlay fade in</span>
+gsap.<span class="function">to</span>(<span class="string">'.overlay'</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">visibility</span>: <span class="string">"visible"</span>,
+    <span class="property">duration</span>: <span class="number">0.3</span>
+});</code></pre>
+            </div>
+
+            <div class="code-block">
+                <pre><code><span class="comment">// Close drawer with reverse animation</span>
+<span class="keyword">function</span> <span class="function">closeDrawer</span>(drawer, direction) {
+    <span class="keyword">const</span> transforms = {
+        left: { x: <span class="string">'-100%'</span> },
+        right: { x: <span class="string">'100%'</span> },
+        top: { y: <span class="string">'-100%'</span> },
+        bottom: { y: <span class="string">'100%'</span> }
+    };
+
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>();
+
+    tl.<span class="function">to</span>(drawer.<span class="function">querySelectorAll</span>(<span class="string">'.drawer-nav a'</span>), {
+        <span class="property">opacity</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.2</span>
+    })
+    .<span class="function">to</span>(drawer, {
+        ...transforms[direction],
+        <span class="property">duration</span>: <span class="number">0.4</span>,
+        <span class="property">ease</span>: <span class="string">"power3.in"</span>
+    }, <span class="string">"-=0.1"</span>);
+
+    <span class="keyword">return</span> tl;
+}</code></pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // DRAWER SYSTEM
+        // =====================
+
+        const overlay = document.getElementById('overlay');
+        const mainContent = document.getElementById('mainContent');
+
+        const drawers = {
+            left: document.getElementById('drawerLeft'),
+            right: document.getElementById('drawerRight'),
+            top: document.getElementById('drawerTop'),
+            bottom: document.getElementById('drawerBottom')
+        };
+
+        let activeDrawer = null;
+        let activeTl = null;
+
+        // Open drawer function
+        function openDrawer(direction) {
+            const drawer = drawers[direction];
+            const links = drawer.querySelectorAll('.drawer-nav a');
+
+            // Reset links
+            gsap.set(links, {
+                opacity: 0,
+                x: direction === 'left' ? -20 : direction === 'right' ? 20 : 0,
+                y: direction === 'top' ? -20 : direction === 'bottom' ? 20 : 0
+            });
+
+            activeTl = gsap.timeline();
+
+            // Show overlay
+            activeTl.to(overlay, {
+                opacity: 1,
+                visibility: 'visible',
+                duration: 0.3
+            }, 0);
+
+            // Slide in drawer
+            const slideProps = {
+                left: { x: 0 },
+                right: { x: 0 },
+                top: { y: 0 },
+                bottom: { y: 0 }
+            };
+
+            activeTl.to(drawer, {
+                ...slideProps[direction],
+                duration: 0.5,
+                ease: "power3.out"
+            }, 0);
+
+            // Push main content for left/right drawers
+            if (direction === 'left') {
+                activeTl.to(mainContent, {
+                    x: 320,
+                    duration: 0.5,
+                    ease: "power3.out"
+                }, 0);
+            } else if (direction === 'right') {
+                activeTl.to(mainContent, {
+                    x: -320,
+                    duration: 0.5,
+                    ease: "power3.out"
+                }, 0);
+            }
+
+            // Stagger in links
+            activeTl.to(links, {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                stagger: 0.05,
+                duration: 0.3,
+                ease: "power2.out"
+            }, "-=0.2");
+
+            activeDrawer = direction;
+        }
+
+        // Close drawer function
+        function closeDrawer() {
+            if (!activeDrawer) return;
+
+            const drawer = drawers[activeDrawer];
+            const links = drawer.querySelectorAll('.drawer-nav a');
+
+            const closeTl = gsap.timeline();
+
+            // Fade out links
+            closeTl.to(links, {
+                opacity: 0,
+                duration: 0.2
+            });
+
+            // Slide out drawer
+            const slideProps = {
+                left: { x: '-100%' },
+                right: { x: '100%' },
+                top: { y: '-100%' },
+                bottom: { y: '100%' }
+            };
+
+            closeTl.to(drawer, {
+                ...slideProps[activeDrawer],
+                duration: 0.4,
+                ease: "power3.in"
+            }, "-=0.1");
+
+            // Reset main content
+            closeTl.to(mainContent, {
+                x: 0,
+                duration: 0.4,
+                ease: "power3.in"
+            }, "-=0.4");
+
+            // Hide overlay
+            closeTl.to(overlay, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    gsap.set(overlay, { visibility: 'hidden' });
+                }
+            }, "-=0.3");
+
+            activeDrawer = null;
+        }
+
+        // Event listeners for trigger buttons
+        document.querySelectorAll('[data-drawer]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const direction = btn.dataset.drawer;
+                openDrawer(direction);
+            });
+        });
+
+        // Event listeners for close buttons
+        document.querySelectorAll('[data-close]').forEach(btn => {
+            btn.addEventListener('click', closeDrawer);
+        });
+
+        // Close on overlay click
+        overlay.addEventListener('click', closeDrawer);
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && activeDrawer) {
+                closeDrawer();
+            }
+        });
+    </script>
+</body>
+</html>

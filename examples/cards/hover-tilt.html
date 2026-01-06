@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Tilt Cards | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           HOVER TILT CARDS
+           Cards that tilt based on mouse position
+           with 3D perspective effects
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 80px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Basic Tilt Card */
+        .tilt-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tilt-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(201, 162, 39, 0.15) 0%,
+                transparent 50%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tilt-card:hover::before {
+            opacity: 1;
+        }
+
+        .tilt-card-content {
+            position: relative;
+            z-index: 1;
+            transform: translateZ(30px);
+        }
+
+        .tilt-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #c9a227;
+        }
+
+        .tilt-card p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .tilt-card-icon {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 4rem;
+            opacity: 0.1;
+            transform: translateZ(50px);
+        }
+
+        /* Glare effect */
+        .tilt-card-glare {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                transparent 40%,
+                rgba(255, 255, 255, 0.1) 45%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.1) 55%,
+                transparent 60%
+            );
+            transform: translateX(-100%);
+            pointer-events: none;
+            border-radius: 16px;
+        }
+
+        /* Image tilt card */
+        .tilt-card--image {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .tilt-card--image img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .tilt-card--image:hover img {
+            transform: scale(1.05);
+        }
+
+        .tilt-card--image .tilt-card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+        }
+
+        /* Floating elements card */
+        .tilt-card--floating .float-element {
+            position: absolute;
+            background: #c9a227;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .tilt-card--floating .float-1 {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            transform: translateZ(40px);
+        }
+
+        .tilt-card--floating .float-2 {
+            width: 40px;
+            height: 40px;
+            top: 40%;
+            right: 20%;
+            transform: translateZ(60px);
+        }
+
+        .tilt-card--floating .float-3 {
+            width: 60px;
+            height: 60px;
+            bottom: 30%;
+            left: 30%;
+            transform: translateZ(50px);
+        }
+
+        /* Shine card */
+        .tilt-card--shine {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            overflow: hidden;
+        }
+
+        .shine-element {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(201, 162, 39, 0.1),
+                transparent,
+                rgba(201, 162, 39, 0.1),
+                transparent
+            );
+            animation: spin 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tilt-card--shine:hover .shine-element {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Depth layers card */
+        .tilt-card--layers {
+            background: transparent;
+            border: none;
+        }
+
+        .layer {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layer-1 {
+            background: #1a1a1a;
+            transform: translateZ(0);
+        }
+
+        .layer-2 {
+            background: rgba(201, 162, 39, 0.1);
+            transform: translateZ(20px) scale(0.95);
+        }
+
+        .layer-3 {
+            background: rgba(201, 162, 39, 0.2);
+            transform: translateZ(40px) scale(0.9);
+        }
+
+        .tilt-card--layers .tilt-card-content {
+            transform: translateZ(60px);
+        }
+
+        /* Control panel */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .control-group input[type="range"] {
+            width: 120px;
+        }
+
+        .control-group span {
+            font-size: 0.9rem;
+            color: #c9a227;
+            min-width: 40px;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Hover <span>Tilt</span> Cards</h1>
+            <p>Interactive 3D cards that respond to mouse movement</p>
+        </div>
+    </section>
+
+    <!-- Basic Tilt -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Basic Tilt Effect</h2>
+            <p>Cards tilt based on mouse position</p>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Max Tilt:</label>
+                <input type="range" id="tiltAmount" min="5" max="30" value="15">
+                <span id="tiltValue">15</span>deg
+            </div>
+            <div class="control-group">
+                <label>Perspective:</label>
+                <input type="range" id="perspectiveAmount" min="500" max="2000" value="1000">
+                <span id="perspectiveValue">1000</span>px
+            </div>
+        </div>
+        <div class="card-grid">
+            <div class="tilt-card" data-tilt>
+                <div class="tilt-card-icon">[1]</div>
+                <div class="tilt-card-glare"></div>
+                <div class="tilt-card-content">
+                    <h3>Basic Tilt</h3>
+                    <p>Move your mouse over this card to see it tilt in 3D space based on cursor position.</p>
+                </div>
+            </div>
+            <div class="tilt-card" data-tilt>
+                <div class="tilt-card-icon">[2]</div>
+                <div class="tilt-card-glare"></div>
+                <div class="tilt-card-content">
+                    <h3>Smooth Motion</h3>
+                    <p>GSAP provides buttery smooth interpolation for natural-feeling movement.</p>
+                </div>
+            </div>
+            <div class="tilt-card" data-tilt>
+                <div class="tilt-card-icon">[3]</div>
+                <div class="tilt-card-glare"></div>
+                <div class="tilt-card-content">
+                    <h3>3D Transform</h3>
+                    <p>The perspective property creates convincing depth perception.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Cards -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Image Tilt Cards</h2>
+            <p>Background images with parallax-like depth</p>
+        </div>
+        <div class="card-grid">
+            <div class="tilt-card tilt-card--image" data-tilt>
+                <img src="https://picsum.photos/400/500?random=1" alt="Card image">
+                <div class="tilt-card-content">
+                    <h3>Mountain View</h3>
+                    <p>Scenic mountain landscapes</p>
+                </div>
+            </div>
+            <div class="tilt-card tilt-card--image" data-tilt>
+                <img src="https://picsum.photos/400/500?random=2" alt="Card image">
+                <div class="tilt-card-content">
+                    <h3>Ocean Waves</h3>
+                    <p>Calming ocean scenery</p>
+                </div>
+            </div>
+            <div class="tilt-card tilt-card--image" data-tilt>
+                <img src="https://picsum.photos/400/500?random=3" alt="Card image">
+                <div class="tilt-card-content">
+                    <h3>Forest Path</h3>
+                    <p>Mystical forest trails</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Elements -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Floating Elements</h2>
+            <p>3D layers with different depths</p>
+        </div>
+        <div class="card-grid">
+            <div class="tilt-card tilt-card--floating" data-tilt>
+                <div class="float-element float-1"></div>
+                <div class="float-element float-2"></div>
+                <div class="float-element float-3"></div>
+                <div class="tilt-card-content">
+                    <h3>Floating Depth</h3>
+                    <p>Elements at different Z depths create parallax effect on tilt.</p>
+                </div>
+            </div>
+            <div class="tilt-card tilt-card--layers" data-tilt>
+                <div class="layer layer-1"></div>
+                <div class="layer layer-2"></div>
+                <div class="layer layer-3"></div>
+                <div class="tilt-card-content">
+                    <h3>Stacked Layers</h3>
+                    <p>Multiple layers shift at different rates.</p>
+                </div>
+            </div>
+            <div class="tilt-card tilt-card--shine" data-tilt>
+                <div class="shine-element"></div>
+                <div class="tilt-card-content">
+                    <h3>Shine Effect</h3>
+                    <p>Animated gradient creates holographic shine.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic tilt effect with GSAP</span>
+<span class="keyword">function</span> <span class="function">initTilt</span>(card, options = {}) {
+    <span class="keyword">const</span> {
+        maxTilt = <span class="number">15</span>,
+        perspective = <span class="number">1000</span>,
+        speed = <span class="number">0.5</span>
+    } = options;
+
+    card.style.<span class="property">perspective</span> = perspective + <span class="string">'px'</span>;
+
+    card.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+        <span class="keyword">const</span> rect = card.<span class="function">getBoundingClientRect</span>();
+        <span class="keyword">const</span> centerX = rect.<span class="property">left</span> + rect.<span class="property">width</span> / <span class="number">2</span>;
+        <span class="keyword">const</span> centerY = rect.<span class="property">top</span> + rect.<span class="property">height</span> / <span class="number">2</span>;
+
+        <span class="keyword">const</span> mouseX = e.<span class="property">clientX</span> - centerX;
+        <span class="keyword">const</span> mouseY = e.<span class="property">clientY</span> - centerY;
+
+        <span class="keyword">const</span> rotateX = (mouseY / (rect.<span class="property">height</span> / <span class="number">2</span>)) * -maxTilt;
+        <span class="keyword">const</span> rotateY = (mouseX / (rect.<span class="property">width</span> / <span class="number">2</span>)) * maxTilt;
+
+        gsap.<span class="function">to</span>(card, {
+            <span class="property">rotateX</span>: rotateX,
+            <span class="property">rotateY</span>: rotateY,
+            <span class="property">duration</span>: speed,
+            <span class="property">ease</span>: <span class="string">"power2.out"</span>
+        });
+    });
+
+    card.<span class="function">addEventListener</span>(<span class="string">'mouseleave'</span>, () => {
+        gsap.<span class="function">to</span>(card, {
+            <span class="property">rotateX</span>: <span class="number">0</span>,
+            <span class="property">rotateY</span>: <span class="number">0</span>,
+            <span class="property">duration</span>: <span class="number">0.5</span>,
+            <span class="property">ease</span>: <span class="string">"power2.out"</span>
+        });
+    });
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Glare/spotlight effect</span>
+card.<span class="function">addEventListener</span>(<span class="string">'mousemove'</span>, (e) => {
+    <span class="keyword">const</span> rect = card.<span class="function">getBoundingClientRect</span>();
+    <span class="keyword">const</span> x = ((e.<span class="property">clientX</span> - rect.<span class="property">left</span>) / rect.<span class="property">width</span>) * <span class="number">100</span>;
+    <span class="keyword">const</span> y = ((e.<span class="property">clientY</span> - rect.<span class="property">top</span>) / rect.<span class="property">height</span>) * <span class="number">100</span>;
+
+    <span class="comment">// Update CSS custom properties for radial gradient</span>
+    card.style.<span class="function">setProperty</span>(<span class="string">'--mouse-x'</span>, x + <span class="string">'%'</span>);
+    card.style.<span class="function">setProperty</span>(<span class="string">'--mouse-y'</span>, y + <span class="string">'%'</span>);
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 3D depth for child elements</span>
+<span class="comment">/* CSS */</span>
+.tilt-card {
+    <span class="property">transform-style</span>: preserve-3d;
+}
+
+.tilt-card-content {
+    <span class="property">transform</span>: <span class="function">translateZ</span>(<span class="number">30px</span>);
+}
+
+.tilt-card-icon {
+    <span class="property">transform</span>: <span class="function">translateZ</span>(<span class="number">50px</span>);
+}
+
+<span class="comment">// Elements with higher translateZ values</span>
+<span class="comment">// appear to float above the card surface</span></code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // TILT CARD INITIALIZATION
+        // =====================
+
+        let maxTilt = 15;
+        let perspective = 1000;
+
+        function initTiltCard(card) {
+            card.style.perspective = perspective + 'px';
+
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                const mouseX = e.clientX - centerX;
+                const mouseY = e.clientY - centerY;
+
+                const rotateX = (mouseY / (rect.height / 2)) * -maxTilt;
+                const rotateY = (mouseX / (rect.width / 2)) * maxTilt;
+
+                gsap.to(card, {
+                    rotateX: rotateX,
+                    rotateY: rotateY,
+                    duration: 0.5,
+                    ease: "power2.out",
+                    transformPerspective: perspective
+                });
+
+                // Update glare position
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', x + '%');
+                card.style.setProperty('--mouse-y', y + '%');
+
+                // Animate glare
+                const glare = card.querySelector('.tilt-card-glare');
+                if (glare) {
+                    gsap.to(glare, {
+                        x: (x - 50) * 4 + '%',
+                        duration: 0.5
+                    });
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotateX: 0,
+                    rotateY: 0,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+
+                const glare = card.querySelector('.tilt-card-glare');
+                if (glare) {
+                    gsap.to(glare, {
+                        x: '-100%',
+                        duration: 0.5
+                    });
+                }
+            });
+        }
+
+        // Initialize all tilt cards
+        document.querySelectorAll('[data-tilt]').forEach(initTiltCard);
+
+        // =====================
+        // CONTROLS
+        // =====================
+
+        const tiltSlider = document.getElementById('tiltAmount');
+        const perspectiveSlider = document.getElementById('perspectiveAmount');
+        const tiltValue = document.getElementById('tiltValue');
+        const perspectiveValue = document.getElementById('perspectiveValue');
+
+        tiltSlider.addEventListener('input', (e) => {
+            maxTilt = parseInt(e.target.value);
+            tiltValue.textContent = maxTilt;
+        });
+
+        perspectiveSlider.addEventListener('input', (e) => {
+            perspective = parseInt(e.target.value);
+            perspectiveValue.textContent = perspective;
+            document.querySelectorAll('[data-tilt]').forEach(card => {
+                card.style.perspective = perspective + 'px';
+            });
+        });
+    </script>
+</body>
+</html>

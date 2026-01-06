@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe-Style Expanding Slider | GSAP Animation Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: rgba(255,255,255,0.1);
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.6);
+      --accent: #635bff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .demo-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .demo-header h1 {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .demo-header a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .demo-header a:hover {
+      color: var(--accent);
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* =========================================
+       HORIZONTAL STRIPE SLIDER
+       ========================================= */
+    .stripe-slider-horizontal {
+      display: flex;
+      gap: 8px;
+      height: 500px;
+      width: 100%;
+      max-width: 1400px;
+    }
+
+    .stripe-slide-h {
+      flex: 1;
+      min-width: 80px;
+      background: var(--surface);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stripe-slide-h:hover {
+      flex: 4;
+    }
+
+    .stripe-slide-h-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stripe-slide-h:hover .stripe-slide-h-bg {
+      transform: scale(1.05);
+    }
+
+    .stripe-slide-h-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+    }
+
+    .stripe-slide-h-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+    }
+
+    .stripe-slide-h:hover .stripe-slide-h-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .stripe-slide-h-number {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .stripe-slide-h-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .stripe-slide-h-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       VERTICAL STRIPE SLIDER
+       ========================================= */
+    .section-title {
+      text-align: center;
+      padding: 3rem 2rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+    }
+
+    .stripe-slider-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 600px;
+      height: 600px;
+    }
+
+    .stripe-slide-v {
+      flex: 1;
+      min-height: 60px;
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stripe-slide-v:hover {
+      flex: 4;
+    }
+
+    .stripe-slide-v-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.4;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stripe-slide-v:hover .stripe-slide-v-bg {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .stripe-slide-v-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    }
+
+    .stripe-slide-v-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      gap: 2rem;
+    }
+
+    .stripe-slide-v-info {
+      flex: 1;
+    }
+
+    .stripe-slide-v-number {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .stripe-slide-v-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: font-size 0.3s ease;
+    }
+
+    .stripe-slide-v:hover .stripe-slide-v-title {
+      font-size: 1.5rem;
+    }
+
+    .stripe-slide-v-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 0.5rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stripe-slide-v:hover .stripe-slide-v-desc {
+      max-height: 100px;
+      opacity: 1;
+    }
+
+    .stripe-slide-v-cta {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+    }
+
+    .stripe-slide-v:hover .stripe-slide-v-cta {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .stripe-slide-v-cta button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stripe-slide-v-cta button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(99, 91, 255, 0.3);
+    }
+
+    /* Demo sections */
+    .demo-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      padding: 2rem;
+      align-items: center;
+    }
+
+    .demo-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Code block */
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      max-width: 800px;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .code-block .comment {
+      color: #6a737d;
+    }
+
+    .code-block .property {
+      color: #79c0ff;
+    }
+
+    .code-block .value {
+      color: #a5d6ff;
+    }
+  </style>
+</head>
+<body>
+  <header class="demo-header">
+    <h1>Stripe-Style Expanding Slider</h1>
+    <a href="index.html">Back to Library</a>
+  </header>
+
+  <div class="demo-sections">
+    <!-- Horizontal Version -->
+    <section class="demo-section">
+      <h2 class="section-title">Horizontal Variant</h2>
+      <div class="stripe-slider-horizontal">
+        <div class="stripe-slide-h">
+          <div class="stripe-slide-h-bg" style="background-image: url('https://images.unsplash.com/photo-1551434678-e076c223a692?w=800')"></div>
+          <div class="stripe-slide-h-overlay"></div>
+          <span class="stripe-slide-h-number">01</span>
+          <div class="stripe-slide-h-content">
+            <h3 class="stripe-slide-h-title">Payments</h3>
+            <p class="stripe-slide-h-desc">Accept payments online, in person, or through your platform.</p>
+          </div>
+        </div>
+        <div class="stripe-slide-h">
+          <div class="stripe-slide-h-bg" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800')"></div>
+          <div class="stripe-slide-h-overlay"></div>
+          <span class="stripe-slide-h-number">02</span>
+          <div class="stripe-slide-h-content">
+            <h3 class="stripe-slide-h-title">Billing</h3>
+            <p class="stripe-slide-h-desc">Build and scale your recurring business model.</p>
+          </div>
+        </div>
+        <div class="stripe-slide-h">
+          <div class="stripe-slide-h-bg" style="background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800')"></div>
+          <div class="stripe-slide-h-overlay"></div>
+          <span class="stripe-slide-h-number">03</span>
+          <div class="stripe-slide-h-content">
+            <h3 class="stripe-slide-h-title">Connect</h3>
+            <p class="stripe-slide-h-desc">Payments for platforms and marketplaces.</p>
+          </div>
+        </div>
+        <div class="stripe-slide-h">
+          <div class="stripe-slide-h-bg" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800')"></div>
+          <div class="stripe-slide-h-overlay"></div>
+          <span class="stripe-slide-h-number">04</span>
+          <div class="stripe-slide-h-content">
+            <h3 class="stripe-slide-h-title">Radar</h3>
+            <p class="stripe-slide-h-desc">Fraud prevention with machine learning.</p>
+          </div>
+        </div>
+        <div class="stripe-slide-h">
+          <div class="stripe-slide-h-bg" style="background-image: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800')"></div>
+          <div class="stripe-slide-h-overlay"></div>
+          <span class="stripe-slide-h-number">05</span>
+          <div class="stripe-slide-h-content">
+            <h3 class="stripe-slide-h-title">Atlas</h3>
+            <p class="stripe-slide-h-desc">Start a company from anywhere in the world.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vertical Version -->
+    <section class="demo-section">
+      <h2 class="section-title">Vertical Variant (for catalogs)</h2>
+      <div class="stripe-slider-vertical">
+        <div class="stripe-slide-v">
+          <div class="stripe-slide-v-bg" style="background-image: url('https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600')"></div>
+          <div class="stripe-slide-v-overlay"></div>
+          <div class="stripe-slide-v-content">
+            <div class="stripe-slide-v-info">
+              <span class="stripe-slide-v-number">Product 01</span>
+              <h3 class="stripe-slide-v-title">Classic Logo Tee</h3>
+              <p class="stripe-slide-v-desc">Premium cotton tee featuring the iconic logo. Available in multiple colors.</p>
+            </div>
+            <div class="stripe-slide-v-cta">
+              <button>View Product</button>
+            </div>
+          </div>
+        </div>
+        <div class="stripe-slide-v">
+          <div class="stripe-slide-v-bg" style="background-image: url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600')"></div>
+          <div class="stripe-slide-v-overlay"></div>
+          <div class="stripe-slide-v-content">
+            <div class="stripe-slide-v-info">
+              <span class="stripe-slide-v-number">Product 02</span>
+              <h3 class="stripe-slide-v-title">Premium Hoodie</h3>
+              <p class="stripe-slide-v-desc">Heavyweight hoodie with embroidered details. Perfect for cold nights.</p>
+            </div>
+            <div class="stripe-slide-v-cta">
+              <button>View Product</button>
+            </div>
+          </div>
+        </div>
+        <div class="stripe-slide-v">
+          <div class="stripe-slide-v-bg" style="background-image: url('https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600')"></div>
+          <div class="stripe-slide-v-overlay"></div>
+          <div class="stripe-slide-v-content">
+            <div class="stripe-slide-v-info">
+              <span class="stripe-slide-v-number">Product 03</span>
+              <h3 class="stripe-slide-v-title">Trucker Cap</h3>
+              <p class="stripe-slide-v-desc">Classic mesh back with embroidered front patch.</p>
+            </div>
+            <div class="stripe-slide-v-cta">
+              <button>View Product</button>
+            </div>
+          </div>
+        </div>
+        <div class="stripe-slide-v">
+          <div class="stripe-slide-v-bg" style="background-image: url('https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?w=600')"></div>
+          <div class="stripe-slide-v-overlay"></div>
+          <div class="stripe-slide-v-content">
+            <div class="stripe-slide-v-info">
+              <span class="stripe-slide-v-number">Product 04</span>
+              <h3 class="stripe-slide-v-title">Vinyl Record</h3>
+              <p class="stripe-slide-v-desc">Limited edition 180g audiophile pressing.</p>
+            </div>
+            <div class="stripe-slide-v-cta">
+              <button>View Product</button>
+            </div>
+          </div>
+        </div>
+        <div class="stripe-slide-v">
+          <div class="stripe-slide-v-bg" style="background-image: url('https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600')"></div>
+          <div class="stripe-slide-v-overlay"></div>
+          <div class="stripe-slide-v-content">
+            <div class="stripe-slide-v-info">
+              <span class="stripe-slide-v-number">Product 05</span>
+              <h3 class="stripe-slide-v-title">Concert Poster</h3>
+              <p class="stripe-slide-v-desc">18x24 archival quality print with vintage design.</p>
+            </div>
+            <div class="stripe-slide-v-cta">
+              <button>View Product</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code Example -->
+    <section class="demo-section">
+      <div class="code-block">
+        <pre><span class="comment">/* Key CSS - Pure CSS, no JS required! */</span>
+
+<span class="comment">/* Container uses flexbox */</span>
+.stripe-slider {
+  <span class="property">display</span>: <span class="value">flex</span>;
+  <span class="property">flex-direction</span>: <span class="value">column</span>; <span class="comment">/* or row for horizontal */</span>
+  <span class="property">gap</span>: <span class="value">8px</span>;
+}
+
+<span class="comment">/* Each slide starts with flex: 1 */</span>
+.stripe-slide {
+  <span class="property">flex</span>: <span class="value">1</span>;
+  <span class="property">min-height</span>: <span class="value">60px</span>; <span class="comment">/* Collapsed height */</span>
+  <span class="property">transition</span>: <span class="value">flex 0.5s cubic-bezier(0.4, 0, 0.2, 1)</span>;
+}
+
+<span class="comment">/* On hover, expand to take 4x space */</span>
+.stripe-slide:hover {
+  <span class="property">flex</span>: <span class="value">4</span>;
+}
+
+<span class="comment">/* Content fades/slides in on hover */</span>
+.stripe-slide-content {
+  <span class="property">opacity</span>: <span class="value">0</span>;
+  <span class="property">transform</span>: <span class="value">translateY(20px)</span>;
+  <span class="property">transition</span>: <span class="value">all 0.4s ease 0.1s</span>;
+}
+
+.stripe-slide:hover .stripe-slide-content {
+  <span class="property">opacity</span>: <span class="value">1</span>;
+  <span class="property">transform</span>: <span class="value">translateY(0)</span>;
+}</pre>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Spinners | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           LOADING SPINNERS
+           Various loading animations created with
+           GSAP instead of CSS keyframes
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Hero */
+        .hero {
+            height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section */
+        .section {
+            padding: 60px 2rem;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Spinner grid */
+        .spinner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .spinner-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .spinner-card h3 {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .spinner-container {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ===========================
+           1. CIRCLE SPINNER
+           =========================== */
+        .spinner-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #c9a227;
+        }
+
+        /* ===========================
+           2. DOTS WAVE
+           =========================== */
+        .spinner-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .spinner-dots .dot {
+            width: 12px;
+            height: 12px;
+            background: #c9a227;
+            border-radius: 50%;
+        }
+
+        /* ===========================
+           3. BARS
+           =========================== */
+        .spinner-bars {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 40px;
+        }
+
+        .spinner-bars .bar {
+            width: 8px;
+            height: 20px;
+            background: #c9a227;
+            border-radius: 4px;
+        }
+
+        /* ===========================
+           4. PULSE
+           =========================== */
+        .spinner-pulse {
+            width: 50px;
+            height: 50px;
+            background: #c9a227;
+            border-radius: 50%;
+        }
+
+        /* ===========================
+           5. RING
+           =========================== */
+        .spinner-ring {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .spinner-ring .ring {
+            position: absolute;
+            inset: 0;
+            border: 3px solid transparent;
+            border-top-color: #c9a227;
+            border-radius: 50%;
+        }
+
+        .spinner-ring .ring:nth-child(2) {
+            inset: 6px;
+            border-top-color: rgba(201, 162, 39, 0.6);
+        }
+
+        .spinner-ring .ring:nth-child(3) {
+            inset: 12px;
+            border-top-color: rgba(201, 162, 39, 0.3);
+        }
+
+        /* ===========================
+           6. SQUARE MORPH
+           =========================== */
+        .spinner-square {
+            width: 40px;
+            height: 40px;
+            background: #c9a227;
+        }
+
+        /* ===========================
+           7. ORBIT
+           =========================== */
+        .spinner-orbit {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .spinner-orbit .center {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(201, 162, 39, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner-orbit .satellite {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #c9a227;
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* ===========================
+           8. FLIP
+           =========================== */
+        .spinner-flip {
+            width: 40px;
+            height: 40px;
+            background: #c9a227;
+            border-radius: 4px;
+        }
+
+        /* ===========================
+           9. TEXT DOTS
+           =========================== */
+        .spinner-text {
+            font-size: 1.25rem;
+            color: #c9a227;
+        }
+
+        .spinner-text .text-dot {
+            display: inline-block;
+        }
+
+        /* ===========================
+           10. PROGRESS CIRCLE
+           =========================== */
+        .spinner-progress {
+            width: 60px;
+            height: 60px;
+        }
+
+        .spinner-progress svg {
+            transform: rotate(-90deg);
+        }
+
+        .spinner-progress .bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 4;
+        }
+
+        .spinner-progress .progress {
+            fill: none;
+            stroke: #c9a227;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 157;
+        }
+
+        /* ===========================
+           11. SNAKE
+           =========================== */
+        .spinner-snake {
+            display: flex;
+            gap: 4px;
+        }
+
+        .spinner-snake .segment {
+            width: 10px;
+            height: 10px;
+            background: #c9a227;
+            border-radius: 2px;
+            opacity: 0.2;
+        }
+
+        /* ===========================
+           12. INFINITY
+           =========================== */
+        .spinner-infinity {
+            width: 60px;
+            height: 30px;
+            position: relative;
+        }
+
+        .spinner-infinity .ball {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #c9a227;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Loading <span>Spinners</span></h1>
+            <p>Animated loading indicators powered by GSAP</p>
+        </div>
+    </section>
+
+    <!-- Spinners -->
+    <section class="section">
+        <div class="spinner-grid">
+            <!-- 1. Circle Spinner -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-circle" id="spinnerCircle"></div>
+                </div>
+                <h3>Circle Spin</h3>
+            </div>
+
+            <!-- 2. Dots Wave -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-dots" id="spinnerDots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <h3>Dots Wave</h3>
+            </div>
+
+            <!-- 3. Bars -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-bars" id="spinnerBars">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+                <h3>Equalizer</h3>
+            </div>
+
+            <!-- 4. Pulse -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-pulse" id="spinnerPulse"></div>
+                </div>
+                <h3>Pulse</h3>
+            </div>
+
+            <!-- 5. Nested Rings -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-ring" id="spinnerRing">
+                        <div class="ring"></div>
+                        <div class="ring"></div>
+                        <div class="ring"></div>
+                    </div>
+                </div>
+                <h3>Nested Rings</h3>
+            </div>
+
+            <!-- 6. Square Morph -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-square" id="spinnerSquare"></div>
+                </div>
+                <h3>Square Morph</h3>
+            </div>
+
+            <!-- 7. Orbit -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-orbit" id="spinnerOrbit">
+                        <div class="center"></div>
+                        <div class="satellite"></div>
+                    </div>
+                </div>
+                <h3>Orbit</h3>
+            </div>
+
+            <!-- 8. 3D Flip -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-flip" id="spinnerFlip"></div>
+                </div>
+                <h3>3D Flip</h3>
+            </div>
+
+            <!-- 9. Text Dots -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-text" id="spinnerText">
+                        Loading<span class="text-dot">.</span><span class="text-dot">.</span><span class="text-dot">.</span>
+                    </div>
+                </div>
+                <h3>Text Dots</h3>
+            </div>
+
+            <!-- 10. Progress Circle -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-progress" id="spinnerProgress">
+                        <svg viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="25"></circle>
+                            <circle class="progress" cx="30" cy="30" r="25"></circle>
+                        </svg>
+                    </div>
+                </div>
+                <h3>Progress Circle</h3>
+            </div>
+
+            <!-- 11. Snake -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-snake" id="spinnerSnake">
+                        <div class="segment"></div>
+                        <div class="segment"></div>
+                        <div class="segment"></div>
+                        <div class="segment"></div>
+                        <div class="segment"></div>
+                    </div>
+                </div>
+                <h3>Snake</h3>
+            </div>
+
+            <!-- 12. Infinity -->
+            <div class="spinner-card">
+                <div class="spinner-container">
+                    <div class="spinner-infinity" id="spinnerInfinity">
+                        <div class="ball"></div>
+                    </div>
+                </div>
+                <h3>Infinity</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Circle Spinner</span>
+gsap.<span class="function">to</span>(<span class="string">'.spinner-circle'</span>, {
+    <span class="property">rotation</span>: <span class="number">360</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">ease</span>: <span class="string">"none"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Dots Wave</span>
+gsap.<span class="function">to</span>(<span class="string">'.dot'</span>, {
+    <span class="property">y</span>: <span class="number">-15</span>,
+    <span class="property">duration</span>: <span class="number">0.4</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">yoyo</span>: <span class="keyword">true</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">each</span>: <span class="number">0.15</span>,
+        <span class="property">repeat</span>: <span class="number">-1</span>,
+        <span class="property">yoyo</span>: <span class="keyword">true</span>
+    },
+    <span class="property">ease</span>: <span class="string">"power2.inOut"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Equalizer Bars</span>
+gsap.<span class="function">to</span>(<span class="string">'.bar'</span>, {
+    <span class="property">scaleY</span>: gsap.utils.<span class="function">random</span>(<span class="number">0.3</span>, <span class="number">2</span>, <span class="keyword">true</span>),
+    <span class="property">duration</span>: <span class="number">0.3</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">yoyo</span>: <span class="keyword">true</span>,
+    <span class="property">stagger</span>: <span class="number">0.1</span>,
+    <span class="property">ease</span>: <span class="string">"power1.inOut"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Pulse Effect</span>
+gsap.<span class="function">to</span>(<span class="string">'.spinner-pulse'</span>, {
+    <span class="property">scale</span>: <span class="number">1.3</span>,
+    <span class="property">opacity</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">ease</span>: <span class="string">"power2.out"</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Orbit Animation</span>
+gsap.<span class="function">to</span>(<span class="string">'.spinner-orbit'</span>, {
+    <span class="property">rotation</span>: <span class="number">360</span>,
+    <span class="property">duration</span>: <span class="number">1.5</span>,
+    <span class="property">repeat</span>: <span class="number">-1</span>,
+    <span class="property">ease</span>: <span class="string">"none"</span>
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        // =====================
+        // 1. CIRCLE SPINNER
+        // =====================
+
+        gsap.to('#spinnerCircle', {
+            rotation: 360,
+            duration: 1,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // =====================
+        // 2. DOTS WAVE
+        // =====================
+
+        gsap.to('#spinnerDots .dot', {
+            y: -15,
+            duration: 0.4,
+            repeat: -1,
+            yoyo: true,
+            stagger: {
+                each: 0.15,
+                repeat: -1,
+                yoyo: true
+            },
+            ease: "power2.inOut"
+        });
+
+        // =====================
+        // 3. EQUALIZER BARS
+        // =====================
+
+        document.querySelectorAll('#spinnerBars .bar').forEach((bar, i) => {
+            gsap.to(bar, {
+                scaleY: gsap.utils.random(0.3, 2),
+                duration: 0.3 + i * 0.05,
+                repeat: -1,
+                yoyo: true,
+                ease: "power1.inOut"
+            });
+        });
+
+        // =====================
+        // 4. PULSE
+        // =====================
+
+        gsap.to('#spinnerPulse', {
+            scale: 1.5,
+            opacity: 0,
+            duration: 1,
+            repeat: -1,
+            ease: "power2.out"
+        });
+
+        // =====================
+        // 5. NESTED RINGS
+        // =====================
+
+        const rings = document.querySelectorAll('#spinnerRing .ring');
+        rings.forEach((ring, i) => {
+            gsap.to(ring, {
+                rotation: i % 2 === 0 ? 360 : -360,
+                duration: 1 + i * 0.3,
+                repeat: -1,
+                ease: "none"
+            });
+        });
+
+        // =====================
+        // 6. SQUARE MORPH
+        // =====================
+
+        const squareTl = gsap.timeline({ repeat: -1 });
+        squareTl
+            .to('#spinnerSquare', {
+                borderRadius: '50%',
+                rotation: 180,
+                duration: 0.5,
+                ease: "power2.inOut"
+            })
+            .to('#spinnerSquare', {
+                borderRadius: '4px',
+                rotation: 360,
+                duration: 0.5,
+                ease: "power2.inOut"
+            });
+
+        // =====================
+        // 7. ORBIT
+        // =====================
+
+        gsap.to('#spinnerOrbit', {
+            rotation: 360,
+            duration: 1.5,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // =====================
+        // 8. 3D FLIP
+        // =====================
+
+        const flipTl = gsap.timeline({ repeat: -1 });
+        flipTl
+            .to('#spinnerFlip', {
+                rotationX: 180,
+                duration: 0.6,
+                ease: "power2.inOut"
+            })
+            .to('#spinnerFlip', {
+                rotationY: 180,
+                duration: 0.6,
+                ease: "power2.inOut"
+            })
+            .to('#spinnerFlip', {
+                rotationX: 360,
+                duration: 0.6,
+                ease: "power2.inOut"
+            })
+            .to('#spinnerFlip', {
+                rotationY: 360,
+                duration: 0.6,
+                ease: "power2.inOut"
+            });
+
+        // =====================
+        // 9. TEXT DOTS
+        // =====================
+
+        gsap.to('#spinnerText .text-dot', {
+            opacity: 0,
+            duration: 0.4,
+            stagger: {
+                each: 0.2,
+                repeat: -1,
+                yoyo: true
+            },
+            ease: "power2.inOut"
+        });
+
+        // =====================
+        // 10. PROGRESS CIRCLE
+        // =====================
+
+        const progressTl = gsap.timeline({ repeat: -1 });
+        progressTl
+            .to('#spinnerProgress .progress', {
+                strokeDashoffset: 0,
+                duration: 1.5,
+                ease: "power2.inOut"
+            })
+            .to('#spinnerProgress .progress', {
+                strokeDashoffset: -157,
+                duration: 1.5,
+                ease: "power2.inOut"
+            });
+
+        // Also rotate
+        gsap.to('#spinnerProgress', {
+            rotation: 360,
+            duration: 2,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // =====================
+        // 11. SNAKE
+        // =====================
+
+        const snakeSegments = document.querySelectorAll('#spinnerSnake .segment');
+        const snakeTl = gsap.timeline({ repeat: -1 });
+
+        snakeSegments.forEach((segment, i) => {
+            snakeTl.to(segment, {
+                opacity: 1,
+                duration: 0.1
+            }, i * 0.1);
+        });
+
+        snakeSegments.forEach((segment, i) => {
+            snakeTl.to(segment, {
+                opacity: 0.2,
+                duration: 0.1
+            }, 0.5 + i * 0.1);
+        });
+
+        // =====================
+        // 12. INFINITY
+        // =====================
+
+        const infinityPath = [
+            { x: 0, y: 0 },
+            { x: 15, y: -8 },
+            { x: 30, y: 0 },
+            { x: 45, y: 8 },
+            { x: 60, y: 0 },
+            { x: 45, y: -8 },
+            { x: 30, y: 0 },
+            { x: 15, y: 8 },
+            { x: 0, y: 0 }
+        ];
+
+        gsap.to('#spinnerInfinity .ball', {
+            motionPath: {
+                path: infinityPath,
+                curviness: 1.5
+            },
+            duration: 2,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // Fallback without MotionPath plugin
+        const infinityTl = gsap.timeline({ repeat: -1 });
+        infinityTl
+            .to('#spinnerInfinity .ball', { x: 24, y: -5, duration: 0.25, ease: "sine.inOut" })
+            .to('#spinnerInfinity .ball', { x: 48, y: 0, duration: 0.25, ease: "sine.inOut" })
+            .to('#spinnerInfinity .ball', { x: 24, y: 5, duration: 0.25, ease: "sine.inOut" })
+            .to('#spinnerInfinity .ball', { x: 0, y: 0, duration: 0.25, ease: "sine.inOut" });
+    </script>
+</body>
+</html>
