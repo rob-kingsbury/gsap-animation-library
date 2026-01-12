@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Section Transitions | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           SMOOTH SECTION TRANSITIONS
+           Polished section-to-section animations with
+           coordinated element reveals - inspired by nexagent
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Section base */
+        .section {
+            min-height: 100vh;
+            padding: 100px 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            opacity: 0.7;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Split section */
+        .split-section .section-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .split-content {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+
+        .split-content h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .split-content h2 span {
+            color: #c9a227;
+        }
+
+        .split-content p {
+            opacity: 0.7;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .split-image {
+            opacity: 0;
+            transform: translateX(60px);
+        }
+
+        .split-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Reversed split */
+        .split-section.reversed .section-inner {
+            direction: rtl;
+        }
+
+        .split-section.reversed .section-inner > * {
+            direction: ltr;
+        }
+
+        .split-section.reversed .split-content {
+            transform: translateX(60px);
+        }
+
+        .split-section.reversed .split-image {
+            transform: translateX(-60px);
+        }
+
+        /* Features grid section */
+        .features-section .section-inner {
+            text-align: center;
+        }
+
+        .features-header {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .features-header h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .features-header h2 span {
+            color: #c9a227;
+        }
+
+        .features-header p {
+            opacity: 0.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #c9a227 0%, #a88420 100%);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* Stats section */
+        .stats-section {
+            background: linear-gradient(135deg, #1a1510 0%, #0a0a0a 100%);
+        }
+
+        .stats-section .section-inner {
+            text-align: center;
+        }
+
+        .stats-header {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .stats-header h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-item {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .stat-number {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #c9a227;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Testimonial section */
+        .testimonial-section .section-inner {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .testimonial-content {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .testimonial-quote {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-quote::before {
+            content: '"';
+            color: #c9a227;
+            font-size: 3rem;
+            line-height: 0;
+            vertical-align: -0.5em;
+            margin-right: 0.25rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .testimonial-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-info p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* CTA section */
+        .cta-section {
+            background: linear-gradient(135deg, #c9a227 0%, #a88420 100%);
+            color: #0a0a0a;
+        }
+
+        .cta-section .section-inner {
+            text-align: center;
+        }
+
+        .cta-content {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .cta-content h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .cta-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #0a0a0a;
+            color: #f5f5f0;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Background decorations */
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 162, 39, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .bg-glow.top-right {
+            top: -200px;
+            right: -200px;
+        }
+
+        .bg-glow.bottom-left {
+            bottom: -200px;
+            left: -200px;
+        }
+
+        /* Code reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        @media (max-width: 900px) {
+            .split-section .section-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .split-section.reversed .section-inner {
+                direction: ltr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="section hero">
+        <div class="section-inner">
+            <h1>Smooth Section <span>Transitions</span></h1>
+            <p>Coordinated animations that flow naturally between sections. Every element reveals at the perfect moment.</p>
+        </div>
+    </section>
+
+    <!-- Split section 1 -->
+    <section class="section split-section" id="split1">
+        <div class="bg-glow top-right"></div>
+        <div class="section-inner">
+            <div class="split-content">
+                <h2>Build something <span>remarkable</span></h2>
+                <p>Create exceptional digital experiences with our comprehensive suite of tools. Every feature is designed to help you move faster and build better.</p>
+                <p>From concept to launch, we've got you covered with intuitive workflows and powerful integrations.</p>
+            </div>
+            <div class="split-image">
+                <img src="https://picsum.photos/600/450?random=10" alt="Feature showcase">
+            </div>
+        </div>
+    </section>
+
+    <!-- Split section 2 (reversed) -->
+    <section class="section split-section reversed" id="split2">
+        <div class="bg-glow bottom-left"></div>
+        <div class="section-inner">
+            <div class="split-content">
+                <h2>Scale without <span>limits</span></h2>
+                <p>Our infrastructure grows with you. Whether you're serving hundreds or millions of users, performance stays rock solid.</p>
+                <p>Focus on building great products while we handle the complexity of scale.</p>
+            </div>
+            <div class="split-image">
+                <img src="https://picsum.photos/600/450?random=11" alt="Scale showcase">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features grid -->
+    <section class="section features-section" id="features">
+        <div class="section-inner">
+            <div class="features-header">
+                <h2>Everything you <span>need</span></h2>
+                <p>Powerful features to supercharge your workflow</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">1</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance ensures your users get the best experience every time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">2</div>
+                    <h3>Secure by Default</h3>
+                    <p>Enterprise-grade security built into every layer of the platform.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">3</div>
+                    <h3>Easy Integration</h3>
+                    <p>Connect with your favorite tools in minutes, not days.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">4</div>
+                    <h3>Real-time Analytics</h3>
+                    <p>Make data-driven decisions with powerful insights and reporting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">5</div>
+                    <h3>24/7 Support</h3>
+                    <p>Our team is always here to help you succeed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">6</div>
+                    <h3>Global CDN</h3>
+                    <p>Deliver content at lightning speed to users worldwide.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats section -->
+    <section class="section stats-section" id="stats">
+        <div class="section-inner">
+            <div class="stats-header">
+                <h2>Trusted by thousands</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="10000">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="500">0</div>
+                    <div class="stat-label">Companies</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="99">0</div>
+                    <div class="stat-label">Uptime %</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="section testimonial-section" id="testimonial">
+        <div class="section-inner">
+            <div class="testimonial-content">
+                <p class="testimonial-quote">This platform transformed how we work. The seamless experience and powerful features helped us 10x our productivity.</p>
+            </div>
+            <div class="testimonial-author">
+                <div class="testimonial-avatar">
+                    <img src="https://picsum.photos/100/100?random=20" alt="Author">
+                </div>
+                <div class="testimonial-info">
+                    <h4>Sarah Johnson</h4>
+                    <p>CEO, TechCorp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-section" id="cta">
+        <div class="section-inner">
+            <div class="cta-content">
+                <h2>Ready to get started?</h2>
+                <p>Join thousands of happy customers building the future.</p>
+                <a href="#" class="cta-btn">Start Free Trial</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Coordinated split section animation</span>
+<span class="keyword">function</span> <span class="function">animateSplitSection</span>(section) {
+    <span class="keyword">const</span> content = section.<span class="function">querySelector</span>(<span class="string">'.split-content'</span>);
+    <span class="keyword">const</span> image = section.<span class="function">querySelector</span>(<span class="string">'.split-image'</span>);
+    <span class="keyword">const</span> glow = section.<span class="function">querySelector</span>(<span class="string">'.bg-glow'</span>);
+
+    <span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>({
+        <span class="property">scrollTrigger</span>: {
+            <span class="property">trigger</span>: section,
+            <span class="property">start</span>: <span class="string">'top 70%'</span>,
+            <span class="property">end</span>: <span class="string">'top 20%'</span>,
+            <span class="property">toggleActions</span>: <span class="string">'play none none none'</span>
+        }
+    });
+
+    <span class="comment">// Background glow fades in</span>
+    tl.<span class="function">to</span>(glow, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">1</span> }, <span class="number">0</span>);
+
+    <span class="comment">// Content slides in</span>
+    tl.<span class="function">to</span>(content, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">x</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.8</span>,
+        <span class="property">ease</span>: <span class="string">'power3.out'</span>
+    }, <span class="number">0.2</span>);
+
+    <span class="comment">// Image slides in (slightly delayed)</span>
+    tl.<span class="function">to</span>(image, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">x</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.8</span>,
+        <span class="property">ease</span>: <span class="string">'power3.out'</span>
+    }, <span class="number">0.4</span>);
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Staggered grid reveal</span>
+gsap.<span class="function">to</span>(<span class="string">'.feature-card'</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">y</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">0.8</span>,
+        <span class="property">grid</span>: [<span class="number">2</span>, <span class="number">3</span>],
+        <span class="property">from</span>: <span class="string">'start'</span>
+    },
+    <span class="property">ease</span>: <span class="string">'power3.out'</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">'.features-grid'</span>,
+        <span class="property">start</span>: <span class="string">'top 70%'</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Number counter animation</span>
+<span class="keyword">function</span> <span class="function">animateCounter</span>(element) {
+    <span class="keyword">const</span> target = +element.dataset.<span class="property">target</span>;
+
+    gsap.<span class="function">to</span>(element, {
+        <span class="property">innerText</span>: target,
+        <span class="property">duration</span>: <span class="number">2</span>,
+        <span class="property">ease</span>: <span class="string">'power2.out'</span>,
+        <span class="property">snap</span>: { <span class="property">innerText</span>: <span class="number">1</span> },
+        <span class="property">scrollTrigger</span>: {
+            <span class="property">trigger</span>: element,
+            <span class="property">start</span>: <span class="string">'top 80%'</span>
+        }
+    });
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // SPLIT SECTIONS
+        // =====================
+
+        function animateSplitSection(section) {
+            const content = section.querySelector('.split-content');
+            const image = section.querySelector('.split-image');
+            const glow = section.querySelector('.bg-glow');
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 70%',
+                    toggleActions: 'play none none none'
+                }
+            });
+
+            if (glow) {
+                tl.to(glow, { opacity: 1, duration: 1 }, 0);
+            }
+
+            tl.to(content, {
+                opacity: 1,
+                x: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            }, 0.2);
+
+            tl.to(image, {
+                opacity: 1,
+                x: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            }, 0.4);
+        }
+
+        document.querySelectorAll('.split-section').forEach(animateSplitSection);
+
+        // =====================
+        // FEATURES GRID
+        // =====================
+
+        gsap.to('.features-header', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '#features',
+                start: 'top 70%'
+            }
+        });
+
+        gsap.to('.feature-card', {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: {
+                amount: 0.8,
+                grid: [2, 3],
+                from: 'start'
+            },
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.features-grid',
+                start: 'top 70%'
+            }
+        });
+
+        // =====================
+        // STATS SECTION
+        // =====================
+
+        gsap.to('.stats-header', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '#stats',
+                start: 'top 70%'
+            }
+        });
+
+        gsap.to('.stat-item', {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+                trigger: '.stats-grid',
+                start: 'top 70%'
+            }
+        });
+
+        // Counter animation
+        document.querySelectorAll('.stat-number').forEach(counter => {
+            const target = +counter.dataset.target;
+
+            gsap.to(counter, {
+                innerText: target,
+                duration: 2,
+                ease: 'power2.out',
+                snap: { innerText: 1 },
+                scrollTrigger: {
+                    trigger: counter,
+                    start: 'top 80%'
+                },
+                onUpdate: function() {
+                    // Add + suffix for large numbers, % for percentage
+                    const current = Math.round(this.targets()[0].innerText);
+                    if (target === 99) {
+                        this.targets()[0].innerText = current + '%';
+                    } else if (target >= 1000) {
+                        this.targets()[0].innerText = current.toLocaleString() + '+';
+                    } else if (target >= 50) {
+                        this.targets()[0].innerText = current + '+';
+                    }
+                }
+            });
+        });
+
+        // =====================
+        // TESTIMONIAL
+        // =====================
+
+        const testimonialTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#testimonial',
+                start: 'top 70%'
+            }
+        });
+
+        testimonialTl
+            .to('.testimonial-content', {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            })
+            .to('.testimonial-author', {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power3.out'
+            }, '-=0.4');
+
+        // =====================
+        // CTA SECTION
+        // =====================
+
+        gsap.to('.cta-content', {
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '#cta',
+                start: 'top 70%'
+            }
+        });
+    </script>
+</body>
+</html>

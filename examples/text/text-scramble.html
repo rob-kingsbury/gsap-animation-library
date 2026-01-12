@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Scramble Effects | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           TEXT SCRAMBLE EFFECTS
+           Character-by-character scramble animations
+           inspired by mosey and modern tech sites
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-inner {
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            opacity: 0.7;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Section */
+        .section {
+            padding: 100px 2rem;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Scramble text base */
+        .scramble-text {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .scramble-text .char {
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .scramble-text .highlight {
+            color: #c9a227;
+        }
+
+        /* Variant: Glitch style */
+        .scramble-glitch {
+            position: relative;
+        }
+
+        .scramble-glitch::before,
+        .scramble-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .scramble-glitch::before {
+            color: #ff0000;
+            z-index: -1;
+        }
+
+        .scramble-glitch::after {
+            color: #00ffff;
+            z-index: -1;
+        }
+
+        .scramble-glitch.glitching::before {
+            animation: glitch-1 0.3s infinite;
+            opacity: 0.8;
+        }
+
+        .scramble-glitch.glitching::after {
+            animation: glitch-2 0.3s infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(-2px, 2px); }
+        }
+
+        /* Variant: Typewriter */
+        .scramble-typewriter {
+            border-right: 3px solid #c9a227;
+            padding-right: 0.1em;
+            white-space: nowrap;
+        }
+
+        .scramble-typewriter.typing {
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #c9a227; }
+        }
+
+        /* Variant: Matrix style */
+        .scramble-matrix {
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Variant: Decode */
+        .scramble-decode {
+            font-family: 'Courier New', monospace;
+        }
+
+        .scramble-decode .char.decoded {
+            color: #c9a227;
+        }
+
+        /* Subtitle scramble */
+        .scramble-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.7;
+            margin-top: 1rem;
+            font-family: inherit;
+            font-weight: 400;
+        }
+
+        /* Interactive demo */
+        .demo-container {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .replay-btn {
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: #c9a227;
+            color: #0a0a0a;
+        }
+
+        /* Word list demo */
+        .word-cycle {
+            display: inline-block;
+            min-width: 300px;
+            text-align: left;
+        }
+
+        /* Code reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <h1>Text <span>Scramble</span> Effects</h1>
+            <p>Character-by-character scramble animations that decode to reveal text. Perfect for hero headlines and tech-forward brands.</p>
+        </div>
+    </section>
+
+    <!-- Basic Scramble -->
+    <section class="section" id="basicSection">
+        <div class="section-header">
+            <h2>Basic Scramble</h2>
+            <p>Characters randomize then resolve to final text</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text" id="basicScramble">INNOVATION</div>
+            <button class="replay-btn" data-target="basic">Replay</button>
+        </div>
+    </section>
+
+    <!-- Glitch Scramble -->
+    <section class="section" id="glitchSection">
+        <div class="section-header">
+            <h2>Glitch Scramble</h2>
+            <p>RGB split effect during scramble</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text scramble-glitch" id="glitchScramble" data-text="DISRUPTION">DISRUPTION</div>
+            <button class="replay-btn" data-target="glitch">Replay</button>
+        </div>
+    </section>
+
+    <!-- Typewriter Scramble -->
+    <section class="section" id="typewriterSection">
+        <div class="section-header">
+            <h2>Typewriter Scramble</h2>
+            <p>Characters appear with typing cursor</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text scramble-typewriter" id="typewriterScramble"></div>
+            <button class="replay-btn" data-target="typewriter">Replay</button>
+        </div>
+    </section>
+
+    <!-- Matrix Decode -->
+    <section class="section" id="matrixSection">
+        <div class="section-header">
+            <h2>Matrix Decode</h2>
+            <p>Cascading character reveal like The Matrix</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text scramble-matrix" id="matrixScramble">WAKE UP NEO</div>
+            <button class="replay-btn" data-target="matrix">Replay</button>
+        </div>
+    </section>
+
+    <!-- Word Cycle -->
+    <section class="section" id="cycleSection">
+        <div class="section-header">
+            <h2>Word Cycle</h2>
+            <p>Scramble between multiple words</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text">
+                We build <span class="word-cycle highlight" id="wordCycle">websites</span>
+            </div>
+            <p class="scramble-subtitle">Cycles through: websites, apps, brands, experiences</p>
+        </div>
+    </section>
+
+    <!-- Headline with subtitle -->
+    <section class="section" id="headlineSection">
+        <div class="section-header">
+            <h2>Full Headline</h2>
+            <p>Scramble headline followed by fade-in subtitle</p>
+        </div>
+        <div class="demo-container">
+            <div class="scramble-text" id="headlineScramble">THE FUTURE IS NOW</div>
+            <div class="scramble-subtitle" id="headlineSubtitle" style="opacity: 0;">Building tomorrow's technology today</div>
+            <button class="replay-btn" data-target="headline">Replay</button>
+        </div>
+    </section>
+
+    <!-- Code reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Text Scramble Class</span>
+<span class="keyword">class</span> <span class="function">TextScramble</span> {
+    <span class="function">constructor</span>(element, options = {}) {
+        <span class="keyword">this</span>.element = element;
+        <span class="keyword">this</span>.chars = options.<span class="property">chars</span> || <span class="string">'!<>-_\\/[]{}—=+*^?#________'</span>;
+        <span class="keyword">this</span>.duration = options.<span class="property">duration</span> || <span class="number">1500</span>;
+        <span class="keyword">this</span>.frameRate = options.<span class="property">frameRate</span> || <span class="number">30</span>;
+    }
+
+    <span class="function">scramble</span>(newText) {
+        <span class="keyword">const</span> oldText = <span class="keyword">this</span>.element.<span class="property">innerText</span>;
+        <span class="keyword">const</span> length = Math.<span class="function">max</span>(oldText.<span class="property">length</span>, newText.<span class="property">length</span>);
+        <span class="keyword">const</span> frames = <span class="keyword">this</span>.duration / (<span class="number">1000</span> / <span class="keyword">this</span>.frameRate);
+
+        <span class="keyword">let</span> frame = <span class="number">0</span>;
+
+        <span class="keyword">const</span> <span class="function">update</span> = () => {
+            <span class="keyword">let</span> output = <span class="string">''</span>;
+            <span class="keyword">const</span> progress = frame / frames;
+
+            <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < length; i++) {
+                <span class="keyword">const</span> charProgress = progress * length;
+
+                <span class="keyword">if</span> (i < charProgress) {
+                    <span class="comment">// Character resolved</span>
+                    output += newText[i] || <span class="string">''</span>;
+                } <span class="keyword">else</span> {
+                    <span class="comment">// Still scrambling</span>
+                    output += <span class="keyword">this</span>.<span class="function">randomChar</span>();
+                }
+            }
+
+            <span class="keyword">this</span>.element.<span class="property">innerText</span> = output;
+            frame++;
+
+            <span class="keyword">if</span> (frame < frames) {
+                <span class="function">requestAnimationFrame</span>(update);
+            }
+        };
+
+        <span class="function">update</span>();
+    }
+
+    <span class="function">randomChar</span>() {
+        <span class="keyword">return</span> <span class="keyword">this</span>.chars[Math.<span class="function">floor</span>(Math.<span class="function">random</span>() * <span class="keyword">this</span>.chars.<span class="property">length</span>)];
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Usage with ScrollTrigger</span>
+<span class="keyword">const</span> scrambler = <span class="keyword">new</span> <span class="function">TextScramble</span>(element, {
+    <span class="property">chars</span>: <span class="string">'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'</span>,
+    <span class="property">duration</span>: <span class="number">1200</span>
+});
+
+ScrollTrigger.<span class="function">create</span>({
+    <span class="property">trigger</span>: element,
+    <span class="property">start</span>: <span class="string">'top 70%'</span>,
+    <span class="property">onEnter</span>: () => scrambler.<span class="function">scramble</span>(<span class="string">'INNOVATION'</span>),
+    <span class="property">once</span>: <span class="keyword">true</span>
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Word cycling effect</span>
+<span class="keyword">const</span> words = [<span class="string">'websites'</span>, <span class="string">'apps'</span>, <span class="string">'brands'</span>, <span class="string">'experiences'</span>];
+<span class="keyword">let</span> currentIndex = <span class="number">0</span>;
+
+<span class="keyword">function</span> <span class="function">cycleWords</span>() {
+    currentIndex = (currentIndex + <span class="number">1</span>) % words.<span class="property">length</span>;
+    scrambler.<span class="function">scramble</span>(words[currentIndex]);
+}
+
+<span class="function">setInterval</span>(cycleWords, <span class="number">3000</span>);</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// GSAP-based scramble with timeline</span>
+<span class="keyword">function</span> <span class="function">gsapScramble</span>(element, text, duration = <span class="number">1</span>) {
+    <span class="keyword">const</span> chars = <span class="string">'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</span>;
+
+    <span class="keyword">return</span> gsap.<span class="function">to</span>({}, {
+        <span class="property">duration</span>: duration,
+        <span class="property">ease</span>: <span class="string">'none'</span>,
+        <span class="property">onUpdate</span>: <span class="keyword">function</span>() {
+            <span class="keyword">const</span> progress = <span class="keyword">this</span>.<span class="function">progress</span>();
+            <span class="keyword">let</span> output = <span class="string">''</span>;
+
+            <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < text.<span class="property">length</span>; i++) {
+                <span class="keyword">if</span> (i < progress * text.<span class="property">length</span>) {
+                    output += text[i];
+                } <span class="keyword">else</span> {
+                    output += chars[Math.<span class="function">floor</span>(Math.<span class="function">random</span>() * chars.<span class="property">length</span>)];
+                }
+            }
+
+            element.<span class="property">innerText</span> = output;
+        }
+    });
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // TEXT SCRAMBLE CLASS
+        // =====================
+
+        class TextScramble {
+            constructor(element, options = {}) {
+                this.element = element;
+                this.chars = options.chars || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+                this.duration = options.duration || 1500;
+                this.frameRate = options.frameRate || 30;
+                this.originalText = element.innerText;
+            }
+
+            scramble(newText, callback) {
+                const length = Math.max(this.originalText.length, newText.length);
+                const frames = this.duration / (1000 / this.frameRate);
+                let frame = 0;
+
+                const update = () => {
+                    let output = '';
+                    const progress = frame / frames;
+
+                    for (let i = 0; i < length; i++) {
+                        if (i < progress * length) {
+                            output += newText[i] || '';
+                        } else if (newText[i] === ' ') {
+                            output += ' ';
+                        } else {
+                            output += this.randomChar();
+                        }
+                    }
+
+                    this.element.innerText = output;
+                    frame++;
+
+                    if (frame <= frames) {
+                        requestAnimationFrame(update);
+                    } else if (callback) {
+                        callback();
+                    }
+                };
+
+                update();
+            }
+
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+
+            reset() {
+                this.element.innerText = '';
+            }
+        }
+
+        // =====================
+        // BASIC SCRAMBLE
+        // =====================
+
+        const basicEl = document.getElementById('basicScramble');
+        const basicScrambler = new TextScramble(basicEl);
+        basicScrambler.reset();
+
+        ScrollTrigger.create({
+            trigger: '#basicSection',
+            start: 'top 70%',
+            onEnter: () => basicScrambler.scramble('INNOVATION'),
+            once: true
+        });
+
+        // =====================
+        // GLITCH SCRAMBLE
+        // =====================
+
+        const glitchEl = document.getElementById('glitchScramble');
+        const glitchScrambler = new TextScramble(glitchEl, {
+            chars: '!<>-_\\/[]{}—=+*^?#',
+            duration: 2000
+        });
+        glitchScrambler.reset();
+
+        ScrollTrigger.create({
+            trigger: '#glitchSection',
+            start: 'top 70%',
+            onEnter: () => {
+                glitchEl.classList.add('glitching');
+                glitchScrambler.scramble('DISRUPTION', () => {
+                    glitchEl.classList.remove('glitching');
+                });
+            },
+            once: true
+        });
+
+        // =====================
+        // TYPEWRITER SCRAMBLE
+        // =====================
+
+        const typewriterEl = document.getElementById('typewriterScramble');
+        const typewriterText = 'HELLO WORLD';
+
+        function playTypewriter() {
+            typewriterEl.innerText = '';
+            typewriterEl.classList.add('typing');
+
+            let i = 0;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            function type() {
+                if (i < typewriterText.length) {
+                    // Scramble current character a few times
+                    let scrambleCount = 0;
+                    const scrambleInterval = setInterval(() => {
+                        if (typewriterText[i] === ' ') {
+                            typewriterEl.innerText += ' ';
+                            clearInterval(scrambleInterval);
+                            i++;
+                            setTimeout(type, 50);
+                        } else if (scrambleCount < 3) {
+                            typewriterEl.innerText = typewriterText.substring(0, i) +
+                                chars[Math.floor(Math.random() * chars.length)];
+                            scrambleCount++;
+                        } else {
+                            typewriterEl.innerText = typewriterText.substring(0, i + 1);
+                            clearInterval(scrambleInterval);
+                            i++;
+                            setTimeout(type, 80);
+                        }
+                    }, 40);
+                } else {
+                    setTimeout(() => {
+                        typewriterEl.classList.remove('typing');
+                    }, 500);
+                }
+            }
+
+            type();
+        }
+
+        ScrollTrigger.create({
+            trigger: '#typewriterSection',
+            start: 'top 70%',
+            onEnter: playTypewriter,
+            once: true
+        });
+
+        // =====================
+        // MATRIX DECODE
+        // =====================
+
+        const matrixEl = document.getElementById('matrixScramble');
+        const matrixText = 'WAKE UP NEO';
+        matrixEl.innerText = '';
+
+        function playMatrix() {
+            const chars = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789';
+            const resolved = new Array(matrixText.length).fill(false);
+
+            function update() {
+                let output = '';
+                let allResolved = true;
+
+                for (let i = 0; i < matrixText.length; i++) {
+                    if (resolved[i]) {
+                        output += matrixText[i];
+                    } else if (matrixText[i] === ' ') {
+                        output += ' ';
+                        resolved[i] = true;
+                    } else {
+                        output += chars[Math.floor(Math.random() * chars.length)];
+                        allResolved = false;
+
+                        // Random chance to resolve
+                        if (Math.random() < 0.05) {
+                            resolved[i] = true;
+                        }
+                    }
+                }
+
+                matrixEl.innerText = output;
+
+                if (!allResolved) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            update();
+        }
+
+        ScrollTrigger.create({
+            trigger: '#matrixSection',
+            start: 'top 70%',
+            onEnter: playMatrix,
+            once: true
+        });
+
+        // =====================
+        // WORD CYCLE
+        // =====================
+
+        const wordCycleEl = document.getElementById('wordCycle');
+        const words = ['websites', 'apps', 'brands', 'experiences'];
+        let currentWordIndex = 0;
+        const wordScrambler = new TextScramble(wordCycleEl, { duration: 800 });
+
+        function cycleWords() {
+            currentWordIndex = (currentWordIndex + 1) % words.length;
+            wordScrambler.scramble(words[currentWordIndex]);
+        }
+
+        let cycleInterval;
+        ScrollTrigger.create({
+            trigger: '#cycleSection',
+            start: 'top 70%',
+            onEnter: () => {
+                cycleInterval = setInterval(cycleWords, 2500);
+            },
+            once: true
+        });
+
+        // =====================
+        // HEADLINE + SUBTITLE
+        // =====================
+
+        const headlineEl = document.getElementById('headlineScramble');
+        const subtitleEl = document.getElementById('headlineSubtitle');
+        const headlineScrambler = new TextScramble(headlineEl, { duration: 1200 });
+        headlineScrambler.reset();
+
+        function playHeadline() {
+            gsap.set(subtitleEl, { opacity: 0 });
+            headlineScrambler.scramble('THE FUTURE IS NOW', () => {
+                gsap.to(subtitleEl, {
+                    opacity: 0.7,
+                    duration: 0.8,
+                    ease: 'power2.out'
+                });
+            });
+        }
+
+        ScrollTrigger.create({
+            trigger: '#headlineSection',
+            start: 'top 70%',
+            onEnter: playHeadline,
+            once: true
+        });
+
+        // =====================
+        // REPLAY BUTTONS
+        // =====================
+
+        document.querySelectorAll('.replay-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+
+                switch(target) {
+                    case 'basic':
+                        basicScrambler.reset();
+                        setTimeout(() => basicScrambler.scramble('INNOVATION'), 100);
+                        break;
+                    case 'glitch':
+                        glitchScrambler.reset();
+                        setTimeout(() => {
+                            glitchEl.classList.add('glitching');
+                            glitchScrambler.scramble('DISRUPTION', () => {
+                                glitchEl.classList.remove('glitching');
+                            });
+                        }, 100);
+                        break;
+                    case 'typewriter':
+                        playTypewriter();
+                        break;
+                    case 'matrix':
+                        matrixEl.innerText = '';
+                        setTimeout(playMatrix, 100);
+                        break;
+                    case 'headline':
+                        headlineScrambler.reset();
+                        setTimeout(playHeadline, 100);
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

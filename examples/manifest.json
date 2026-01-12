@@ -1,6 +1,6 @@
 {
-  "generated": "2026-01-06T10:44:31.594Z",
-  "totalExamples": 24,
+  "generated": "2026-01-12T15:07:04.997Z",
+  "totalExamples": 30,
   "categories": [
     {
       "id": "cards",
@@ -10,6 +10,11 @@
         {
           "file": "cards/3d-flip-cards.html",
           "title": "3D Flip Cards",
+          "description": ""
+        },
+        {
+          "file": "cards/bento-grid.html",
+          "title": "Bento Grid Animations",
           "description": ""
         },
         {
@@ -48,6 +53,11 @@
           "file": "hero/hero-text-entrance.html",
           "title": "Hero Text Entrance",
           "description": ""
+        },
+        {
+          "file": "hero/parallax-hero-layers.html",
+          "title": "Parallax Hero Layers",
+          "description": "Create stunning digital experiences with our powerful platform. From concept to launch in record time."
         }
       ]
     },
@@ -106,6 +116,11 @@
       "icon": "↕",
       "examples": [
         {
+          "file": "scroll/3d-device-scroll.html",
+          "title": "3D Device Scroll",
+          "description": ""
+        },
+        {
           "file": "scroll/horizontal-gallery.html",
           "title": "Horizontal Scroll Gallery",
           "description": ""
@@ -129,6 +144,16 @@
           "file": "scroll/scroll-reveals.html",
           "title": "Scroll-Triggered Reveals",
           "description": ""
+        },
+        {
+          "file": "scroll/slide-out-reveals.html",
+          "title": "Slide-Out Reveals",
+          "description": ""
+        },
+        {
+          "file": "scroll/smooth-section-transitions.html",
+          "title": "Smooth Section Transitions",
+          "description": ""
         }
       ]
     },
@@ -150,6 +175,11 @@
         {
           "file": "text/text-marquee.html",
           "title": "Text Marquee",
+          "description": ""
+        },
+        {
+          "file": "text/text-scramble.html",
+          "title": "Text Scramble Effects",
           "description": ""
         },
         {

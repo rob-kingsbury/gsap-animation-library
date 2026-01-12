@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bento Grid Animations | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           BENTO GRID ANIMATIONS
+           Modern bento-style grid layouts with
+           staggered reveal animations - inspired by kitpro
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section */
+        .section {
+            padding: 100px 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Bento Grid Base */
+        .bento-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        /* Layout 1: Classic Bento */
+        .bento-classic {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 300px);
+        }
+
+        .bento-classic .bento-item:nth-child(1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-classic .bento-item:nth-child(2) {
+            grid-column: span 2;
+        }
+
+        .bento-classic .bento-item:nth-child(3),
+        .bento-classic .bento-item:nth-child(4) {
+            grid-column: span 1;
+        }
+
+        /* Layout 2: Feature Focus */
+        .bento-feature {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 200px);
+        }
+
+        .bento-feature .bento-item:nth-child(1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-feature .bento-item:nth-child(2) {
+            grid-row: span 2;
+        }
+
+        .bento-feature .bento-item:nth-child(3),
+        .bento-feature .bento-item:nth-child(4),
+        .bento-feature .bento-item:nth-child(5) {
+            grid-column: span 1;
+        }
+
+        /* Layout 3: Masonry-ish */
+        .bento-masonry {
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 150px;
+        }
+
+        .bento-masonry .bento-item:nth-child(1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-masonry .bento-item:nth-child(2) {
+            grid-row: span 3;
+        }
+
+        .bento-masonry .bento-item:nth-child(3) {
+            grid-row: span 2;
+        }
+
+        .bento-masonry .bento-item:nth-child(4) {
+            grid-column: span 2;
+        }
+
+        .bento-masonry .bento-item:nth-child(5) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        /* Bento Item Styles */
+        .bento-item {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+        }
+
+        .bento-item--accent {
+            background: linear-gradient(135deg, #c9a227 0%, #a88420 100%);
+            color: #0a0a0a;
+        }
+
+        .bento-item--image {
+            padding: 0;
+        }
+
+        .bento-item--image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bento-content {
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bento-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bento-item--accent .bento-icon {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .bento-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bento-content p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+
+        .bento-item--accent .bento-content p {
+            opacity: 0.8;
+        }
+
+        .bento-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .bento-stat-number {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .bento-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Interactive Bento */
+        .bento-interactive .bento-item {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .bento-interactive .bento-item:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        /* Animation variants */
+        .bento-scale-up .bento-item {
+            transform: scale(0.8);
+        }
+
+        .bento-rotate .bento-item {
+            transform: translateY(40px) rotate(-5deg);
+        }
+
+        .bento-slide-left .bento-item:nth-child(odd) {
+            transform: translateX(-60px);
+        }
+
+        .bento-slide-left .bento-item:nth-child(even) {
+            transform: translateX(60px);
+        }
+
+        /* Glassmorphism variant */
+        .bento-glass .bento-item {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Code reference */
+        .code-reference {
+            background: #111;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        @media (max-width: 900px) {
+            .bento-classic,
+            .bento-feature,
+            .bento-masonry {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bento-classic .bento-item:nth-child(1),
+            .bento-feature .bento-item:nth-child(1),
+            .bento-masonry .bento-item:nth-child(1) {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+
+            .bento-classic .bento-item:nth-child(2),
+            .bento-masonry .bento-item:nth-child(4),
+            .bento-masonry .bento-item:nth-child(5) {
+                grid-column: span 2;
+            }
+
+            .bento-feature .bento-item:nth-child(2),
+            .bento-masonry .bento-item:nth-child(2),
+            .bento-masonry .bento-item:nth-child(3) {
+                grid-row: span 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bento-classic,
+            .bento-feature,
+            .bento-masonry {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-classic .bento-item,
+            .bento-feature .bento-item,
+            .bento-masonry .bento-item {
+                grid-column: span 1 !important;
+                grid-row: span 1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Bento Grid <span>Animations</span></h1>
+            <p>Modern asymmetric grid layouts with staggered reveal animations. Perfect for feature showcases and dashboards.</p>
+        </div>
+    </section>
+
+    <!-- Classic Bento Layout -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Classic Bento</h2>
+            <p>Staggered scale-up reveal from grid position</p>
+        </div>
+
+        <div class="bento-grid bento-classic" id="bentoClassic">
+            <div class="bento-item bento-item--image">
+                <img src="https://picsum.photos/800/600?random=70" alt="Feature">
+            </div>
+            <div class="bento-item bento-item--accent">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">1</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Optimized performance ensures blazing fast load times across all devices.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-stat">
+                    <div class="bento-stat-number" data-target="99">0</div>
+                    <div class="bento-stat-label">Uptime %</div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-stat">
+                    <div class="bento-stat-number" data-target="50">0</div>
+                    <div class="bento-stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Focus Layout -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Feature Focus</h2>
+            <p>Alternating slide directions for dynamic feel</p>
+        </div>
+
+        <div class="bento-grid bento-feature bento-slide-left" id="bentoFeature">
+            <div class="bento-item bento-item--accent">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">2</div>
+                        <h3>Powerful Analytics</h3>
+                        <p>Get deep insights into your data with real-time dashboards and custom reports. Track every metric that matters.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item bento-item--image">
+                <img src="https://picsum.photos/400/400?random=71" alt="Analytics">
+            </div>
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">3</div>
+                        <h3>Secure</h3>
+                        <p>Enterprise-grade security built in.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">4</div>
+                        <h3>Scalable</h3>
+                        <p>Grows with your business.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">5</div>
+                        <h3>24/7 Support</h3>
+                        <p>Always here to help.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Masonry Layout -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Masonry Style</h2>
+            <p>Rotate entrance for playful effect</p>
+        </div>
+
+        <div class="bento-grid bento-masonry bento-rotate" id="bentoMasonry">
+            <div class="bento-item bento-item--image">
+                <img src="https://picsum.photos/600/400?random=72" alt="Dashboard">
+            </div>
+            <div class="bento-item bento-item--accent">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">6</div>
+                        <h3>Automation</h3>
+                        <p>Set it and forget it. Our automation tools handle the repetitive work so you can focus on what matters.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-stat">
+                    <div class="bento-stat-number">10k+</div>
+                    <div class="bento-stat-label">Users</div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">7</div>
+                        <h3>Integrations</h3>
+                        <p>Connect with 100+ tools.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item bento-item--image">
+                <img src="https://picsum.photos/600/300?random=73" alt="Integrations">
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Glass -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Glass Interactive</h2>
+            <p>Glassmorphism with hover effects</p>
+        </div>
+
+        <div class="bento-grid bento-classic bento-glass bento-interactive bento-scale-up" id="bentoGlass">
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">8</div>
+                        <h3>Beautiful Design</h3>
+                        <p>Every pixel crafted with care. Modern aesthetics meet functional design.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-content">
+                    <div>
+                        <div class="bento-icon">9</div>
+                        <h3>Easy Setup</h3>
+                        <p>Get started in minutes, not hours.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-stat">
+                    <div class="bento-stat-number" data-target="500">0</div>
+                    <div class="bento-stat-label">Companies</div>
+                </div>
+            </div>
+            <div class="bento-item">
+                <div class="bento-stat">
+                    <div class="bento-stat-number">4.9</div>
+                    <div class="bento-stat-label">Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Basic bento grid stagger reveal</span>
+gsap.<span class="function">to</span>(<span class="string">".bento-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">y</span>: <span class="number">0</span>,
+    <span class="property">scale</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">0.8</span>,
+        <span class="property">grid</span>: <span class="string">"auto"</span>,
+        <span class="property">from</span>: <span class="string">"start"</span>  <span class="comment">// or "center", "edges", "random"</span>
+    },
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".bento-grid"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Alternating slide directions</span>
+gsap.<span class="function">to</span>(<span class="string">".bento-slide-left .bento-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">x</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: <span class="number">0.1</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".bento-slide-left"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Rotation reveal</span>
+gsap.<span class="function">to</span>(<span class="string">".bento-rotate .bento-item"</span>, {
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">y</span>: <span class="number">0</span>,
+    <span class="property">rotation</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">0.7</span>,
+    <span class="property">stagger</span>: {
+        <span class="property">amount</span>: <span class="number">0.6</span>,
+        <span class="property">from</span>: <span class="string">"random"</span>
+    },
+    <span class="property">ease</span>: <span class="string">"back.out(1.2)"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".bento-rotate"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// CSS Grid for Bento Layout</span>
+.<span class="property">bento-grid</span> {
+    <span class="property">display</span>: grid;
+    <span class="property">gap</span>: <span class="number">1.5rem</span>;
+}
+
+.<span class="property">bento-classic</span> {
+    <span class="property">grid-template-columns</span>: repeat(<span class="number">4</span>, <span class="number">1fr</span>);
+    <span class="property">grid-template-rows</span>: repeat(<span class="number">2</span>, <span class="number">300px</span>);
+}
+
+<span class="comment">/* First item spans 2x2 */</span>
+.<span class="property">bento-classic</span> .bento-item:<span class="function">nth-child</span>(<span class="number">1</span>) {
+    <span class="property">grid-column</span>: span <span class="number">2</span>;
+    <span class="property">grid-row</span>: span <span class="number">2</span>;
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // CLASSIC BENTO
+        // =====================
+
+        gsap.to("#bentoClassic .bento-item", {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: {
+                amount: 0.8,
+                grid: "auto",
+                from: "start"
+            },
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#bentoClassic",
+                start: "top 70%"
+            }
+        });
+
+        // Counter animation for classic
+        document.querySelectorAll("#bentoClassic .bento-stat-number[data-target]").forEach(counter => {
+            const target = +counter.dataset.target;
+            gsap.to(counter, {
+                innerText: target,
+                duration: 2,
+                ease: "power2.out",
+                snap: { innerText: 1 },
+                scrollTrigger: {
+                    trigger: counter,
+                    start: "top 80%"
+                },
+                onUpdate: function() {
+                    const current = Math.round(this.targets()[0].innerText);
+                    if (target === 99) {
+                        this.targets()[0].innerText = current + '%';
+                    } else {
+                        this.targets()[0].innerText = current + '+';
+                    }
+                }
+            });
+        });
+
+        // =====================
+        // FEATURE FOCUS (Slide Left/Right)
+        // =====================
+
+        gsap.to("#bentoFeature .bento-item", {
+            opacity: 1,
+            x: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#bentoFeature",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // MASONRY (Rotation)
+        // =====================
+
+        gsap.to("#bentoMasonry .bento-item", {
+            opacity: 1,
+            y: 0,
+            rotation: 0,
+            duration: 0.7,
+            stagger: {
+                amount: 0.6,
+                from: "random"
+            },
+            ease: "back.out(1.2)",
+            scrollTrigger: {
+                trigger: "#bentoMasonry",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // GLASS (Scale Up)
+        // =====================
+
+        gsap.to("#bentoGlass .bento-item", {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: {
+                amount: 0.6,
+                grid: "auto",
+                from: "center"
+            },
+            ease: "back.out(1.4)",
+            scrollTrigger: {
+                trigger: "#bentoGlass",
+                start: "top 70%"
+            }
+        });
+
+        // Counter animation for glass
+        document.querySelectorAll("#bentoGlass .bento-stat-number[data-target]").forEach(counter => {
+            const target = +counter.dataset.target;
+            gsap.to(counter, {
+                innerText: target,
+                duration: 2,
+                ease: "power2.out",
+                snap: { innerText: 1 },
+                scrollTrigger: {
+                    trigger: counter,
+                    start: "top 80%"
+                },
+                onUpdate: function() {
+                    const current = Math.round(this.targets()[0].innerText);
+                    this.targets()[0].innerText = current + '+';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

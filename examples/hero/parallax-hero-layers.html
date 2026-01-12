@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax Hero Layers | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           PARALLAX HERO LAYERS
+           Multi-layer parallax effect with depth
+           inspired by heliorender
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero section */
+        .parallax-hero {
+            height: 150vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Sticky content container */
+        .parallax-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Background layers */
+        .parallax-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Gradient backgrounds */
+        .layer-bg-1 {
+            background: radial-gradient(ellipse at 30% 40%, rgba(201, 162, 39, 0.15) 0%, transparent 50%);
+        }
+
+        .layer-bg-2 {
+            background: radial-gradient(ellipse at 70% 60%, rgba(100, 100, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .layer-bg-3 {
+            background: radial-gradient(ellipse at 50% 80%, rgba(255, 100, 100, 0.08) 0%, transparent 50%);
+        }
+
+        /* Floating shapes */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.2) 0%, transparent 70%);
+            top: 20%;
+            left: 10%;
+        }
+
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(100, 150, 255, 0.15) 0%, transparent 70%);
+            top: 60%;
+            right: 15%;
+        }
+
+        .shape-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(255, 150, 100, 0.1) 0%, transparent 70%);
+            bottom: 10%;
+            left: 30%;
+        }
+
+        .shape-4 {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.25) 0%, transparent 70%);
+            top: 30%;
+            right: 25%;
+        }
+
+        /* Grid overlay */
+        .grid-layer {
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0;
+        }
+
+        /* Hero content */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .hero-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #c9a227;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-title .line-inner {
+            display: block;
+            transform: translateY(100%);
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, #c9a227 0%, #f0d060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            opacity: 0;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            color: rgba(245, 245, 240, 0.7);
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-btn--primary {
+            background: #c9a227;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+        }
+
+        .hero-btn--secondary {
+            background: transparent;
+            color: #f5f5f0;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.5;
+        }
+
+        .scroll-hint .line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, #c9a227, transparent);
+        }
+
+        /* Following sections */
+        .section {
+            min-height: 100vh;
+            padding: 100px 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section:nth-child(even) {
+            background: #111;
+        }
+
+        .section-content {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .section-content h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .section-content h2 span {
+            color: #c9a227;
+        }
+
+        .section-content p {
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        /* Variant: Image parallax */
+        .image-parallax-hero {
+            height: 150vh;
+            position: relative;
+        }
+
+        .image-parallax-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .image-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .image-layer img {
+            width: 100%;
+            height: 120%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.8) 100%);
+        }
+
+        .image-hero-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Code reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <!-- Parallax Hero with Shapes -->
+    <section class="parallax-hero" id="hero1">
+        <div class="parallax-container">
+            <!-- Background layers -->
+            <div class="parallax-layer layer-bg-1" data-speed="0.1"></div>
+            <div class="parallax-layer layer-bg-2" data-speed="0.15"></div>
+            <div class="parallax-layer layer-bg-3" data-speed="0.2"></div>
+
+            <!-- Grid -->
+            <div class="parallax-layer grid-layer" data-speed="0.05"></div>
+
+            <!-- Floating shapes -->
+            <div class="floating-shape shape-1" data-speed="0.3"></div>
+            <div class="floating-shape shape-2" data-speed="0.4"></div>
+            <div class="floating-shape shape-3" data-speed="0.2"></div>
+            <div class="floating-shape shape-4" data-speed="0.5"></div>
+
+            <!-- Content -->
+            <div class="parallax-layer">
+                <div class="hero-content">
+                    <p class="hero-label">Next Generation Platform</p>
+                    <h1 class="hero-title">
+                        <span class="line"><span class="line-inner">Build the</span></span>
+                        <span class="line"><span class="line-inner"><span class="highlight">future</span></span></span>
+                        <span class="line"><span class="line-inner">of the web</span></span>
+                    </h1>
+                    <p class="hero-description">Create stunning digital experiences with our powerful platform. From concept to launch in record time.</p>
+                    <div class="hero-cta">
+                        <button class="hero-btn hero-btn--primary">Get Started</button>
+                        <button class="hero-btn hero-btn--secondary">Watch Demo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll hint -->
+            <div class="scroll-hint">
+                <span>Scroll</span>
+                <div class="line"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content section -->
+    <section class="section">
+        <div class="section-content">
+            <h2>Multi-layer <span>depth</span></h2>
+            <p>The parallax effect creates a sense of depth by moving background elements at different speeds. Each layer responds to scroll position, creating an immersive 3D-like experience.</p>
+        </div>
+    </section>
+
+    <!-- Image Parallax Hero -->
+    <section class="image-parallax-hero" id="hero2">
+        <div class="image-parallax-container">
+            <div class="image-layer" id="imageLayer">
+                <img src="https://picsum.photos/1920/1200?random=60" alt="Hero background">
+            </div>
+            <div class="image-overlay"></div>
+            <div class="image-hero-content">
+                <div class="hero-content">
+                    <h1 class="hero-title" style="color: #fff;">
+                        <span class="line"><span class="line-inner image-line">Immersive</span></span>
+                        <span class="line"><span class="line-inner image-line">experiences</span></span>
+                    </h1>
+                    <p class="hero-description image-desc" style="color: rgba(255,255,255,0.8);">Background images that move at different rates create a cinematic scroll effect.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content section -->
+    <section class="section">
+        <div class="section-content">
+            <h2>Image <span>parallax</span></h2>
+            <p>Apply the parallax effect to background images for a dramatic, cinematic feel. The image shifts as you scroll, creating depth and visual interest.</p>
+        </div>
+    </section>
+
+    <!-- Code reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Multi-layer parallax with different speeds</span>
+gsap.utils.<span class="function">toArray</span>(<span class="string">'[data-speed]'</span>).<span class="function">forEach</span>(layer => {
+    <span class="keyword">const</span> speed = layer.dataset.<span class="property">speed</span>;
+
+    gsap.<span class="function">to</span>(layer, {
+        <span class="property">y</span>: () => window.<span class="property">innerHeight</span> * speed * <span class="number">-1</span>,
+        <span class="property">ease</span>: <span class="string">'none'</span>,
+        <span class="property">scrollTrigger</span>: {
+            <span class="property">trigger</span>: <span class="string">'.parallax-hero'</span>,
+            <span class="property">start</span>: <span class="string">'top top'</span>,
+            <span class="property">end</span>: <span class="string">'bottom top'</span>,
+            <span class="property">scrub</span>: <span class="keyword">true</span>
+        }
+    });
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Image parallax effect</span>
+gsap.<span class="function">to</span>(<span class="string">'.image-layer img'</span>, {
+    <span class="property">y</span>: <span class="string">'-20%'</span>,  <span class="comment">// Move up as we scroll down</span>
+    <span class="property">ease</span>: <span class="string">'none'</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">'.image-parallax-hero'</span>,
+        <span class="property">start</span>: <span class="string">'top top'</span>,
+        <span class="property">end</span>: <span class="string">'bottom top'</span>,
+        <span class="property">scrub</span>: <span class="keyword">true</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Hero content entrance animation</span>
+<span class="keyword">const</span> heroTl = gsap.<span class="function">timeline</span>({ <span class="property">delay</span>: <span class="number">0.3</span> });
+
+heroTl
+    <span class="comment">// Grid fades in</span>
+    .<span class="function">to</span>(<span class="string">'.grid-layer'</span>, { <span class="property">opacity</span>: <span class="number">1</span>, <span class="property">duration</span>: <span class="number">1</span> })
+
+    <span class="comment">// Label</span>
+    .<span class="function">to</span>(<span class="string">'.hero-label'</span>, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">y</span>: <span class="number">0</span>,
+        <span class="property">duration</span>: <span class="number">0.6</span>
+    }, <span class="number">0</span>)
+
+    <span class="comment">// Title lines</span>
+    .<span class="function">to</span>(<span class="string">'.line-inner'</span>, {
+        <span class="property">y</span>: <span class="number">0</span>,
+        <span class="property">stagger</span>: <span class="number">0.12</span>,
+        <span class="property">duration</span>: <span class="number">0.9</span>,
+        <span class="property">ease</span>: <span class="string">'power4.out'</span>
+    }, <span class="number">0.2</span>)
+
+    <span class="comment">// Description</span>
+    .<span class="function">to</span>(<span class="string">'.hero-description'</span>, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">duration</span>: <span class="number">0.8</span>
+    }, <span class="string">'-=0.4'</span>)
+
+    <span class="comment">// Buttons</span>
+    .<span class="function">to</span>(<span class="string">'.hero-btn'</span>, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">y</span>: <span class="number">0</span>,
+        <span class="property">stagger</span>: <span class="number">0.1</span>,
+        <span class="property">duration</span>: <span class="number">0.5</span>
+    }, <span class="string">'-=0.3'</span>)
+
+    <span class="comment">// Scroll hint</span>
+    .<span class="function">to</span>(<span class="string">'.scroll-hint'</span>, {
+        <span class="property">opacity</span>: <span class="number">1</span>,
+        <span class="property">duration</span>: <span class="number">0.6</span>
+    }, <span class="string">'-=0.2'</span>);</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// CSS for sticky parallax container</span>
+.<span class="property">parallax-hero</span> {
+    <span class="property">height</span>: <span class="number">150vh</span>;  <span class="comment">/* Extra height for scroll distance */</span>
+    <span class="property">position</span>: relative;
+}
+
+.<span class="property">parallax-container</span> {
+    <span class="property">position</span>: sticky;
+    <span class="property">top</span>: <span class="number">0</span>;
+    <span class="property">height</span>: <span class="number">100vh</span>;
+    <span class="property">overflow</span>: hidden;
+}
+
+.<span class="property">parallax-layer</span> {
+    <span class="property">position</span>: absolute;
+    <span class="property">inset</span>: <span class="number">0</span>;
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // HERO 1: SHAPE PARALLAX
+        // =====================
+
+        // Entrance animation
+        const heroTl = gsap.timeline({ delay: 0.3 });
+
+        heroTl
+            // Grid
+            .to('.grid-layer', { opacity: 1, duration: 1 })
+            // Label
+            .to('.hero-label', { opacity: 1, y: 0, duration: 0.6 }, 0)
+            // Title lines
+            .to('#hero1 .line-inner', {
+                y: 0,
+                stagger: 0.12,
+                duration: 0.9,
+                ease: 'power4.out'
+            }, 0.2)
+            // Description
+            .to('#hero1 .hero-description', { opacity: 1, duration: 0.8 }, '-=0.4')
+            // Buttons
+            .to('#hero1 .hero-btn', {
+                opacity: 1,
+                y: 0,
+                stagger: 0.1,
+                duration: 0.5
+            }, '-=0.3')
+            // Scroll hint
+            .to('.scroll-hint', { opacity: 1, duration: 0.6 }, '-=0.2');
+
+        // Parallax on scroll
+        gsap.utils.toArray('[data-speed]').forEach(layer => {
+            const speed = parseFloat(layer.dataset.speed);
+
+            gsap.to(layer, {
+                y: () => window.innerHeight * speed * -1,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#hero1',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+
+        // Floating shapes subtle rotation
+        gsap.utils.toArray('.floating-shape').forEach((shape, i) => {
+            gsap.to(shape, {
+                rotation: i % 2 === 0 ? 15 : -15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#hero1',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+
+        // =====================
+        // HERO 2: IMAGE PARALLAX
+        // =====================
+
+        // Image parallax
+        gsap.to('#imageLayer img', {
+            y: '-20%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '#hero2',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+
+        // Content entrance
+        ScrollTrigger.create({
+            trigger: '#hero2',
+            start: 'top 60%',
+            onEnter: () => {
+                gsap.to('.image-line', {
+                    y: 0,
+                    stagger: 0.15,
+                    duration: 0.9,
+                    ease: 'power4.out'
+                });
+                gsap.to('.image-desc', {
+                    opacity: 1,
+                    duration: 0.8,
+                    delay: 0.4
+                });
+            },
+            once: true
+        });
+
+        // Set initial states for image hero
+        gsap.set('.image-line', { y: '100%' });
+        gsap.set('.image-desc', { opacity: 0 });
+    </script>
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide-Out Reveals | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           SLIDE-OUT REVEALS
+           Subtle horizontal reveal animations with
+           mask overlays - inspired by dappify
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Section base */
+        .section {
+            padding: 100px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.6;
+        }
+
+        /* Slide-out card */
+        .slide-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .slide-card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: #1a1a1a;
+        }
+
+        .slide-card-text {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide-card-text h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .slide-card-text p {
+            opacity: 0.7;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .slide-card-text a {
+            color: #c9a227;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .slide-card-text a:hover {
+            text-decoration: underline;
+        }
+
+        .slide-card-image {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            min-height: 300px;
+        }
+
+        /* Slide mask overlay */
+        .slide-mask {
+            position: absolute;
+            inset: 0;
+            background: #c9a227;
+            transform-origin: left center;
+        }
+
+        .slide-mask--right {
+            transform-origin: right center;
+        }
+
+        /* Reveal from left variant */
+        .slide-card.from-left .slide-card-content {
+            clip-path: inset(0 100% 0 0);
+        }
+
+        /* Reveal from right variant */
+        .slide-card.from-right .slide-card-content {
+            clip-path: inset(0 0 0 100%);
+        }
+
+        /* Reversed layout */
+        .slide-card.reversed .slide-card-content {
+            direction: rtl;
+        }
+
+        .slide-card.reversed .slide-card-content > * {
+            direction: ltr;
+        }
+
+        /* Text slide-out */
+        .text-slide-container {
+            margin-bottom: 4rem;
+        }
+
+        .text-slide {
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .text-slide-inner {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.2;
+            transform: translateX(-100%);
+        }
+
+        .text-slide-inner span {
+            color: #c9a227;
+        }
+
+        /* List slide-out */
+        .list-slide {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .list-slide-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            transform: translateX(-60px);
+            opacity: 0;
+        }
+
+        .list-slide-item.from-right {
+            transform: translateX(60px);
+        }
+
+        .list-slide-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #c9a227 0%, #a88420 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .list-slide-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-slide-content p {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        /* Image gallery slide-out */
+        .gallery-slide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .gallery-slide-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-slide-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.2);
+        }
+
+        .gallery-slide-mask {
+            position: absolute;
+            inset: 0;
+            background: #c9a227;
+        }
+
+        /* Stacked cards slide */
+        .stacked-slide {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stacked-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .stacked-card:nth-child(even) {
+            transform: translateX(100%);
+        }
+
+        .stacked-card-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #c9a227;
+            line-height: 1;
+        }
+
+        .stacked-card-content h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stacked-card-content p {
+            opacity: 0.6;
+            font-size: 0.95rem;
+        }
+
+        /* Code reference */
+        .code-reference {
+            background: #111;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        @media (max-width: 768px) {
+            .slide-card-content {
+                grid-template-columns: 1fr;
+            }
+
+            .list-slide {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-slide {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div>
+            <h1>Slide-Out <span>Reveals</span></h1>
+            <p>Subtle horizontal animations that reveal content with elegant mask transitions. Professional and restrained.</p>
+        </div>
+    </section>
+
+    <!-- Card slide reveals -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Card Reveals</h2>
+            <p>Content cards that slide in with mask overlays</p>
+        </div>
+
+        <!-- From left -->
+        <div class="slide-card from-left" id="card1">
+            <div class="slide-card-content">
+                <div class="slide-card-text">
+                    <h3>Seamless Integration</h3>
+                    <p>Connect your existing tools and workflows without disruption. Our platform adapts to how you work, not the other way around.</p>
+                    <a href="#">Learn more &rarr;</a>
+                </div>
+                <div class="slide-card-image">
+                    <img src="https://picsum.photos/600/400?random=40" alt="Integration">
+                </div>
+            </div>
+        </div>
+
+        <!-- From right, reversed layout -->
+        <div class="slide-card from-right reversed" id="card2">
+            <div class="slide-card-content">
+                <div class="slide-card-text">
+                    <h3>Real-time Collaboration</h3>
+                    <p>Work together with your team in real-time. See changes as they happen and stay in sync across all devices.</p>
+                    <a href="#">Learn more &rarr;</a>
+                </div>
+                <div class="slide-card-image">
+                    <img src="https://picsum.photos/600/400?random=41" alt="Collaboration">
+                </div>
+            </div>
+        </div>
+
+        <!-- With mask overlay -->
+        <div class="slide-card" id="card3">
+            <div class="slide-card-content">
+                <div class="slide-card-text">
+                    <h3>Advanced Analytics</h3>
+                    <p>Gain deep insights into your data with powerful analytics tools. Make informed decisions based on real metrics.</p>
+                    <a href="#">Learn more &rarr;</a>
+                </div>
+                <div class="slide-card-image">
+                    <img src="https://picsum.photos/600/400?random=42" alt="Analytics">
+                    <div class="slide-mask"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Text slide reveals -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Text Slide Reveals</h2>
+            <p>Headlines that slide in from the side</p>
+        </div>
+
+        <div class="text-slide-container" id="textSlides">
+            <div class="text-slide">
+                <div class="text-slide-inner">Build something</div>
+            </div>
+            <div class="text-slide">
+                <div class="text-slide-inner"><span>extraordinary</span></div>
+            </div>
+            <div class="text-slide">
+                <div class="text-slide-inner">today.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- List slide reveals -->
+    <section class="section">
+        <div class="section-header">
+            <h2>List Item Slides</h2>
+            <p>Feature lists that alternate slide directions</p>
+        </div>
+
+        <div class="list-slide" id="listSlide">
+            <div class="list-slide-item">
+                <div class="list-slide-icon">1</div>
+                <div class="list-slide-content">
+                    <h4>Lightning Fast</h4>
+                    <p>Optimized for speed and performance</p>
+                </div>
+            </div>
+            <div class="list-slide-item from-right">
+                <div class="list-slide-icon">2</div>
+                <div class="list-slide-content">
+                    <h4>Secure by Default</h4>
+                    <p>Enterprise-grade security built in</p>
+                </div>
+            </div>
+            <div class="list-slide-item">
+                <div class="list-slide-icon">3</div>
+                <div class="list-slide-content">
+                    <h4>Easy to Use</h4>
+                    <p>Intuitive interface for everyone</p>
+                </div>
+            </div>
+            <div class="list-slide-item from-right">
+                <div class="list-slide-icon">4</div>
+                <div class="list-slide-content">
+                    <h4>24/7 Support</h4>
+                    <p>Always here when you need us</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery slide reveals -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Gallery Mask Reveals</h2>
+            <p>Images revealed by sliding masks</p>
+        </div>
+
+        <div class="gallery-slide" id="gallerySlide">
+            <div class="gallery-slide-item">
+                <img src="https://picsum.photos/400/300?random=50" alt="Gallery 1">
+                <div class="gallery-slide-mask"></div>
+            </div>
+            <div class="gallery-slide-item">
+                <img src="https://picsum.photos/400/300?random=51" alt="Gallery 2">
+                <div class="gallery-slide-mask"></div>
+            </div>
+            <div class="gallery-slide-item">
+                <img src="https://picsum.photos/400/300?random=52" alt="Gallery 3">
+                <div class="gallery-slide-mask"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stacked alternating slides -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Alternating Stack</h2>
+            <p>Cards sliding from alternate sides</p>
+        </div>
+
+        <div class="stacked-slide" id="stackedSlide">
+            <div class="stacked-card">
+                <div class="stacked-card-number">01</div>
+                <div class="stacked-card-content">
+                    <h4>Discovery Phase</h4>
+                    <p>We learn about your business, goals, and target audience to create a tailored strategy.</p>
+                </div>
+            </div>
+            <div class="stacked-card">
+                <div class="stacked-card-number">02</div>
+                <div class="stacked-card-content">
+                    <h4>Design & Prototype</h4>
+                    <p>Our team creates beautiful designs and interactive prototypes for your approval.</p>
+                </div>
+            </div>
+            <div class="stacked-card">
+                <div class="stacked-card-number">03</div>
+                <div class="stacked-card-content">
+                    <h4>Development</h4>
+                    <p>We build your product using cutting-edge technologies and best practices.</p>
+                </div>
+            </div>
+            <div class="stacked-card">
+                <div class="stacked-card-number">04</div>
+                <div class="stacked-card-content">
+                    <h4>Launch & Support</h4>
+                    <p>We deploy your product and provide ongoing support to ensure success.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Clip-path slide reveal</span>
+gsap.<span class="function">to</span>(<span class="string">".slide-card.from-left .slide-card-content"</span>, {
+    <span class="property">clipPath</span>: <span class="string">"inset(0 0 0 0)"</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power4.inOut"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".slide-card"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Mask overlay reveal</span>
+<span class="keyword">const</span> tl = gsap.<span class="function">timeline</span>({
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".gallery-slide-item"</span>,
+        <span class="property">start</span>: <span class="string">"top 75%"</span>
+    }
+});
+
+<span class="comment">// Slide mask away</span>
+tl.<span class="function">to</span>(<span class="string">".gallery-slide-mask"</span>, {
+    <span class="property">scaleX</span>: <span class="number">0</span>,
+    <span class="property">transformOrigin</span>: <span class="string">"right center"</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">ease</span>: <span class="string">"power4.inOut"</span>
+});
+
+<span class="comment">// Scale image to normal</span>
+tl.<span class="function">to</span>(<span class="string">"img"</span>, {
+    <span class="property">scale</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>
+}, <span class="number">0</span>);</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Text slide from left</span>
+gsap.<span class="function">to</span>(<span class="string">".text-slide-inner"</span>, {
+    <span class="property">x</span>: <span class="number">0</span>,
+    <span class="property">duration</span>: <span class="number">0.8</span>,
+    <span class="property">stagger</span>: <span class="number">0.15</span>,
+    <span class="property">ease</span>: <span class="string">"power4.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".text-slide-container"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Alternating direction slides</span>
+gsap.<span class="function">to</span>(<span class="string">".stacked-card"</span>, {
+    <span class="property">x</span>: <span class="number">0</span>,
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">0.6</span>,
+    <span class="property">stagger</span>: <span class="number">0.15</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".stacked-slide"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // CARD SLIDE REVEALS
+        // =====================
+
+        // From left (clip-path)
+        gsap.to("#card1 .slide-card-content", {
+            clipPath: "inset(0 0 0 0)",
+            duration: 1,
+            ease: "power4.inOut",
+            scrollTrigger: {
+                trigger: "#card1",
+                start: "top 70%"
+            }
+        });
+
+        // From right (clip-path)
+        gsap.to("#card2 .slide-card-content", {
+            clipPath: "inset(0 0 0 0)",
+            duration: 1,
+            ease: "power4.inOut",
+            scrollTrigger: {
+                trigger: "#card2",
+                start: "top 70%"
+            }
+        });
+
+        // With mask overlay
+        const card3Tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#card3",
+                start: "top 70%"
+            }
+        });
+
+        card3Tl
+            .to("#card3 .slide-mask", {
+                scaleX: 0,
+                transformOrigin: "right center",
+                duration: 0.8,
+                ease: "power4.inOut"
+            });
+
+        // =====================
+        // TEXT SLIDE REVEALS
+        // =====================
+
+        gsap.to(".text-slide-inner", {
+            x: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power4.out",
+            scrollTrigger: {
+                trigger: "#textSlides",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // LIST SLIDE REVEALS
+        // =====================
+
+        gsap.to(".list-slide-item", {
+            x: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#listSlide",
+                start: "top 70%"
+            }
+        });
+
+        // =====================
+        // GALLERY MASK REVEALS
+        // =====================
+
+        gsap.utils.toArray(".gallery-slide-item").forEach((item, i) => {
+            const mask = item.querySelector(".gallery-slide-mask");
+            const img = item.querySelector("img");
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 75%"
+                }
+            });
+
+            // Alternate direction
+            const fromRight = i % 2 === 0;
+
+            tl.to(mask, {
+                scaleX: 0,
+                transformOrigin: fromRight ? "right center" : "left center",
+                duration: 0.8,
+                ease: "power4.inOut",
+                delay: i * 0.15
+            });
+
+            tl.to(img, {
+                scale: 1,
+                duration: 1.2,
+                ease: "power3.out"
+            }, 0);
+        });
+
+        // =====================
+        // STACKED ALTERNATING
+        // =====================
+
+        gsap.to(".stacked-card", {
+            x: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#stackedSlide",
+                start: "top 70%"
+            }
+        });
+    </script>
+</body>
+</html>

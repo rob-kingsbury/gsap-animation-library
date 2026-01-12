@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Device Scroll | GSAP Animation Library</title>
+    <style>
+        /* ============================================
+           3D DEVICE SCROLL
+           Device (tablet/phone/laptop) rotates into
+           view as user scrolls - inspired by skytune
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 span {
+            color: #c9a227;
+        }
+
+        .hero p {
+            opacity: 0.7;
+            max-width: 500px;
+        }
+
+        /* Device showcase section */
+        .device-section {
+            min-height: 200vh;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 100px 2rem;
+        }
+
+        .device-content {
+            position: sticky;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .device-text {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .device-text h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .device-text h2 span {
+            color: #c9a227;
+        }
+
+        .device-text p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .device-text .cta {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #c9a227;
+            color: #0a0a0a;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .device-text .cta:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 3D Device container */
+        .device-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+        }
+
+        .device {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            transform-style: preserve-3d;
+            /* Initial state - rotated away */
+            transform: rotateY(-35deg) rotateX(15deg) translateZ(-100px);
+            opacity: 0;
+        }
+
+        /* Tablet frame */
+        .device-frame {
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow:
+                0 50px 100px rgba(0,0,0,0.5),
+                0 20px 60px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .device-screen {
+            background: #111;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        .device-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Reflection effect */
+        .device::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,0.1) 0%,
+                transparent 50%
+            );
+            border-radius: 24px;
+            pointer-events: none;
+        }
+
+        /* Variant sections */
+        .variant-section {
+            min-height: 200vh;
+            position: relative;
+            padding: 100px 2rem;
+        }
+
+        .variant-content {
+            position: sticky;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .variant-content h2 {
+            font-size: 1.5rem;
+            color: #c9a227;
+            margin-bottom: 0.5rem;
+        }
+
+        .variant-content > p {
+            opacity: 0.6;
+            margin-bottom: 3rem;
+        }
+
+        /* Phone variant */
+        .phone-device {
+            width: 280px;
+            margin: 0 auto;
+            transform: rotateY(25deg) rotateX(-10deg) translateZ(-50px);
+            opacity: 0;
+        }
+
+        .phone-frame {
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 36px;
+            padding: 12px;
+            box-shadow:
+                0 50px 100px rgba(0,0,0,0.5),
+                0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .phone-screen {
+            background: #111;
+            border-radius: 28px;
+            overflow: hidden;
+            aspect-ratio: 9/19;
+        }
+
+        .phone-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Laptop variant */
+        .laptop-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 2000px;
+        }
+
+        .laptop-device {
+            transform-style: preserve-3d;
+            transform: rotateX(25deg);
+            opacity: 0;
+        }
+
+        .laptop-screen {
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 16px 16px 0 0;
+            padding: 12px 12px 0;
+            transform-origin: bottom center;
+            transform: rotateX(-80deg);
+        }
+
+        .laptop-screen-inner {
+            background: #111;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            aspect-ratio: 16/10;
+        }
+
+        .laptop-screen-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .laptop-base {
+            background: linear-gradient(180deg, #333 0%, #222 100%);
+            height: 16px;
+            border-radius: 0 0 16px 16px;
+            position: relative;
+        }
+
+        .laptop-base::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+        }
+
+        /* Multiple devices */
+        .multi-devices {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            perspective: 2000px;
+        }
+
+        .multi-devices .device {
+            max-width: 400px;
+        }
+
+        .multi-devices .phone-device {
+            width: 200px;
+        }
+
+        /* Code Reference */
+        .code-reference {
+            background: #0a0a0a;
+            padding: 4rem 2rem;
+        }
+
+        .code-reference h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #c9a227;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        @media (max-width: 900px) {
+            .device-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .device-text {
+                max-width: 100%;
+            }
+
+            .multi-devices {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <h1>3D Device <span>Scroll</span></h1>
+        <p>Devices rotate into view with perspective transforms as you scroll. Inspired by modern SaaS landing pages.</p>
+    </section>
+
+    <!-- Tablet showcase -->
+    <section class="device-section" id="tabletSection">
+        <div class="device-content">
+            <div class="device-text">
+                <h2>Beautiful on <span>every device</span></h2>
+                <p>Your content looks stunning across all screen sizes. Our responsive design ensures a perfect experience whether on desktop, tablet, or mobile.</p>
+                <a href="#" class="cta">Get Started</a>
+            </div>
+            <div class="device-wrapper">
+                <div class="device" id="tabletDevice">
+                    <div class="device-frame">
+                        <div class="device-screen">
+                            <img src="https://picsum.photos/800/600?random=1" alt="App screenshot">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Phone variant -->
+    <section class="variant-section" id="phoneSection">
+        <div class="variant-content">
+            <h2>Phone Variant</h2>
+            <p>Swings in from the side with rotation</p>
+            <div class="device-wrapper">
+                <div class="phone-device" id="phoneDevice">
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <img src="https://picsum.photos/400/850?random=2" alt="Mobile screenshot">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Laptop variant -->
+    <section class="variant-section" id="laptopSection">
+        <div class="variant-content">
+            <h2>Laptop Variant</h2>
+            <p>Screen opens up as you scroll</p>
+            <div class="laptop-wrapper">
+                <div class="laptop-device" id="laptopDevice">
+                    <div class="laptop-screen">
+                        <div class="laptop-screen-inner">
+                            <img src="https://picsum.photos/1600/1000?random=3" alt="Desktop screenshot">
+                        </div>
+                    </div>
+                    <div class="laptop-base"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multiple devices -->
+    <section class="variant-section" id="multiSection">
+        <div class="variant-content">
+            <h2>Multiple Devices</h2>
+            <p>Staggered entrance of multiple devices</p>
+            <div class="multi-devices">
+                <div class="device multi-device" data-index="0">
+                    <div class="device-frame">
+                        <div class="device-screen">
+                            <img src="https://picsum.photos/800/600?random=4" alt="Tablet screenshot">
+                        </div>
+                    </div>
+                </div>
+                <div class="phone-device multi-device" data-index="1">
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <img src="https://picsum.photos/400/850?random=5" alt="Phone screenshot">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Reference -->
+    <section class="code-reference">
+        <h2>Code Reference</h2>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// 3D Device scroll animation with ScrollTrigger</span>
+gsap.<span class="function">to</span>(<span class="string">".device"</span>, {
+    <span class="property">rotateY</span>: <span class="number">0</span>,
+    <span class="property">rotateX</span>: <span class="number">0</span>,
+    <span class="property">translateZ</span>: <span class="number">0</span>,
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".device-section"</span>,
+        <span class="property">start</span>: <span class="string">"top 60%"</span>,
+        <span class="property">end</span>: <span class="string">"top 20%"</span>,
+        <span class="property">scrub</span>: <span class="number">1</span>  <span class="comment">// Smooth scrubbing</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Laptop lid opening effect</span>
+gsap.<span class="function">to</span>(<span class="string">".laptop-screen"</span>, {
+    <span class="property">rotateX</span>: <span class="number">0</span>,
+    <span class="property">ease</span>: <span class="string">"power2.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".laptop-wrapper"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>,
+        <span class="property">end</span>: <span class="string">"top 30%"</span>,
+        <span class="property">scrub</span>: <span class="number">1.5</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Multiple devices with stagger</span>
+gsap.<span class="function">to</span>(<span class="string">".multi-device"</span>, {
+    <span class="property">rotateY</span>: <span class="number">0</span>,
+    <span class="property">rotateX</span>: <span class="number">0</span>,
+    <span class="property">opacity</span>: <span class="number">1</span>,
+    <span class="property">stagger</span>: <span class="number">0.2</span>,
+    <span class="property">duration</span>: <span class="number">1</span>,
+    <span class="property">ease</span>: <span class="string">"power3.out"</span>,
+    <span class="property">scrollTrigger</span>: {
+        <span class="property">trigger</span>: <span class="string">".multi-devices"</span>,
+        <span class="property">start</span>: <span class="string">"top 70%"</span>
+    }
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// CSS for 3D perspective</span>
+.<span class="property">device-wrapper</span> {
+    <span class="property">perspective</span>: <span class="number">1500px</span>;
+}
+
+.<span class="property">device</span> {
+    <span class="property">transform-style</span>: preserve-3d;
+    <span class="comment">/* Initial rotated state */</span>
+    <span class="property">transform</span>: rotateY(-35deg) rotateX(15deg) translateZ(-100px);
+    <span class="property">opacity</span>: <span class="number">0</span>;
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // =====================
+        // TABLET DEVICE
+        // =====================
+
+        gsap.to("#tabletDevice", {
+            rotateY: 0,
+            rotateX: 0,
+            translateZ: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#tabletSection",
+                start: "top 60%",
+                end: "top 20%",
+                scrub: 1
+            }
+        });
+
+        // =====================
+        // PHONE DEVICE
+        // =====================
+
+        gsap.to("#phoneDevice", {
+            rotateY: 0,
+            rotateX: 0,
+            translateZ: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#phoneSection",
+                start: "top 60%",
+                end: "top 20%",
+                scrub: 1
+            }
+        });
+
+        // =====================
+        // LAPTOP DEVICE
+        // =====================
+
+        // Fade in the laptop
+        gsap.to("#laptopDevice", {
+            opacity: 1,
+            duration: 0.5,
+            scrollTrigger: {
+                trigger: "#laptopSection",
+                start: "top 70%"
+            }
+        });
+
+        // Open the laptop lid
+        gsap.to(".laptop-screen", {
+            rotateX: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: "#laptopSection",
+                start: "top 60%",
+                end: "top 20%",
+                scrub: 1.5
+            }
+        });
+
+        // =====================
+        // MULTIPLE DEVICES
+        // =====================
+
+        // Set initial states
+        gsap.set(".multi-device", {
+            opacity: 0,
+            rotateY: (i) => i === 0 ? -35 : 25,
+            rotateX: 15,
+            translateZ: -50
+        });
+
+        gsap.to(".multi-device", {
+            rotateY: 0,
+            rotateX: 0,
+            translateZ: 0,
+            opacity: 1,
+            stagger: 0.3,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#multiSection",
+                start: "top 60%",
+                end: "top 20%",
+                scrub: 1
+            }
+        });
+    </script>
+</body>
+</html>
